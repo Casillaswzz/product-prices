@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>常用同行报价表</title>
+<style>
+  :root {
+    --bg: #f8f6fa; --card-bg: #ffffff; --text: #2d1b3d;
+    --text-secondary: #7a6490; --border: #e8e0f0;
+    --accent: #7c3aed; --accent-light: #f3eeff;
+    --danger: #dc3545; --danger-light: #fef2f2; --success: #059669;
+    --price-color: #6d28d9; --note-color: #5b21b6;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #2e1065 0%, #5b21b6 50%, #7c3aed 100%);
+    color: white; padding: 24px 24px 20px; text-align: center;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 2px; }
+  .header .subtitle { font-size: 0.85rem; opacity: 0.75; font-weight: 400; }
+  .header .update-time { font-size: 0.75rem; opacity: 0.55; margin-top: 2px; }
+  .toolbar { display: flex; justify-content: center; gap: 10px; padding: 16px 24px; flex-wrap: wrap; }
+  .btn { padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px; color: var(--text); white-space: nowrap; }
+  .btn:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .btn-save { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-save:hover { background: #6d28d9; }
+  .btn-export { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
+  .btn-reset { background: var(--danger-light); border-color: #fecaca; color: #991b1b; }
+  .search-bar { max-width: 1100px; margin: 8px auto 0; padding: 0; display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; padding: 9px 14px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.9rem; background: rgba(255,255,255,0.1); transition: all 0.2s; outline: none; color: white; }
+  .search-input::placeholder { color: rgba(255,255,255,0.45); }
+  .search-input:focus { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
+  .result-count { display: none; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 24px; }
+  body { padding-left: 205px; transition: padding-left 0.3s; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .tab { padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; color: var(--text-secondary); white-space: nowrap; user-select: none; }
+  .tab:hover { background: #f3eeff; border-color: #c4b5fd; }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3); }
+  .tab .count { font-size: 0.7rem; opacity: 0.7; margin-left: 3px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .summary-card { background: white; padding: 14px 18px; border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+  .summary-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .summary-card .label { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 2px; }
+  .summary-card .value { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+  .category { margin-bottom: 28px; scroll-margin-top: 160px; }
+  .category-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .category-header-left { display: flex; align-items: center; gap: 10px; }
+  .category-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .category-icon.mask { background: #ede9fe; } .category-icon.fins { background: #dbeafe; }
+  .category-icon.hook { background: #fce7f3; } .category-icon.light { background: #fef3c7; }
+  .category-icon.accessory { background: #e0f2fe; } .category-icon.gloves { background: #d1fae5; }
+  .category-icon.smb { background: #f3eeff; } .category-icon.wetsuit { background: #ccfbf1; }
+  .category-icon.computer { background: #fee2e2; } .category-icon.buoyancy { background: #e8e0f0; }
+  .category-icon.regulator { background: #fff7ed; } .category-icon.bag { background: #f1f5f9; }
+  .category-title { font-size: 1.15rem; font-weight: 700; }
+  .category-count { font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; }
+  .table-wrapper { background: var(--card-bg); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead { background: #faf8fc; border-bottom: 2px solid var(--border); }
+  thead th { padding: 10px 16px; text-align: left; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  thead th.col-name { width: 62%; } thead th.col-price { width: 26%; } thead th.col-actions { width: 12%; text-align: center; }
+  tbody td { padding: 9px 16px; border-bottom: 1px solid #f5f2f8; font-size: 0.9rem; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: #faf8fc; }
+  td[contenteditable] { outline: none; border-radius: 4px; transition: all 0.15s; cursor: text; }
+  td[contenteditable]:hover { background: #f5f3ff; box-shadow: inset 0 0 0 1px #c4b5fd; }
+  td[contenteditable]:focus { background: #f5f3ff; box-shadow: inset 0 0 0 2px var(--accent); cursor: text; }
+  td.product-name { font-weight: 500; word-break: break-all; }
+  td.price { text-align: right; font-weight: 600; font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
+  .price-simple { color: var(--price-color); }
+  .price-calc { color: var(--note-color); font-size: 0.85rem; }
+  .btn-del-row { width: 30px; height: 30px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; font-size: 1rem; color: #b8a8cc; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+  .btn-del-row:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+  .add-row-area { padding: 10px 16px; text-align: center; border-top: 1px dashed var(--border); }
+  .btn-add-row { padding: 7px 20px; border-radius: 6px; border: 1.5px dashed #c4b5fd; background: transparent; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-add-row:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: #2e1065; color: white; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; } .toast.success { background: #059669; }
+  .footer { text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.8rem; }
+  .hidden { display: none !important; }
+  mark { background: #ddd6fe; padding: 0 2px; border-radius: 2px; }
+  .sidebar { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 200; display: flex; flex-direction: column; gap: 1px; background: var(--card-bg); border: 1px solid var(--border); border-left: none; border-radius: 0 10px 10px 0; box-shadow: 2px 0 12px rgba(0,0,0,0.08); padding: 8px 6px; width: 185px; transition: transform 0.3s; }
+  .sidebar.collapsed { transform: translate(-100%, -50%); }
+  .sidebar-toggle { position: fixed; left: 185px; top: 50%; transform: translateY(-50%); z-index: 201; width: 20px; height: 54px; border-radius: 0 8px 8px 0; border: 1px solid var(--border); border-left: none; background: var(--card-bg); cursor: pointer; font-size: 0.65rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.06); writing-mode: vertical-rl; letter-spacing: 2px; }
+  .sidebar.collapsed ~ .sidebar-toggle, .sidebar-toggle.collapsed { left: 0; }
+  .sidebar-toggle:hover { color: var(--accent); background: var(--accent-light); }
+  .sidebar-item { display: flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 5px; border: none; background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; transition: all 0.15s; text-align: left; width: 100%; }
+  .sidebar-item:hover { background: #f3eeff; color: var(--text); }
+  .sidebar-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .sidebar-item .si-icon { font-size: 0.8rem; flex-shrink: 0; width: 18px; text-align: center; }
+  .sidebar-item .si-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-item .si-count { font-size: 0.55rem; opacity: 0.6; background: var(--border); padding: 0 4px; border-radius: 6px; line-height: 1.3; }
+  .back-to-top { position: fixed; bottom: 32px; right: 32px; z-index: 200; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card-bg); cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); box-shadow: var(--shadow-md); transition: all 0.3s; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+  .back-to-top.visible { opacity: 1; pointer-events: auto; }
+  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3); }
+  @media (max-width: 768px) {
+    .header h1 { font-size: 1.3rem; } .container { padding: 10px; } .tabs { gap: 4px; }
+    .tab { padding: 5px 10px; font-size: 0.75rem; }
+    thead th, tbody td { padding: 7px 10px; font-size: 0.8rem; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .toolbar { gap: 6px; }
+    .btn { padding: 6px 12px; font-size: 0.78rem; }
+    .sidebar, .sidebar-toggle { display: none; } .back-to-top { bottom: 20px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
+    body { padding-left: 0; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #150f22; --card-bg: #1e172b; --text: #ddd0f0; --text-secondary: #9a85b8; --border: #352848; --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 6px rgba(0,0,0,0.4); }
+    thead { background: #1a1225; } tbody tr:hover { background: #1a1225; }
+    tbody td { border-bottom-color: #221a30; }
+    td[contenteditable]:hover { background: #261d38; } td[contenteditable]:focus { background: #261d38; }
+    .search-input { background: rgba(255,255,255,0.05); }
+    .tab { background: #1e172b; border-color: #352848; } .btn { background: #1e172b; border-color: #352848; }
+    .btn-save { background: var(--accent); } .summary-card { background: #1e172b; } .btn-add-row { border-color: #4a3a60; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🤝 常用同行报价表</h1>
+  <div class="subtitle">Competitive Price Reference · 双击单元格即可编辑</div>
+  <div class="update-time" id="updateTime">数据已加载</div>
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
+    <span class="result-count" id="resultCount"></span>
+  </div>
+</div>
+
+<nav class="sidebar" id="sidebar"></nav>
+<button class="sidebar-toggle" id="sidebarToggle" title="展开/收起分类导航">分类导航</button>
+<button class="back-to-top" id="backToTop" title="回到顶部">⬆</button>
+
+<div class="container">
+  <div class="toolbar">
+    <button class="btn btn-save" id="btnSave"><span class="icon">💾</span> 保存更改</button>
+    <button class="btn btn-export" id="btnExport"><span class="icon">📥</span> 导出 CSV</button>
+    <button class="btn btn-reset" id="btnReset"><span class="icon">🔄</span> 恢复原始数据</button>
+    <span style="font-size:0.78rem;color:var(--text-secondary);display:flex;align-items:center;margin-left:8px;">💡 双击单元格编辑 | 改动后点保存 | Ctrl+S 快捷保存</span>
+  </div>
+  <div class="summary-grid" id="summaryGrid"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="content"></div>
+  <div class="footer"><p>数据来源：常用同行报价.xlsx</p></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  var ORIGINAL_DATA = [
+    { id: "mask", name: "面镜系列", icon: "🥽", iconClass: "mask", columns: ["产品名称", "同行报价"], products: [
+      ["Gull Vader", "720"], ["Gull Vader Fanette", "720"], ["Gull 复古面镜", "390"],
+      ["GULL LUVOS UV380", "1090"], ["GULL LUVOS UV420", "985"],
+      ["Lapis自由潜水面镜UM2005系列", "294"], ["TUSA 自由潜面镜UM2005WWD（UV380）", "350"],
+      ["Tusa M110 银角", "720"], ["Tusa M110 S", "780"], ["Tusa M1010", "515"],
+      ["Tusa M1010 S", "898"], ["Tusa M212", "405"], ["Tusa M212 近视镜片", "228"],
+      ["TUSA M19", "1118"], ["TUSA M1010F", "586"], ["TUSA M-1007", "1120"], ["TUSA SP170", "211"],
+      ["Apollo 60cc 铝合金", "850-900"], ["Apollo 85cc 铝合金", "850-900"], ["Apollo 95cc 铝合金", "850-900"],
+      ["Apollo进口500-600镜片", "320"], ["Brancllla 自由潜面镜", "标价7折"],
+      ["Aqualung大神面镜", "490"], ["国产Mantis LV镀膜镜片", "200/片"],
+      ["国产Apollo", "105"], ["国产镜片", "40/片"], ["四元素 Seeker", "1800×0.7"],
+      ["四元素面镜带", "227.5"], ["Divevolk 铂金版防水壳套装", "2898×0.65"],
+      ["防水壳双手托盘", "598×0.7"]
+    ]},
+    { id: "fins", name: "脚蹼系列", icon: "🦶", iconClass: "fins", columns: ["产品名称", "同行报价"], products: [
+      ["Mares 四线金刚", "750"], ["Supermew", "850-880"], ["Supermew XX", "850-880"],
+      ["Scubapro Go Sport", "680"], ["Gull GT", "1980"], ["Diverite", "1150"],
+      ["OMS Jetfin", "960"], ["抹茶 SB3", "2836"]
+    ]},
+    { id: "hook", name: "流钩系列", icon: "🪝", iconClass: "hook", columns: ["产品名称", "同行报价"], products: [
+      ["ISLET PTERO流钩", "318"], ["ISLET PTERO流钩 灰色 标准版", "318"],
+      ["ISLET 流钩黑色 豪华版", "365"]
+    ]},
+    { id: "light", name: "手电系列", icon: "🔦", iconClass: "light", columns: ["产品名称", "同行报价"], products: [
+      ["虎鲸 X7", "339"], ["虎鲸D570 GL（绿激光）", "440"],
+      ["X-Adventurer M1500", "200"], ["奥瞳J1", "228"], ["SUPE RD80 V2 黑色", "187.6"]
+    ]},
+    { id: "accessory", name: "配件系列", icon: "🔧", iconClass: "accessory", columns: ["产品名称", "同行报价"], products: [
+      ["鹦鹉螺舒适咬嘴", "30"], ["Nautilus热塑咬嘴", "20"], ["多功能叮叮棒", "16"],
+      ["Nautilus 多功能摇铃", "80"], ["TACTIC 绳扣", "5"], ["TACTIC 小双头 炫彩", "28"],
+      ["TACTIC 单头扣 炫彩", "25"], ["Tactic 配重包 2kg /对", "70"],
+      ["绵羊海兔抱枕", "230"], ["QMD的高压管", "280"], ["Akuana 管线保护套", "30"],
+      ["极械 Manta蓝色", "2100"]
+    ]},
+    { id: "gloves", name: "手套&头套&靴子系列", icon: "🧤", iconClass: "gloves", columns: ["产品名称", "同行报价"], products: [
+      ["四元素 3mm 头套", "650×0.7=455"], ["四元素 5mm 头套", "770×0.7"],
+      ["四元素 3mm 手套", "500.5"], ["四元素面镜带", "325×0.75=243.75"],
+      ["Scubapro Tropic 手套", "99"], ["Bestdive 小丑鱼头套", "188×0.5"],
+      ["SEAC 薄底靴5mm", "250"], ["STEADY 靴子", "289"]
+    ]},
+    { id: "smb", name: "象拔&线轮", icon: "🛟", iconClass: "smb", columns: ["产品名称", "同行报价"], products: [
+      ["Tactic 常规款 1.5米 象拔", "100"], ["Tactic 常规款 1.8米 象拔", "105"],
+      ["30米实色-线轮", "270"], ["塑料线轮 30米", "58"],
+      ["Islet 铝合金30米 钛灰轮绿线2.0版", "310"], ["ISLET 碳纤维夜光-30米线轴", "490"],
+      ["Islet 铝合金15米 黑轮绿线2.0版", "270"], ["ISLET 马卡龙蓝框粉线 15米 2.0转轴板", "270"],
+      ["ISLET ATOM 21米线轮", "280"], ["鹦鹉螺 15米 金色框红线", "128"]
+    ]},
+    { id: "wetsuit", name: "湿衣&斗篷&背心&短裤", icon: "🦺", iconClass: "wetsuit", columns: ["产品名称", "同行报价"], products: [
+      ["Seaplay连帽背心", "250"], ["Helios 技潜短裤", "498×0.75"],
+      ["Aquaplay 帽子 联名款", "189×0.75"], ["安泊来 Aquaplay 斗篷 黑拼玫粉猫耳", "330"],
+      ["T-FLEX SHARK 鲨鱼 水母衣", "383.4"], ["TDI 潜水斗篷", "180"],
+      ["NF-技潜短裤", "442"], ["第四元素-防晒衣", "670×0.75=502.5"],
+      ["四元素PROTEUS.II-三毫米连体湿衣", "4820×0.7=3374"]
+    ]},
+    { id: "computer", name: "电脑表系列", icon: "⌚", iconClass: "computer", columns: ["产品名称", "同行报价"], products: [
+      ["SUUNTO NAUTIC S", "3159"], ["SUUNTO NAUTIC", "4500"], ["SUUNTO OCEAN", "4699"],
+      ["NAUTIC+TANKPOD套装", "6224.25"], ["TANKPOD", "2100"],
+      ["Shearwater Peregrine Tx", "3850"], ["佳明 G1", "3043"], ["佳明 G2", "4233"],
+      ["佳明mk3i 钛合金古铜色43mm", ""], ["GARMIN Mk3i，51mm", "10183"]
+    ]},
+    { id: "buoyancy", name: "浮力调节器系列", icon: "🎈", iconClass: "buoyancy", columns: ["产品名称", "同行报价"], products: [
+      ["CRESSI Travelight BCD 蓝色", "3007.5"],
+      ["TACTIC 黑色30LBS考杜拉气囊+银色铝合金背板", "2250"],
+      ["Razor 4.0", "6180"], ["Razor 4.0 Ti", "7000"]
+    ]},
+    { id: "regulator", name: "调节器系列", icon: "⚙️", iconClass: "regulator", columns: ["产品名称", "同行报价"], products: [
+      ["APEKS Xtx50 侧挂套装", "9926"],
+      ["Atomic B2+Z3+DBT单表", "5175+2070+690×1.1=8004"],
+      ["Atomic B2X 侧挂套装-水货", "7245×2+2200=16690"],
+      ["Atomic B2X 侧挂套装-行货", "8765×2+790+1150=19470"]
+    ]},
+    { id: "bag", name: "箱包系列", icon: "🎒", iconClass: "bag", columns: ["产品名称", "同行报价"], products: [
+      ["AQUAPLAY-薄荷色斜挎包", "189×0.7"], ["HUAYU 脚蹼包 航班标准版", "130"],
+      ["鹦鹉螺网袋包", "90"], ["鹦鹉螺网袋包 黑色加强版", "130"],
+      ["Halcyon 包", "1063"]
+    ]}
+  ];
+
+  var categories = [];
+  function loadData() {
+    var saved = localStorage.getItem("competitor-price-data");
+    if (saved) { try { categories = JSON.parse(saved); document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）"; return; } catch(e) {} }
+    resetToOriginal();
+  }
+  function resetToOriginal() {
+    categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+    document.getElementById("updateTime").textContent = "数据来源：常用同行报价.xlsx";
+  }
+  var toastTimer;
+  function showToast(msg, type) {
+    var el = document.getElementById("toast"); el.textContent = msg;
+    el.className = "toast " + (type || "") + " show";
+    clearTimeout(toastTimer); toastTimer = setTimeout(function() { el.classList.remove("show"); }, 2000);
+  }
+  function syncDOMtoData() {
+    document.querySelectorAll(".category").forEach(function(catDiv) {
+      var catId = catDiv.id.replace("cat-", ""), cat = null;
+      for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+      if (!cat) return;
+      catDiv.querySelectorAll("tbody tr").forEach(function(row) {
+        var origIdx = parseInt(row.getAttribute("data-idx"), 10);
+        var nc = row.querySelector(".product-name"), pc = row.querySelector(".price");
+        if (nc && pc && origIdx >= 0 && origIdx < cat.products.length)
+          cat.products[origIdx] = [nc.textContent.trim(), pc.textContent.trim()];
+      });
+    });
+  }
+  function saveData() {
+    syncDOMtoData();
+    localStorage.setItem("competitor-price-data", JSON.stringify(categories));
+    document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存：" + new Date().toLocaleString("zh-CN") + "）";
+    renderAll(document.getElementById("searchInput").value); showToast("✅ 数据已保存", "success");
+  }
+  function resetData() {
+    if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
+      resetToOriginal(); localStorage.removeItem("competitor-price-data");
+      renderAll(""); document.getElementById("searchInput").value = ""; showToast("🔄 已恢复为原始数据");
+    }
+  }
+  function exportCSV() {
+    syncDOMtoData(); var csv = "﻿";
+    categories.forEach(function(cat) {
+      csv += "\n" + cat.name + "\n" + cat.columns.join(",") + "\n";
+      cat.products.forEach(function(p) { csv += '"' + (p[0]||"").replace(/"/g, '""') + '","' + (p[1]||"").replace(/"/g, '""') + '"\n'; });
+    });
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "常用同行报价_" + new Date().toISOString().slice(0,10) + ".csv"; a.click();
+    URL.revokeObjectURL(url); showToast("📥 CSV 文件已下载");
+  }
+  function getPriceClass(priceStr) {
+    if (!priceStr) return "price-simple";
+    if (/[×xX*=+\-]/.test(priceStr) && priceStr.length > 6) return "price-calc";
+    return "price-simple";
+  }
+  function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    var escaped = escapeHtml(text), q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escaped.replace(new RegExp("(" + q + ")", "gi"), '<mark>$1</mark>');
+  }
+  function escapeHtml(str) { var div = document.createElement("div"); div.textContent = str; return div.innerHTML; }
+  function renderAll(filter) {
+    filter = filter || ""; var scrollY = window.scrollY, filterLower = filter.toLowerCase().trim(), totalVisible = 0;
+    var summaryGrid = document.getElementById("summaryGrid"), tabsDiv = document.getElementById("tabs"),
+        content = document.getElementById("content"), resultCount = document.getElementById("resultCount");
+    summaryGrid.innerHTML = categories.map(function(cat) {
+      var visible = 0; cat.products.forEach(function(p) { if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visible++; });
+      return '<div class="summary-card" data-cat="' + cat.id + '"><div class="label">' + cat.icon + ' ' + cat.name + '</div><div class="value">' + visible + '</div><div style="font-size:0.75rem;color:var(--text-secondary)">款产品</div></div>';
+    }).join("");
+    tabsDiv.innerHTML = '<button class="tab active" data-cat="all">📋 全部</button>' + categories.map(function(cat) {
+      return '<button class="tab" data-cat="' + cat.id + '">' + cat.icon + ' ' + cat.name + '<span class="count">' + cat.products.length + '</span></button>';
+    }).join("");
+    content.innerHTML = categories.map(function(cat) {
+      var visibleIndices = []; cat.products.forEach(function(p, i) { if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visibleIndices.push({ p: p, i: i }); });
+      totalVisible += visibleIndices.length;
+      return '<div class="category ' + (visibleIndices.length === 0 ? "hidden" : "") + '" id="cat-' + cat.id + '">'
+        + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
+        + '<div class="table-wrapper"><table><thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead><tbody>'
+        + visibleIndices.map(function(item) {
+            return '<tr data-idx="' + item.i + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button></td></tr>';
+          }).join("")
+        + '</tbody></table><div class="add-row-area"><button class="btn-add-row" data-cat="' + cat.id + '">＋ 添加新产品</button></div></div></div>';
+    }).join("");
+    resultCount.innerHTML = filterLower ? '搜索 "<strong>' + escapeHtml(filter) + '</strong>"：<strong>' + totalVisible + '</strong> 条结果' : '共 <strong>' + totalVisible + '</strong> 款产品';
+    renderSidebar(); requestAnimationFrame(function() { window.scrollTo(0, scrollY); });
+  }
+  function renderSidebar() {
+    document.getElementById("sidebar").innerHTML = categories.map(function(cat) {
+      return '<button class="sidebar-item" data-cat="' + cat.id + '"><span class="si-icon">' + cat.icon + '</span><span class="si-name">' + cat.name + '</span><span class="si-count">' + cat.products.length + '</span></button>';
+    }).join("");
+  }
+  function updateActiveSidebarItem() {
+    var bestId = null, bestTop = Infinity;
+    categories.forEach(function(cat) {
+      var el = document.getElementById("cat-" + cat.id); if (!el || el.classList.contains("hidden")) return;
+      var dist = Math.abs(el.getBoundingClientRect().top - 170);
+      if (el.getBoundingClientRect().top <= 200 && dist < bestTop) { bestTop = dist; bestId = cat.id; }
+    });
+    document.querySelectorAll(".sidebar-item").forEach(function(item) {
+      item.classList.remove("active"); if (item.getAttribute("data-cat") === bestId) item.classList.add("active");
+    });
+  }
+  function addRow(catId) {
+    syncDOMtoData(); var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat) return; cat.products.push(["新产品名称", "0"]);
+    renderAll(document.getElementById("searchInput").value);
+    setTimeout(function() {
+      var catDiv = document.getElementById("cat-" + catId); if (!catDiv) return;
+      var rows = catDiv.querySelectorAll("tbody tr"); if (!rows.length) return;
+      var nameCell = rows[rows.length - 1].querySelector(".product-name");
+      if (nameCell) { nameCell.focus(); var r = document.createRange(); r.selectNodeContents(nameCell); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+    }, 100);
+  }
+  function deleteRow(catId, idx) {
+    syncDOMtoData(); var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat || idx < 0 || idx >= cat.products.length) return;
+    if (!confirm("确定删除「" + cat.products[idx][0] + "」吗？")) return;
+    cat.products.splice(idx, 1); saveData(); showToast("🗑️ 已删除");
+  }
+  document.addEventListener("click", function(e) {
+    var t = e.target;
+    if (t.closest(".btn-del-row")) { var b = t.closest(".btn-del-row"); deleteRow(b.getAttribute("data-cat"), parseInt(b.getAttribute("data-idx"), 10)); return; }
+    if (t.closest(".btn-add-row")) { addRow(t.closest(".btn-add-row").getAttribute("data-cat")); return; }
+    if (t.closest(".summary-card")) { scrollToCategory(t.closest(".summary-card").getAttribute("data-cat")); return; }
+    if (t.closest(".sidebar-item")) { scrollToCategory(t.closest(".sidebar-item").getAttribute("data-cat")); return; }
+    if (t.closest(".tab")) {
+      var tab = t.closest(".tab"), catId = tab.getAttribute("data-cat");
+      if (catId === "all") { document.querySelectorAll(".category").forEach(function(c) { c.classList.remove("hidden"); }); document.getElementById("searchInput").value = ""; renderAll(""); document.querySelectorAll(".tab").forEach(function(tb) { tb.classList.remove("active"); }); tab.classList.add("active"); }
+      else scrollToCategory(catId);
+    }
+  });
+  document.addEventListener("input", function(e) {
+    if (e.target.matches("td.price[contenteditable]")) {
+      var text = e.target.textContent.trim(); e.target.classList.remove("price-simple", "price-calc");
+      if (/[×xX*=+\-]/.test(text) && text.length > 6) e.target.classList.add("price-calc");
+      else e.target.classList.add("price-simple");
+    }
+  });
+  document.addEventListener("keydown", function(e) { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); } });
+  function scrollToCategory(id) {
+    var el = document.getElementById("cat-" + id);
+    if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); }); var tab = document.querySelector('.tab[data-cat="' + id + '"]'); if (tab) tab.classList.add("active"); }
+  }
+  document.getElementById("btnSave").addEventListener("click", saveData);
+  document.getElementById("btnExport").addEventListener("click", exportCSV);
+  document.getElementById("btnReset").addEventListener("click", resetData);
+  document.addEventListener("DOMContentLoaded", function() {
+    loadData(); renderAll("");
+    var input = document.getElementById("searchInput"); input.addEventListener("input", function() { renderAll(input.value); });
+    input.addEventListener("keydown", function(e) { if (e.key === "Escape") { input.value = ""; renderAll(""); } });
+    var sidebar = document.getElementById("sidebar"), sidebarToggle = document.getElementById("sidebarToggle"), sidebarVisible = true, sidebarWidth = 205;
+    function applySidebarOffset() { document.body.style.paddingLeft = sidebarVisible ? sidebarWidth + "px" : "22px"; if (sidebarVisible) { sidebar.classList.remove("collapsed"); sidebarToggle.classList.remove("collapsed"); } else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); } }
+    sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); }); applySidebarOffset();
+    var backToTop = document.getElementById("backToTop"); window.addEventListener("scroll", function() { if (window.scrollY > 400) backToTop.classList.add("visible"); else backToTop.classList.remove("visible"); updateActiveSidebarItem(); });
+    backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); }); setTimeout(updateActiveSidebarItem, 200);
+  });
+})();
+</script>
+</body>
+</html>
