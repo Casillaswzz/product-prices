@@ -551,12 +551,17 @@
 
   function renderSidebar() {
     var sidebar = document.getElementById("sidebar");
-    sidebar.innerHTML = categories.map(function(cat) {
+    var html = categories.map(function(cat) {
       return '<button class="sidebar-item" data-cat="' + cat.id + '">'
         + '<span class="si-icon">' + cat.icon + '</span>'
         + '<span class="si-name">' + cat.name + '</span>'
         + '<span class="si-count">' + cat.products.length + '</span></button>';
     }).join("");
+    html += '<div style="border-top:1px solid var(--border);margin:6px 4px 4px;"></div>';
+    html += '<a href="wholesale.html" style="text-decoration:none;display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;font-size:0.7rem;color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.background=\'#e0f2fe\';this.style.color=\'#0ea5e9\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'var(--text-secondary)\'"><span style="font-size:0.8rem;">📦</span> 产品出库价格</a>';
+    html += '<a href="competitor.html" style="text-decoration:none;display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;font-size:0.7rem;color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.background=\'#eef2ff\';this.style.color=\'#4f46e5\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'var(--text-secondary)\'"><span style="font-size:0.8rem;">🤝</span> 常用同行报价</a>';
+    html += '<div style="font-size:0.6rem;color:var(--text-secondary);text-align:center;margin-top:4px;opacity:0.5;">📍 产品零售价格</div>';
+    sidebar.innerHTML = html;
   }
 
   function updateActiveSidebarItem() {
