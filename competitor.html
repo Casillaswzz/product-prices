@@ -380,7 +380,12 @@
   document.addEventListener("keydown", function(e) { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); } });
   function scrollToCategory(id) {
     var el = document.getElementById("cat-" + id);
-    if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); }); var tab = document.querySelector('.tab[data-cat="' + id + '"]'); if (tab) tab.classList.add("active"); }
+    if (el) {
+      var top = el.getBoundingClientRect().top + window.pageYOffset - 200;
+      window.scrollTo({ top: top, behavior: "smooth" });
+      document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
+      var tab = document.querySelector('.tab[data-cat="' + id + '"]'); if (tab) tab.classList.add("active");
+    }
   }
   document.getElementById("btnSave").addEventListener("click", saveData);
   document.getElementById("btnExport").addEventListener("click", exportCSV);

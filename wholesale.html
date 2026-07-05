@@ -612,7 +612,7 @@
   function scrollToCategory(id) {
     var el = document.getElementById("cat-" + id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      var top = el.getBoundingClientRect().top + window.pageYOffset - 200; window.scrollTo({ top: top, behavior: "smooth" });
       document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
       var tab = document.querySelector('.tab[data-cat="' + id + '"]');
       if (tab) tab.classList.add("active");
