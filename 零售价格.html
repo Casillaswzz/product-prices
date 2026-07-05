@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品零售价格表</title>
+<style>
+  :root {
+    --bg: #f5f8fb;
+    --card-bg: #ffffff;
+    --text: #1a2a3c;
+    --text-secondary: #54708a;
+    --border: #dce6f0;
+    --accent: #2563eb;
+    --accent-light: #e8f0fe;
+    --danger: #dc3545;
+    --danger-light: #fef2f2;
+    --success: #059669;
+    --price-color: #1d4ed8;
+    --note-color: #1e40af;
+    --cb-color: #7c3aed;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 50%, #2563eb 100%);
+    color: white;
+    padding: 24px 24px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 2px; }
+  .header .subtitle { font-size: 0.85rem; opacity: 0.75; font-weight: 400; }
+  .header .update-time { font-size: 0.75rem; opacity: 0.55; margin-top: 2px; }
+
+  .toolbar {
+    display: flex; justify-content: center; gap: 10px;
+    padding: 16px 24px; flex-wrap: wrap;
+  }
+  .btn {
+    padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: white; cursor: pointer; font-size: 0.85rem; font-weight: 500;
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    color: var(--text); white-space: nowrap;
+  }
+  .btn:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .btn-save { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-save:hover { background: #1d4ed8; }
+  .btn-export { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+  .btn-reset { background: var(--danger-light); border-color: #fecaca; color: #991b1b; }
+  .btn .icon { font-size: 1rem; }
+
+  .search-bar {
+    max-width: 1100px; margin: 8px auto 0; padding: 0;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .search-input {
+    flex: 1; padding: 9px 14px;
+    border: 1.5px solid rgba(255,255,255,0.2); border-radius: 8px;
+    font-size: 0.9rem; background: rgba(255,255,255,0.1);
+    transition: all 0.2s; outline: none; color: white;
+  }
+  .search-input::placeholder { color: rgba(255,255,255,0.45); }
+  .search-input:focus { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
+  .result-count { display: none; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 24px; }
+  body { padding-left: 205px; transition: padding-left 0.3s; }
+
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;
+  }
+  .tab {
+    padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: white; cursor: pointer; font-size: 0.85rem; font-weight: 500;
+    transition: all 0.2s; color: var(--text-secondary); white-space: nowrap; user-select: none;
+  }
+  .tab:hover { background: #e8f0fe; border-color: #93b8f5; }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
+  .tab .count { font-size: 0.7rem; opacity: 0.7; margin-left: 3px; }
+
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .summary-card {
+    background: white; padding: 14px 18px; border-radius: 10px;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .summary-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .summary-card .label { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 2px; }
+  .summary-card .value { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+
+  .category { margin-bottom: 28px; scroll-margin-top: 160px; }
+  .category-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .category-header-left { display: flex; align-items: center; gap: 10px; }
+  .category-icon {
+    width: 36px; height: 36px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+  }
+  .category-icon.mask { background: #fef3c7; }
+  .category-icon.regulator { background: #fce7f3; }
+  .category-icon.buoyancy { background: #d1fae5; }
+  .category-icon.snorkel { background: #dbeafe; }
+  .category-icon.wetsuit { background: #ede9fe; }
+  .category-icon.boots { background: #e0f2fe; }
+  .category-icon.light { background: #fee2e2; }
+  .category-icon.fins { background: #ccfbf1; }
+  .category-icon.computer { background: #fef3c7; }
+  .category-icon.accessory { background: #f1f5f9; }
+  .category-title { font-size: 1.15rem; font-weight: 700; }
+  .category-count { font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; }
+
+  .table-wrapper { background: var(--card-bg); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead { background: #f5f8fb; border-bottom: 2px solid var(--border); }
+  thead th { padding: 10px 16px; text-align: left; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  thead th.col-name { width: 62%; } thead th.col-price { width: 26%; } thead th.col-actions { width: 12%; text-align: center; }
+  tbody td { padding: 9px 16px; border-bottom: 1px solid #f0f4f8; font-size: 0.9rem; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: #f5f8fb; }
+
+  td[contenteditable] { outline: none; border-radius: 4px; transition: all 0.15s; cursor: text; }
+  td[contenteditable]:hover { background: #eff6ff; box-shadow: inset 0 0 0 1px #93c5fd; }
+  td[contenteditable]:focus { background: #eff6ff; box-shadow: inset 0 0 0 2px var(--accent); cursor: text; }
+  td.product-name { font-weight: 500; word-break: break-all; }
+  td.price { text-align: right; font-weight: 600; font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
+  .price-simple { color: var(--price-color); }
+  .price-range { color: var(--note-color); font-size: 0.85rem; }
+
+  .row-actions { text-align: center; white-space: nowrap; }
+  .btn-del-row {
+    width: 30px; height: 30px; border-radius: 6px; border: 1px solid transparent;
+    background: transparent; cursor: pointer; font-size: 1rem; color: #c4b5a5;
+    transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .btn-del-row:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+
+  .add-row-area { padding: 10px 16px; text-align: center; border-top: 1px dashed var(--border); }
+  .btn-add-row {
+    padding: 7px 20px; border-radius: 6px; border: 1.5px dashed #d4c4b0;
+    background: transparent; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary);
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-add-row:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #1e3a5f; color: white; padding: 10px 24px; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 500; z-index: 999; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .toast.success { background: #059669; }
+  .footer { text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.8rem; }
+  .hidden { display: none !important; }
+  mark { background: #bfdbfe; padding: 0 2px; border-radius: 2px; }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+    z-index: 200; display: flex; flex-direction: column; gap: 1px;
+    background: var(--card-bg); border: 1px solid var(--border); border-left: none;
+    border-radius: 0 10px 10px 0; box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+    padding: 8px 6px; width: 185px; transition: transform 0.3s;
+  }
+  .sidebar.collapsed { transform: translate(-100%, -50%); }
+  .sidebar-toggle {
+    position: fixed; left: 185px; top: 50%; transform: translateY(-50%);
+    z-index: 201; width: 20px; height: 54px; border-radius: 0 8px 8px 0;
+    border: 1px solid var(--border); border-left: none; background: var(--card-bg);
+    cursor: pointer; font-size: 0.65rem; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+    writing-mode: vertical-rl; letter-spacing: 2px;
+  }
+  .sidebar.collapsed ~ .sidebar-toggle, .sidebar-toggle.collapsed { left: 0; }
+  .sidebar-toggle:hover { color: var(--accent); background: var(--accent-light); }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 5px; padding: 5px 9px;
+    border-radius: 5px; border: none; background: transparent; cursor: pointer;
+    font-size: 0.73rem; color: var(--text-secondary); white-space: nowrap;
+    transition: all 0.15s; text-align: left; width: 100%;
+  }
+  .sidebar-item:hover { background: #e8f0fe; color: var(--text); }
+  .sidebar-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .sidebar-item .si-icon { font-size: 0.85rem; flex-shrink: 0; width: 20px; text-align: center; }
+  .sidebar-item .si-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-item .si-count { font-size: 0.58rem; opacity: 0.6; background: var(--border); padding: 0 4px; border-radius: 6px; line-height: 1.3; }
+
+  /* Back to Top */
+  .back-to-top {
+    position: fixed; bottom: 32px; right: 32px; z-index: 200;
+    width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: var(--card-bg); cursor: pointer; font-size: 1.2rem;
+    color: var(--text-secondary); box-shadow: var(--shadow-md);
+    transition: all 0.3s; opacity: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .back-to-top.visible { opacity: 1; pointer-events: auto; }
+  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
+
+  @media (max-width: 768px) {
+    .header h1 { font-size: 1.3rem; }
+    .container { padding: 10px; }
+    .tabs { gap: 4px; }
+    .tab { padding: 5px 10px; font-size: 0.75rem; }
+    thead th, tbody td { padding: 7px 10px; font-size: 0.8rem; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .toolbar { gap: 6px; }
+    .btn { padding: 6px 12px; font-size: 0.78rem; }
+    .sidebar, .sidebar-toggle { display: none; }
+    .back-to-top { bottom: 20px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
+    body { padding-left: 0; }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a; --card-bg: #1e293b; --text: #e2e8f0;
+      --text-secondary: #94a3b8; --border: #334155;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+    }
+    thead { background: #1a2332; }
+    tbody tr:hover { background: #1a2332; }
+    tbody td { border-bottom-color: #1e293b; }
+    td[contenteditable]:hover { background: #1e2e4a; }
+    td[contenteditable]:focus { background: #1e2e4a; }
+    .search-input { background: rgba(255,255,255,0.05); }
+    .tab { background: #1e293b; border-color: #334155; }
+    .btn { background: #1e293b; border-color: #334155; }
+    .btn-save { background: var(--accent); }
+    .summary-card { background: #1e293b; }
+    .btn-add-row { border-color: #475569; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🪸 产品零售价格表</h1>
+  <div class="subtitle">Diving Equipment Retail Price List · 双击单元格即可编辑</div>
+  <div class="update-time" id="updateTime">数据已加载</div>
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
+    <span class="result-count" id="resultCount"></span>
+  </div>
+</div>
+
+<nav class="sidebar" id="sidebar"></nav>
+<button class="sidebar-toggle" id="sidebarToggle" title="展开/收起分类导航">分类导航</button>
+<button class="back-to-top" id="backToTop" title="回到顶部">⬆</button>
+
+<div class="container">
+  <div class="toolbar">
+    <button class="btn btn-save" id="btnSave"><span class="icon">💾</span> 保存更改</button>
+    <button class="btn btn-export" id="btnExport"><span class="icon">📥</span> 导出 CSV</button>
+    <button class="btn btn-reset" id="btnReset"><span class="icon">🔄</span> 恢复原始数据</button>
+    <span style="font-size:0.78rem;color:var(--text-secondary);display:flex;align-items:center;margin-left:8px;">💡 双击单元格编辑 | 改动后记得点保存 | Ctrl+S 快捷保存</span>
+  </div>
+  <div class="summary-grid" id="summaryGrid"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="content"></div>
+  <div class="footer"><p>数据来源：产品零售价格.docx</p></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  var ORIGINAL_DATA = [
+    {
+      id: "mask", name: "面镜系列", icon: "🥽", iconClass: "mask",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["TUSA M110", "890 / 1050"], ["TUSA M19", "700"], ["TUSA M1011", "625"],
+        ["TUSA M1010", "780 / 800"], ["TUSA M1010F", "755"], ["TUSA M1007", "1120"],
+        ["TUSA M2001", ""], ["TUSA M3001", "530 ~ 550"], ["TUSA M212 白框黑胶", "505 / 530"],
+        ["国产近视镜片", "99/片"],
+        ["Apollo 不锈钢 UVAR", "2060"], ["Apollo 不锈钢 黑色 type D", "2280"],
+        ["Apollo 60cc", "950"], ["Apollo 85cc", "950 ~ 1020"], ["Apollo 95cc", "980"],
+        ["Apollo 95cc 不锈钢镀膜银色", "2400"], ["Apollo 95cc 金色镀膜款", "2680"],
+        ["Apollo 防雾贴", "120"],
+        ["Gull Vader 25款", "860 ~ 950"], ["Gull Vader Fanette 仙女粉 白胶", "880 ~ 920"],
+        ["Cressi Z2", "549"], ["进口大神面镜", "520"], ["国产大神面镜", "88"],
+        ["复古面镜", "480"], ["国产Apollo面镜", "198"], ["第四元素 Seeker 面镜", "1500"],
+        ["SCUBAPRO CRYSTAL VU", "560"]
+      ]
+    },
+    {
+      id: "regulator", name: "调节器系列", icon: "⚙️", iconClass: "regulator",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["ATOMIC TFX DIN", "16500"], ["ATOMIC SS1 钛", "3800"],
+        ["ATOMIC B2 DIN+Z3+QMD单表", "8500"]
+      ]
+    },
+    {
+      id: "buoyancy", name: "浮力调节器系列", icon: "🛟", iconClass: "buoyancy",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["Razor 4.0 ti", "7600"], ["Razor 配重包", "220/个"],
+        ["国产瓶箍", "220"],
+        ["Diverite 背飞-实心钢板+25磅装甲囊(背垫+肩垫)", "8078"]
+      ]
+    },
+    {
+      id: "snorkel", name: "呼吸管", icon: "🤿", iconClass: "snorkel",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["Gull Super Bullet & Mini", "335 ~ 350"], ["Tusa SP0101", "240"],
+        ["Tusa 干式呼吸管", "300"], ["国产湿式", "55"]
+      ]
+    },
+    {
+      id: "wetsuit", name: "湿衣系列", icon: "🦺", iconClass: "wetsuit",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["Scubapro Everflex Yulex 3MM", "2088"], ["Sharkskin T2上衣+裤子", "3650"]
+      ]
+    },
+    {
+      id: "boots", name: "潜水靴系列", icon: "👢", iconClass: "boots",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["Scubapro Delta 5mm", "470"]
+      ]
+    },
+    {
+      id: "light", name: "手电系列", icon: "🔦", iconClass: "light",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["探险家M1500", "205 / 252"], ["虎鲸X7", "466"]
+      ]
+    },
+    {
+      id: "fins", name: "脚蹼系列", icon: "🦶", iconClass: "fins",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["Supermew", "1000"], ["Mares", "920 ~ 950 ~ 1033"],
+        ["Diverite", "1000 ~ 1060"], ["Seac Pro Pulsion", "610"],
+        ["SCUBAPRO GO SPORT", "800"]
+      ]
+    },
+    {
+      id: "computer", name: "电脑表系列", icon: "⌚", iconClass: "computer",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["佳明mk3i 钛合金古铜色43mm", "10180 ~ 10680"], ["Nautic S", "3650 ~ 3800"],
+        ["Perdix 2", "4400"], ["Shearwater Tern Tx", "5300"],
+        ["Shearwater Perdix 3", "7800"]
+      ]
+    },
+    {
+      id: "accessory", name: "配件系列", icon: "🔧", iconClass: "accessory",
+      columns: ["产品名称", "零售价格"],
+      products: [
+        ["鹦鹉螺咬嘴", "50 ~ 55"], ["塑料线轮", "80"],
+        ["ISLET 15米实色线轮", "310"], ["鹦鹉螺线轮15米 金色框红线", "198"],
+        ["鹦鹉螺线轮15米 铝合金", "549"], ["Scubapro面镜带-灰色", "120"],
+        ["Scubapro 黑色1.5mm手套", "320"], ["双头流钩", "48"],
+        ["Ilab防晒棒", "72"], ["四元素面镜带", "330"],
+        ["四元素手套5mm", "680"], ["四元素头套 3mm", "520"],
+        ["四元素头套 7mm 带脖领", "850"], ["Sharkskin T2头套", "650"],
+        ["SEAPLAY 防晒手套", "105 / 130 / 135"], ["Aquaplay 防晒帽", "189"],
+        ["Aquaplay防水包", "499"], ["Tactic 1.5米象拔", "100 ~ 120"],
+        ["Tactic 1.8米象拔", "150"], ["Tactic 小单头-银色", "45"],
+        ["Tactic 大单头-炫彩", "58"], ["Tactic 小双头-黑色", "55"],
+        ["Tactic 小双头-炫彩", "55"], ["Tactic 大双头-炫彩", "60"],
+        ["Tactic 防水壳", "130"], ["Helios 技潜短裤", "398"],
+        ["四元素 90L", "1250"]
+      ]
+    }
+  ];
+
+  var categories = [];
+
+  function loadData() {
+    var saved = localStorage.getItem("product-retail-price-data");
+    if (saved) {
+      try { categories = JSON.parse(saved); document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）"; return; }
+      catch(e) {}
+    }
+    resetToOriginal();
+  }
+
+  function resetToOriginal() {
+    categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+    document.getElementById("updateTime").textContent = "数据来源：产品零售价格.docx";
+  }
+
+  var toastTimer;
+  function showToast(msg, type) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className = "toast " + (type || "") + " show";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { el.classList.remove("show"); }, 2000);
+  }
+
+  function syncDOMtoData() {
+    document.querySelectorAll(".category").forEach(function(catDiv) {
+      var catId = catDiv.id.replace("cat-", "");
+      var cat = null;
+      for (var i = 0; i < categories.length; i++) {
+        if (categories[i].id === catId) { cat = categories[i]; break; }
+      }
+      if (!cat) return;
+      var rows = catDiv.querySelectorAll("tbody tr");
+      rows.forEach(function(row) {
+        var origIdx = parseInt(row.getAttribute("data-idx"), 10);
+        var nameCell = row.querySelector(".product-name");
+        var priceCell = row.querySelector(".price");
+        if (nameCell && priceCell && origIdx >= 0 && origIdx < cat.products.length) {
+          cat.products[origIdx] = [nameCell.textContent.trim(), priceCell.textContent.trim()];
+        }
+      });
+    });
+  }
+
+  function saveData() {
+    syncDOMtoData();
+    localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+    document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存：" + new Date().toLocaleString("zh-CN") + "）";
+    renderAll(document.getElementById("searchInput").value);
+    showToast("✅ 数据已保存到浏览器本地存储", "success");
+  }
+
+  function resetData() {
+    if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
+      resetToOriginal();
+      localStorage.removeItem("product-retail-price-data");
+      renderAll("");
+      document.getElementById("searchInput").value = "";
+      showToast("🔄 已恢复为原始数据");
+    }
+  }
+
+  function exportCSV() {
+    syncDOMtoData();
+    var csv = "﻿";
+    categories.forEach(function(cat) {
+      csv += "\n" + cat.name + "\n" + cat.columns.join(",") + "\n";
+      cat.products.forEach(function(p) {
+        csv += '"' + (p[0]||"").replace(/"/g, '""') + '","' + (p[1]||"").replace(/"/g, '""') + '"\n';
+      });
+    });
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "产品零售价格_" + new Date().toISOString().slice(0,10) + ".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("📥 CSV 文件已下载");
+  }
+
+  function getPriceClass(priceStr) {
+    if (!priceStr) return "price-simple";
+    if (/[~/\-]/.test(priceStr) && priceStr.length > 8) return "price-range";
+    if (/[~/\-]/.test(priceStr)) return "price-range";
+    return "price-simple";
+  }
+
+  function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    var escaped = escapeHtml(text);
+    var q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escaped.replace(new RegExp("(" + q + ")", "gi"), '<mark>$1</mark>');
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderAll(filter) {
+    filter = filter || "";
+    var scrollY = window.scrollY;
+    var filterLower = filter.toLowerCase().trim();
+    var totalVisible = 0;
+    var summaryGrid = document.getElementById("summaryGrid");
+    var tabsDiv = document.getElementById("tabs");
+    var content = document.getElementById("content");
+    var resultCount = document.getElementById("resultCount");
+
+    summaryGrid.innerHTML = categories.map(function(cat) {
+      var visible = 0;
+      cat.products.forEach(function(p) { if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visible++; });
+      return '<div class="summary-card" data-cat="' + cat.id + '"><div class="label">' + cat.icon + ' ' + cat.name + '</div><div class="value">' + visible + '</div><div style="font-size:0.75rem;color:var(--text-secondary)">款产品</div></div>';
+    }).join("");
+
+    tabsDiv.innerHTML = '<button class="tab active" data-cat="all">📋 全部</button>' +
+      categories.map(function(cat) {
+        return '<button class="tab" data-cat="' + cat.id + '">' + cat.icon + ' ' + cat.name + '<span class="count">' + cat.products.length + '</span></button>';
+      }).join("");
+
+    content.innerHTML = categories.map(function(cat) {
+      var visibleIndices = [];
+      cat.products.forEach(function(p, i) {
+        if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visibleIndices.push({ p: p, i: i });
+      });
+      totalVisible += visibleIndices.length;
+      var hiddenClass = visibleIndices.length === 0 ? "hidden" : "";
+      return '<div class="category ' + hiddenClass + '" id="cat-' + cat.id + '">'
+        + '<div class="category-header"><div class="category-header-left">'
+        + '<div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div>'
+        + '<div><span class="category-title">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div>'
+        + '</div></div>'
+        + '<div class="table-wrapper"><table>'
+        + '<thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead>'
+        + '<tbody>'
+        + visibleIndices.map(function(item) {
+            var name = item.p[0], price = item.p[1], idx = item.i;
+            return '<tr data-idx="' + idx + '">'
+              + '<td class="product-name" contenteditable="true">' + highlightMatch(name, filterLower) + '</td>'
+              + '<td class="price ' + getPriceClass(price) + '" contenteditable="true">' + highlightMatch(price, filterLower) + '</td>'
+              + '<td class="row-actions"><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + idx + '" title="删除此行">✕</button></td></tr>';
+          }).join("")
+        + '</tbody></table>'
+        + '<div class="add-row-area"><button class="btn-add-row" data-cat="' + cat.id + '">＋ 添加新产品</button></div>'
+        + '</div></div>';
+    }).join("");
+
+    resultCount.innerHTML = filterLower
+      ? '搜索 "<strong>' + escapeHtml(filter) + '</strong>"：<strong>' + totalVisible + '</strong> 条结果'
+      : '共 <strong>' + totalVisible + '</strong> 款产品';
+
+    renderSidebar();
+    requestAnimationFrame(function() { window.scrollTo(0, scrollY); });
+  }
+
+  function renderSidebar() {
+    var sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = categories.map(function(cat) {
+      return '<button class="sidebar-item" data-cat="' + cat.id + '">'
+        + '<span class="si-icon">' + cat.icon + '</span>'
+        + '<span class="si-name">' + cat.name + '</span>'
+        + '<span class="si-count">' + cat.products.length + '</span></button>';
+    }).join("");
+  }
+
+  function updateActiveSidebarItem() {
+    var bestId = null, bestTop = Infinity;
+    categories.forEach(function(cat) {
+      var el = document.getElementById("cat-" + cat.id);
+      if (!el || el.classList.contains("hidden")) return;
+      var dist = Math.abs(el.getBoundingClientRect().top - 170);
+      if (el.getBoundingClientRect().top <= 200 && dist < bestTop) { bestTop = dist; bestId = cat.id; }
+    });
+    document.querySelectorAll(".sidebar-item").forEach(function(item) {
+      item.classList.remove("active");
+      if (item.getAttribute("data-cat") === bestId) item.classList.add("active");
+    });
+  }
+
+  function addRow(catId) {
+    syncDOMtoData();
+    var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat) return;
+    cat.products.push(["新产品名称", "0"]);
+    var searchVal = document.getElementById("searchInput").value;
+    renderAll(searchVal);
+    setTimeout(function() {
+      var catDiv = document.getElementById("cat-" + catId);
+      if (catDiv) {
+        var rows = catDiv.querySelectorAll("tbody tr");
+        if (rows.length) {
+          var nameCell = rows[rows.length - 1].querySelector(".product-name");
+          if (nameCell) { nameCell.focus(); var range = document.createRange(); range.selectNodeContents(nameCell); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+        }
+      }
+    }, 100);
+  }
+
+  function deleteRow(catId, idx) {
+    syncDOMtoData();
+    var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat || idx < 0 || idx >= cat.products.length) return;
+    if (!confirm("确定删除「" + cat.products[idx][0] + "」吗？")) return;
+    cat.products.splice(idx, 1);
+    saveData();
+    showToast("🗑️ 已删除");
+  }
+
+  document.addEventListener("click", function(e) {
+    var target = e.target;
+    if (target.closest(".btn-del-row")) {
+      var btn = target.closest(".btn-del-row");
+      deleteRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10));
+      return;
+    }
+    if (target.closest(".btn-add-row")) { addRow(target.closest(".btn-add-row").getAttribute("data-cat")); return; }
+    if (target.closest(".summary-card")) { scrollToCategory(target.closest(".summary-card").getAttribute("data-cat")); return; }
+    if (target.closest(".sidebar-item")) { scrollToCategory(target.closest(".sidebar-item").getAttribute("data-cat")); return; }
+    if (target.closest(".tab")) {
+      var tab = target.closest(".tab");
+      var catId = tab.getAttribute("data-cat");
+      if (catId === "all") {
+        document.querySelectorAll(".category").forEach(function(c) { c.classList.remove("hidden"); });
+        document.getElementById("searchInput").value = "";
+        renderAll("");
+        document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
+        tab.classList.add("active");
+      } else { scrollToCategory(catId); }
+      return;
+    }
+  });
+
+  document.addEventListener("input", function(e) {
+    if (e.target.matches("td.price[contenteditable]")) {
+      var text = e.target.textContent.trim();
+      e.target.classList.remove("price-simple", "price-range");
+      if (/[~/\-]/.test(text)) e.target.classList.add("price-range");
+      else e.target.classList.add("price-simple");
+    }
+  });
+
+  document.addEventListener("keydown", function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }
+  });
+
+  function scrollToCategory(id) {
+    var el = document.getElementById("cat-" + id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
+      var tab = document.querySelector('.tab[data-cat="' + id + '"]');
+      if (tab) tab.classList.add("active");
+    }
+  }
+
+  document.getElementById("btnSave").addEventListener("click", saveData);
+  document.getElementById("btnExport").addEventListener("click", exportCSV);
+  document.getElementById("btnReset").addEventListener("click", resetData);
+
+  document.addEventListener("DOMContentLoaded", function() {
+    loadData();
+    renderAll("");
+    var input = document.getElementById("searchInput");
+    input.addEventListener("input", function() { renderAll(input.value); });
+    input.addEventListener("keydown", function(e) { if (e.key === "Escape") { input.value = ""; renderAll(""); } });
+
+    var sidebar = document.getElementById("sidebar");
+    var sidebarToggle = document.getElementById("sidebarToggle");
+    var sidebarVisible = true;
+    var sidebarWidth = 205;
+    function applySidebarOffset() {
+      document.body.style.paddingLeft = sidebarVisible ? sidebarWidth + "px" : "22px";
+      if (sidebarVisible) { sidebar.classList.remove("collapsed"); sidebarToggle.classList.remove("collapsed"); }
+      else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); }
+    }
+    sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); });
+    applySidebarOffset();
+
+    var backToTop = document.getElementById("backToTop");
+    window.addEventListener("scroll", function() {
+      if (window.scrollY > 400) backToTop.classList.add("visible");
+      else backToTop.classList.remove("visible");
+      updateActiveSidebarItem();
+    });
+    backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); });
+    setTimeout(updateActiveSidebarItem, 200);
+  });
+})();
+</script>
+</body>
+</html>
