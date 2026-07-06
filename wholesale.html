@@ -218,6 +218,14 @@
   .sidebar-page-link:hover { background: #f1f5f9; color: var(--text); }
   .sidebar-page-link.current { background: var(--accent-light); color: var(--accent); font-weight: 600; cursor: default; }
 
+  .sidebar-top-btn {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 5px 9px; border-radius: 5px; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary);
+    transition: all 0.15s; text-align: center; width: 100%;
+  }
+  .sidebar-top-btn:hover { background: #f1f5f9; color: var(--text); }
+
   /* Back to Top */
   .back-to-top {
     position: fixed; top: 50%; right: 24px; transform: translateY(-50%); z-index: 200;
@@ -549,6 +557,8 @@
     html += '<span class="sidebar-page-link current">📍 出库价格</span>';
     html += '<a href="retail.html" class="sidebar-page-link">🏷️ 零售价格</a>';
     html += '<a href="competitor.html" class="sidebar-page-link">📊 同行报价</a>';
+    html += '<div class="sidebar-divider"></div>';
+    html += '<button class="sidebar-top-btn" id="sidebarTopBtn" title="回到顶部">⬆ 回到顶部</button>';
     sidebar.innerHTML = html;
   }
 
@@ -624,6 +634,7 @@
       moveRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10), 1);
       return;
     }
+    if (target.closest("#sidebarTopBtn")) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     if (target.closest(".btn-del-row")) {
       var btn = target.closest(".btn-del-row");
       deleteRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10));

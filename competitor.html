@@ -108,6 +108,8 @@
   .sidebar-page-link { display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 5px; border: none; background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; transition: all 0.15s; text-align: left; width: 100%; text-decoration: none; }
   .sidebar-page-link:hover { background: #eef2ff; color: var(--text); }
   .sidebar-page-link.current { background: var(--accent-light); color: var(--accent); font-weight: 600; cursor: default; }
+  .sidebar-top-btn { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 9px; border-radius: 5px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); transition: all 0.15s; text-align: center; width: 100%; }
+  .sidebar-top-btn:hover { background: #eef2ff; color: var(--text); }
   .back-to-top { position: fixed; top: 50%; right: 24px; transform: translateY(-50%); z-index: 200; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card-bg); cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); box-shadow: var(--shadow-md); transition: all 0.3s; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .back-to-top.visible { opacity: 1; pointer-events: auto; }
   .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(calc(-50% - 2px)); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25); }
@@ -341,12 +343,8 @@
     html += '<a href="retail.html" class="sidebar-page-link">🏷️ 零售价格</a>';
     html += '<span class="sidebar-page-link current">📍 同行报价</span>';
     html += '<div class="sidebar-divider"></div>';
-    html += '<div class="sidebar-undo-row">';
-    html += '<button class="sidebar-undo-btn" id="btnUndo" title="撤销" disabled>↩</button>';
-    html += '<button class="sidebar-undo-btn" id="btnRedo" title="重做" disabled>↪</button>';
-    html += '</div>';
+    html += '<button class="sidebar-top-btn" id="sidebarTopBtn" title="回到顶部">⬆ 回到顶部</button>';
     document.getElementById("sidebar").innerHTML = html;
-    updateUndoRedoButtons();
   }
   function updateActiveSidebarItem() {
     var bestId = null, bestTop = Infinity;
@@ -394,6 +392,7 @@
   }
   document.addEventListener("click", function(e) {
     var t = e.target;
+    if (t.closest("#sidebarTopBtn")) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     if (t.closest(".btn-move-up")) { var b = t.closest(".btn-move-up"); moveRow(b.getAttribute("data-cat"), parseInt(b.getAttribute("data-idx"), 10), -1); return; }
     if (t.closest(".btn-move-down")) { var b = t.closest(".btn-move-down"); moveRow(b.getAttribute("data-cat"), parseInt(b.getAttribute("data-idx"), 10), 1); return; }
     if (t.closest(".btn-del-row")) { var b = t.closest(".btn-del-row"); deleteRow(b.getAttribute("data-cat"), parseInt(b.getAttribute("data-idx"), 10)); return; }
