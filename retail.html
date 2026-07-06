@@ -222,9 +222,19 @@
   .sidebar-page-link:hover { background: #e8f0fe; color: var(--text); }
   .sidebar-page-link.current { background: var(--accent-light); color: var(--accent); font-weight: 600; cursor: default; }
 
+  .sidebar-undo-row { display: flex; gap: 4px; padding: 2px 4px; }
+  .sidebar-undo-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 5px 0; border-radius: 5px; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+  .sidebar-undo-btn:hover { background: #e8f0fe; color: var(--text); }
+  .sidebar-undo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
   /* Back to Top */
   .back-to-top {
-    position: fixed; bottom: 32px; left: 24px; z-index: 200;
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 200;
     width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border);
     background: var(--card-bg); cursor: pointer; font-size: 1.2rem;
     color: var(--text-secondary); box-shadow: var(--shadow-md);
@@ -232,7 +242,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .back-to-top.visible { opacity: 1; pointer-events: auto; }
-  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
+  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateX(-50%) translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
 
   @media (max-width: 768px) {
     .header h1 { font-size: 1.3rem; }
@@ -244,7 +254,7 @@
     .toolbar { gap: 6px; }
     .btn { padding: 6px 12px; font-size: 0.78rem; }
     .sidebar, .sidebar-toggle { display: none; }
-    .back-to-top { bottom: 20px; left: 16px; width: 38px; height: 38px; font-size: 1rem; }
+    .back-to-top { bottom: 20px; left: 50%; transform: translateX(-50%); width: 38px; height: 38px; font-size: 1rem; }
     body { padding-left: 0; }
   }
 
@@ -409,6 +419,44 @@
   ];
 
   var categories = [];
+  var undoStack = [];
+  var redoStack = [];
+
+  function pushUndo(action) {
+    undoStack.push({ data: JSON.parse(JSON.stringify(categories)), action: action });
+    if (undoStack.length > 50) undoStack.shift();
+    redoStack = [];
+    updateUndoRedoButtons();
+  }
+
+  function undo() {
+    if (!undoStack.length) return;
+    var entry = undoStack.pop();
+    redoStack.push({ data: JSON.parse(JSON.stringify(categories)), action: entry.action });
+    categories = entry.data;
+    localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+    renderAll(document.getElementById("searchInput").value);
+    showToast("↩ 已撤销：" + entry.action);
+    updateUndoRedoButtons();
+  }
+
+  function redo() {
+    if (!redoStack.length) return;
+    var entry = redoStack.pop();
+    undoStack.push({ data: JSON.parse(JSON.stringify(categories)), action: entry.action });
+    categories = entry.data;
+    localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+    renderAll(document.getElementById("searchInput").value);
+    showToast("↪ 已重做：" + entry.action);
+    updateUndoRedoButtons();
+  }
+
+  function updateUndoRedoButtons() {
+    var btnUndo = document.getElementById("btnUndo");
+    var btnRedo = document.getElementById("btnRedo");
+    if (btnUndo) btnUndo.disabled = undoStack.length === 0;
+    if (btnRedo) btnRedo.disabled = redoStack.length === 0;
+  }
 
   function loadData() {
     var saved = localStorage.getItem("product-retail-price-data");
@@ -454,6 +502,7 @@
   }
 
   function saveData() {
+    pushUndo("编辑保存");
     syncDOMtoData();
     localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
     document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存：" + new Date().toLocaleString("zh-CN") + "）";
@@ -463,6 +512,7 @@
 
   function resetData() {
     if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
+      pushUndo("恢复原始数据");
       resetToOriginal();
       localStorage.removeItem("product-retail-price-data");
       renderAll("");
@@ -582,7 +632,17 @@
     html += '<a href="wholesale.html" class="sidebar-page-link">📦 出库价格</a>';
     html += '<span class="sidebar-page-link current">📍 零售价格</span>';
     html += '<a href="competitor.html" class="sidebar-page-link">📊 同行报价</a>';
+    html += '<div class="sidebar-divider"></div>';
+    html += '<div class="sidebar-undo-row">';
+    html += '<button class="sidebar-undo-btn" id="btnUndo" title="撤销" disabled>↩</button>';
+    html += '<button class="sidebar-undo-btn" id="btnRedo" title="重做" disabled>↪</button>';
+    html += '</div>';
     sidebar.innerHTML = html;
+    var btnUndo = document.getElementById("btnUndo");
+    var btnRedo = document.getElementById("btnRedo");
+    if (btnUndo) btnUndo.onclick = undo;
+    if (btnRedo) btnRedo.onclick = redo;
+    updateUndoRedoButtons();
   }
 
   function updateActiveSidebarItem() {
@@ -600,6 +660,7 @@
   }
 
   function addRow(catId) {
+    pushUndo("添加产品");
     syncDOMtoData();
     var cat = null;
     for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
@@ -620,17 +681,20 @@
   }
 
   function deleteRow(catId, idx) {
-    syncDOMtoData();
     var cat = null;
     for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
     if (!cat || idx < 0 || idx >= cat.products.length) return;
     if (!confirm("确定删除「" + cat.products[idx][0] + "」吗？")) return;
+    pushUndo("删除：" + cat.products[idx][0]);
+    syncDOMtoData();
     cat.products.splice(idx, 1);
-    saveData();
+    localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+    renderAll(document.getElementById("searchInput").value);
     showToast("🗑️ 已删除");
   }
 
   function moveRow(catId, idx, direction) {
+    pushUndo("移动产品");
     syncDOMtoData();
     var cat = null;
     for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
