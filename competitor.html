@@ -78,8 +78,8 @@
   td[contenteditable]:focus { background: #eef2ff; box-shadow: inset 0 0 0 2px var(--accent); cursor: text; }
   td.product-name { font-weight: 500; word-break: break-all; }
   td.price { text-align: right; font-weight: 600; font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
-  .price-simple { color: var(--price-color); }
-  .price-calc { color: var(--note-color); font-size: 0.85rem; }
+  .price-simple { color: var(--text); }
+  .price-calc { color: var(--text); font-size: 0.85rem; }
   .btn-del-row { width: 30px; height: 30px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; font-size: 1rem; color: #94a3b8; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
   .btn-del-row:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
   .btn-move-up, .btn-move-down { width: 30px; height: 30px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; font-size: 1rem; color: #94a3b8; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
@@ -108,7 +108,7 @@
   .sidebar-page-link { display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 5px; border: none; background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; transition: all 0.15s; text-align: left; width: 100%; text-decoration: none; }
   .sidebar-page-link:hover { background: #eef2ff; color: var(--text); }
   .sidebar-page-link.current { background: var(--accent-light); color: var(--accent); font-weight: 600; cursor: default; }
-  .sidebar-top-btn { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 9px; border-radius: 5px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); transition: all 0.15s; text-align: center; width: 100%; }
+  .sidebar-top-btn { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 9px; margin: 3px 4px; border-radius: 5px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); transition: all 0.15s; text-align: center; width: calc(100% - 8px); }
   .sidebar-top-btn:hover { background: #eef2ff; color: var(--text); }
   .back-to-top { position: fixed; top: 50%; right: 24px; transform: translateY(-50%); z-index: 200; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card-bg); cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); box-shadow: var(--shadow-md); transition: all 0.3s; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .back-to-top.visible { opacity: 1; pointer-events: auto; }

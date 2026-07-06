@@ -142,8 +142,8 @@
   td[contenteditable]:focus { background: #eff6ff; box-shadow: inset 0 0 0 2px var(--accent); cursor: text; }
   td.product-name { font-weight: 500; word-break: break-all; }
   td.price { text-align: right; font-weight: 600; font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
-  .price-simple { color: var(--price-color); }
-  .price-range { color: var(--note-color); font-size: 0.85rem; }
+  .price-simple { color: var(--text); }
+  .price-range { color: var(--text); font-size: 0.85rem; }
 
   .row-actions { text-align: center; white-space: nowrap; }
   .btn-del-row {
@@ -224,9 +224,9 @@
 
   .sidebar-top-btn {
     display: flex; align-items: center; justify-content: center; gap: 4px;
-    padding: 5px 9px; border-radius: 5px; border: 1px solid var(--border);
+    padding: 6px 9px; margin: 3px 4px; border-radius: 5px; border: 1px solid var(--border);
     background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary);
-    transition: all 0.15s; text-align: center; width: 100%;
+    transition: all 0.15s; text-align: center; width: calc(100% - 8px);
   }
   .sidebar-top-btn:hover { background: #e8f0fe; color: var(--text); }
 
