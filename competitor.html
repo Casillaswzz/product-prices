@@ -113,13 +113,56 @@
   .back-to-top { position: fixed; top: 50%; right: 24px; transform: translateY(-50%); z-index: 200; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card-bg); cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); box-shadow: var(--shadow-md); transition: all 0.3s; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
   .back-to-top.visible { opacity: 1; pointer-events: auto; }
   .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(calc(-50% - 2px)); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25); }
+  .hamburger-btn { display: none; }
+  .sidebar-backdrop { display: none; }
   @media (max-width: 768px) {
-    .header h1 { font-size: 1.3rem; } .container { padding: 10px; } .tabs { gap: 4px; }
-    .tab { padding: 5px 10px; font-size: 0.75rem; }
-    thead th, tbody td { padding: 7px 10px; font-size: 0.8rem; }
-    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .toolbar { gap: 6px; }
-    .btn { padding: 6px 12px; font-size: 0.78rem; }
-    .sidebar, .sidebar-toggle { display: none; } .back-to-top { top: auto; bottom: 20px; right: 16px; transform: none; width: 38px; height: 38px; font-size: 1rem; }
+    .header { padding: 12px 16px 12px 44px; text-align: left; position: relative; }
+    .header h1 { font-size: 1.15rem; }
+    .header .subtitle { display: none; }
+    .header .update-time { font-size: 0.7rem; }
+    .search-bar { margin: 8px 0 0; width: 100%; }
+    .search-input { font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; }
+    .hamburger-btn { display: flex; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 4px 6px; z-index: 10; line-height: 1; border-radius: 4px; }
+    .hamburger-btn:active { background: rgba(255,255,255,0.15); }
+    .toolbar { padding: 8px 10px; gap: 5px; justify-content: flex-start; }
+    .toolbar span { display: none; }
+    .btn { padding: 7px 10px; font-size: 0.73rem; border-radius: 6px; gap: 4px; }
+    .btn .icon { font-size: 0.85rem; }
+    .container { padding: 10px 12px 24px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .summary-card { padding: 10px 12px; }
+    .summary-card .label { font-size: 0.72rem; }
+    .summary-card .value { font-size: 1.1rem; }
+    .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 6px; padding-bottom: 2px; }
+    .tab { flex-shrink: 0; padding: 6px 14px; font-size: 0.78rem; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; max-width: 85vw; height: 100vh; transform: translateX(-100%); z-index: 1000; border-radius: 0 12px 12px 0; border: none; border-right: 1px solid var(--border); box-shadow: 4px 0 24px rgba(0,0,0,0.2); padding: 16px 10px; overflow-y: auto; transition: transform 0.3s ease; }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-toggle { display: none; }
+    .sidebar-backdrop { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+    .category { margin-bottom: 20px; scroll-margin-top: 120px; }
+    .category-header { margin-bottom: 8px; padding-bottom: 8px; }
+    .category-title { font-size: 1rem; }
+    .category-icon { width: 32px; height: 32px; font-size: 1rem; border-radius: 6px; }
+    .table-wrapper { background: transparent; box-shadow: none; border: none; border-radius: 0; overflow: visible; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tbody tr { background: var(--card-bg); margin-bottom: 10px; border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); padding: 12px 14px 10px; position: relative; transition: box-shadow 0.15s; }
+    tbody tr:hover { background: var(--card-bg); box-shadow: var(--shadow-md); }
+    tbody tr:last-child { margin-bottom: 0; }
+    td.product-name { font-size: 0.95rem; font-weight: 600; padding: 0 36px 8px 0; border: none !important; display: block; word-break: break-all; }
+    td.price { font-size: 1.05rem; font-weight: 700; color: var(--price-color); padding: 4px 0; border: none !important; display: flex; align-items: center; gap: 6px; text-align: left; }
+    td.price:before { content: "💰"; font-size: 0.8rem; opacity: 0.6; }
+    .price-calc, .price-simple { font-size: 1rem; }
+    td.row-actions, .row-actions { display: flex; gap: 4px; padding: 8px 0 0 0; border: none !important; justify-content: flex-end; }
+    .btn-del-row { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 6px; font-size: 1rem; color: #94a3b8; }
+    .btn-del-row:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+    .btn-move-up, .btn-move-down { width: 32px; height: 32px; font-size: 0.85rem; }
+    .add-row-area { padding: 6px 0 0; border-top: none; }
+    .btn-add-row { width: 100%; justify-content: center; padding: 8px; font-size: 0.82rem; border-radius: 8px; }
+    .back-to-top { top: auto; bottom: 20px; right: 16px; transform: none; width: 40px; height: 40px; font-size: 1.1rem; border-radius: 50%; }
+    .footer { padding: 16px; font-size: 0.75rem; }
+    .toast { bottom: 24px; left: 16px; right: 16px; transform: none; text-align: center; font-size: 0.85rem; border-radius: 8px; }
     body { padding-left: 0; }
   }
   @media (prefers-color-scheme: dark) {
@@ -136,6 +179,7 @@
 <body>
 
 <div class="header">
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="菜单">☰</button>
   <h1>🤝 常用同行报价表</h1>
   <div class="subtitle">Competitive Price Reference · 双击单元格即可编辑</div>
   <div class="update-time" id="updateTime">数据已加载</div>
@@ -458,10 +502,17 @@
     var sidebar = document.getElementById("sidebar"), sidebarToggle = document.getElementById("sidebarToggle"), sidebarVisible = true, sidebarWidth = 205;
     function applySidebarOffset() { document.body.style.paddingLeft = sidebarVisible ? sidebarWidth + "px" : "22px"; if (sidebarVisible) { sidebar.classList.remove("collapsed"); sidebarToggle.classList.remove("collapsed"); } else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); } }
     sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); }); applySidebarOffset();
+    var hamburgerBtn = document.getElementById("hamburgerBtn"), sidebarBackdropEl = document.getElementById("sidebarBackdrop");
+    function openMobileSidebar() { sidebar.classList.add("open"); sidebarBackdropEl.classList.add("show"); }
+    function closeMobileSidebar() { sidebar.classList.remove("open"); sidebarBackdropEl.classList.remove("show"); }
+    hamburgerBtn.addEventListener("click", function() { if (sidebar.classList.contains("open")) closeMobileSidebar(); else openMobileSidebar(); });
+    sidebarBackdropEl.addEventListener("click", closeMobileSidebar);
+    sidebar.addEventListener("click", function(e) { if (e.target.closest(".sidebar-item") || e.target.closest(".sidebar-page-link")) { setTimeout(closeMobileSidebar, 200); } });
     var backToTop = document.getElementById("backToTop"); window.addEventListener("scroll", function() { if (window.scrollY > 400) backToTop.classList.add("visible"); else backToTop.classList.remove("visible"); updateActiveSidebarItem(); });
     backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); }); setTimeout(updateActiveSidebarItem, 200);
   });
 })();
 </script>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 </body>
 </html>
