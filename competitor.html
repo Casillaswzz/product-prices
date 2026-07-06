@@ -324,7 +324,7 @@
         + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
         + '<div class="table-wrapper"><table><thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead><tbody>'
         + visibleIndices.map(function(item) {
-            return '<tr data-idx="' + item.i + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="上移">▲</button><button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="下移">▼</button><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button></td></tr>';
+            return '<tr data-idx="' + item.i + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="上移">▲</button><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button><button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="下移">▼</button></td></tr>';
           }).join("")
         + '</tbody></table><div class="add-row-area"><button class="btn-add-row" data-cat="' + cat.id + '">＋ 添加新产品</button></div></div></div>';
     }).join("");
@@ -378,7 +378,8 @@
     var newIdx = idx + direction;
     if (newIdx < 0 || newIdx >= cat.products.length) return;
     var temp = cat.products[idx]; cat.products[idx] = cat.products[newIdx]; cat.products[newIdx] = temp;
-    saveData();
+    localStorage.setItem("competitor-price-data", JSON.stringify(categories));
+    renderAll(document.getElementById("searchInput").value);
   }
   document.addEventListener("click", function(e) {
     var t = e.target;
