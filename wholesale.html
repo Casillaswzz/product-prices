@@ -655,6 +655,35 @@
     }
   });
 
+  function autoCalculate(cell) {
+    var text = cell.textContent.trim();
+    if (!text || text === "CB" || text.indexOf("CB") === 0) return;
+    // Already has calculated result
+    if (/=\s*[\d.]+$/.test(text)) return;
+    // Match: number operator number
+    var match = text.match(/^([\d.]+)\s*([×xX*+/\÷\-])\s*([\d.]+)$/);
+    if (!match) return;
+    var a = parseFloat(match[1]);
+    var op = match[2];
+    var b = parseFloat(match[3]);
+    var result;
+    if (op === '+' || op === '＋') result = a + b;
+    else if (op === '-' || op === '－') result = a - b;
+    else if (op === '×' || op === 'x' || op === 'X' || op === '*') result = a * b;
+    else if (op === '/' || op === '÷') result = a / b;
+    else return;
+    // Round to avoid floating point issues, max 4 decimal places
+    result = parseFloat(result.toFixed(4));
+    cell.textContent = text + '=' + result;
+    cell.dispatchEvent(new Event('input', {bubbles: true}));
+  }
+
+  document.addEventListener("blur", function(e) {
+    if (e.target.matches("td.price[contenteditable]")) {
+      autoCalculate(e.target);
+    }
+  }, true);
+
   document.addEventListener("keydown", function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }
   });
