@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>产品零售价格表</title>
 <style>
   :root {
@@ -110,7 +107,7 @@
   .summary-card .label { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 2px; }
   .summary-card .value { font-size: 1.4rem; font-weight: 700; color: var(--text); }
 
-  .category { margin-bottom: 28px; scroll-margin-top: 260px; }
+  .category { margin-bottom: 28px; scroll-margin-top: 160px; }
   .category-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
   .category-header-left { display: flex; align-items: center; gap: 10px; }
   .category-icon {
@@ -178,7 +175,7 @@
 
   /* Sidebar */
   .sidebar {
-    position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+    position: fixed; left: 0; top: 66.67%; transform: translateY(-50%);
     z-index: 200; display: flex; flex-direction: column; gap: 1px;
     background: var(--card-bg); border: 1px solid var(--border); border-left: none;
     border-radius: 0 10px 10px 0; box-shadow: 2px 0 12px rgba(0,0,0,0.08);
@@ -186,7 +183,7 @@
   }
   .sidebar.collapsed { transform: translate(-100%, -50%); }
   .sidebar-toggle {
-    position: fixed; left: 185px; top: 50%; transform: translateY(-50%);
+    position: fixed; left: 185px; top: 66.67%; transform: translateY(-50%);
     z-index: 201; width: 20px; height: 54px; border-radius: 0 8px 8px 0;
     border: 1px solid var(--border); border-left: none; background: var(--card-bg);
     cursor: pointer; font-size: 0.65rem; color: var(--text-secondary);
@@ -554,17 +551,12 @@
 
   function renderSidebar() {
     var sidebar = document.getElementById("sidebar");
-    var html = categories.map(function(cat) {
+    sidebar.innerHTML = categories.map(function(cat) {
       return '<button class="sidebar-item" data-cat="' + cat.id + '">'
         + '<span class="si-icon">' + cat.icon + '</span>'
         + '<span class="si-name">' + cat.name + '</span>'
         + '<span class="si-count">' + cat.products.length + '</span></button>';
     }).join("");
-    html += '<div style="border-top:1px solid var(--border);margin:6px 4px 4px;"></div>';
-    html += '<a href="wholesale.html" style="text-decoration:none;display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;font-size:0.7rem;color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.background=\'#e0f2fe\';this.style.color=\'#0ea5e9\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'var(--text-secondary)\'"><span style="font-size:0.8rem;">📦</span> 产品出库价格</a>';
-    html += '<a href="competitor.html" style="text-decoration:none;display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:5px;font-size:0.7rem;color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.background=\'#eef2ff\';this.style.color=\'#4f46e5\'" onmouseout="this.style.background=\'transparent\';this.style.color=\'var(--text-secondary)\'"><span style="font-size:0.8rem;">🤝</span> 常用同行报价</a>';
-    html += '<div style="font-size:0.6rem;color:var(--text-secondary);text-align:center;margin-top:4px;opacity:0.5;">📍 产品零售价格</div>';
-    sidebar.innerHTML = html;
   }
 
   function updateActiveSidebarItem() {
@@ -652,7 +644,7 @@
   function scrollToCategory(id) {
     var el = document.getElementById("cat-" + id);
     if (el) {
-      var top = el.getBoundingClientRect().top + window.pageYOffset - 200; window.scrollTo({ top: top, behavior: "smooth" });
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
       document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
       var tab = document.querySelector('.tab[data-cat="' + id + '"]');
       if (tab) tab.classList.add("active");
