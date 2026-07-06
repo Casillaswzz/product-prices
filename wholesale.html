@@ -230,7 +230,7 @@
 
   /* Back to Top */
   .back-to-top {
-    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 200;
+    position: fixed; bottom: 32px; right: 32px; z-index: 200;
     width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border);
     background: var(--card-bg); cursor: pointer; font-size: 1.2rem;
     color: var(--text-secondary); box-shadow: var(--shadow-md);
@@ -238,7 +238,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .back-to-top.visible { opacity: 1; pointer-events: auto; }
-  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateX(-50%) translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3); }
+  .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3); }
 
   @media (max-width: 768px) {
     .header h1 { font-size: 1.3rem; }
@@ -250,7 +250,7 @@
     .toolbar { gap: 6px; }
     .btn { padding: 6px 12px; font-size: 0.78rem; }
     .sidebar, .sidebar-toggle { display: none; }
-    .back-to-top { bottom: 20px; left: 50%; transform: translateX(-50%); width: 38px; height: 38px; font-size: 1rem; }
+    .back-to-top { bottom: 20px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
     body { padding-left: 0; }
   }
 
@@ -605,11 +605,6 @@
     html += '<button class="sidebar-undo-btn" id="btnRedo" title="重做" disabled>↪</button>';
     html += '</div>';
     sidebar.innerHTML = html;
-    // Re-bind undo/redo buttons
-    var btnUndo = document.getElementById("btnUndo");
-    var btnRedo = document.getElementById("btnRedo");
-    if (btnUndo) btnUndo.onclick = undo;
-    if (btnRedo) btnRedo.onclick = redo;
     updateUndoRedoButtons();
   }
 
@@ -688,6 +683,8 @@
       moveRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10), 1);
       return;
     }
+    if (target.closest("#btnUndo")) { undo(); return; }
+    if (target.closest("#btnRedo")) { redo(); return; }
     if (target.closest(".btn-del-row")) {
       var btn = target.closest(".btn-del-row");
       deleteRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10));
