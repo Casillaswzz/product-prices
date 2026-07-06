@@ -684,6 +684,7 @@
       e.target.classList.remove("price-simple", "price-range");
       if (/[~/\-]/.test(text)) e.target.classList.add("price-range");
       else e.target.classList.add("price-simple");
+      if (/=$/.test(text)) autoCalculate(e.target);
     }
   });
 
@@ -691,7 +692,7 @@
     var text = cell.textContent.trim();
     if (!text) return;
     if (/=\s*[\d.]+$/.test(text)) return;
-    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)$/);
+    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)=?$/);
     if (!match) return;
     var a = parseFloat(match[1]), op = match[2], b = parseFloat(match[3]), result;
     if (op === '+' || op === '＋') result = a + b;
@@ -700,7 +701,13 @@
     else if (op === '/' || op === '÷') result = a / b;
     else return;
     result = parseFloat(result.toFixed(4));
-    cell.textContent = text + '=' + result;
+    cell.textContent = text.replace(/=?\s*$/, '') + '=' + result;
+    var range = document.createRange();
+    range.selectNodeContents(cell);
+    range.collapse(false);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
     cell.dispatchEvent(new Event('input', {bubbles: true}));
   }
 
@@ -711,6 +718,12 @@
   });
 
   document.addEventListener("keydown", function(e) {
+    if (e.target.matches("td.price[contenteditable]") && e.key === "Enter") {
+      e.preventDefault();
+      autoCalculate(e.target);
+      e.target.blur();
+      return;
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }
   });
 

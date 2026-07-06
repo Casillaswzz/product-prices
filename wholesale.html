@@ -652,16 +652,18 @@
       if (text === "CB" || text.indexOf("CB") === 0) e.target.classList.add("price-cb");
       else if (/[×xX*=]/.test(text)) e.target.classList.add("price-calc");
       else e.target.classList.add("price-simple");
+      // Auto-calculate when ending with =
+      if (/=$/.test(text)) autoCalculate(e.target);
     }
   });
 
   function autoCalculate(cell) {
     var text = cell.textContent.trim();
     if (!text || text === "CB" || text.indexOf("CB") === 0) return;
-    // Already has calculated result
+    // Already has calculated result (ends with =number)
     if (/=\s*[\d.]+$/.test(text)) return;
-    // Match: number operator number
-    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)$/);
+    // Match: number operator number (optionally ending with =)
+    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)=?$/);
     if (!match) return;
     var a = parseFloat(match[1]);
     var op = match[2];
@@ -672,9 +674,15 @@
     else if (op === '×' || op === 'x' || op === 'X' || op === '*') result = a * b;
     else if (op === '/' || op === '÷') result = a / b;
     else return;
-    // Round to avoid floating point issues, max 4 decimal places
     result = parseFloat(result.toFixed(4));
-    cell.textContent = text + '=' + result;
+    cell.textContent = text.replace(/=?\s*$/, '') + '=' + result;
+    // Move cursor to end
+    var range = document.createRange();
+    range.selectNodeContents(cell);
+    range.collapse(false);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
     cell.dispatchEvent(new Event('input', {bubbles: true}));
   }
 
@@ -685,6 +693,12 @@
   });
 
   document.addEventListener("keydown", function(e) {
+    if (e.target.matches("td.price[contenteditable]") && e.key === "Enter") {
+      e.preventDefault();
+      autoCalculate(e.target);
+      e.target.blur();
+      return;
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }
   });
 
