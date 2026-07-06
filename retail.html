@@ -131,7 +131,7 @@
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   thead { background: #f5f8fb; border-bottom: 2px solid var(--border); }
   thead th { padding: 10px 16px; text-align: left; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
-  thead th.col-name { width: 62%; } thead th.col-price { width: 26%; text-align: right; } thead th.col-actions { width: 12%; text-align: center; }
+  thead th.col-name { width: 54%; } thead th.col-price { width: 28%; text-align: right; } thead th.col-actions { width: 18%; text-align: center; }
   tbody td { padding: 9px 16px; border-bottom: 1px solid #f0f4f8; font-size: 0.9rem; }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr { transition: background 0.15s; }
@@ -152,6 +152,13 @@
     transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1;
   }
   .btn-del-row:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+  .btn-move-up, .btn-move-down {
+    width: 26px; height: 26px; border-radius: 4px; border: 1px solid transparent;
+    background: transparent; cursor: pointer; font-size: 0.7rem; color: #94a3b8;
+    transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .btn-move-up:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .btn-move-down:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
 
   .add-row-area { padding: 10px 16px; text-align: center; border-top: 1px dashed var(--border); }
   .btn-add-row {
@@ -544,7 +551,11 @@
             return '<tr data-idx="' + idx + '">'
               + '<td class="product-name" contenteditable="true">' + highlightMatch(name, filterLower) + '</td>'
               + '<td class="price ' + getPriceClass(price) + '" contenteditable="true">' + highlightMatch(price, filterLower) + '</td>'
-              + '<td class="row-actions"><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + idx + '" title="删除此行">✕</button></td></tr>';
+              + '<td class="row-actions">'
+              + '<button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + idx + '" title="上移">▲</button>'
+              + '<button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + idx + '" title="下移">▼</button>'
+              + '<button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + idx + '" title="删除此行">✕</button>'
+              + '</td></tr>';
           }).join("")
         + '</tbody></table>'
         + '<div class="add-row-area"><button class="btn-add-row" data-cat="' + cat.id + '">＋ 添加新产品</button></div>'
@@ -619,8 +630,31 @@
     showToast("🗑️ 已删除");
   }
 
+  function moveRow(catId, idx, direction) {
+    syncDOMtoData();
+    var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat || idx < 0 || idx >= cat.products.length) return;
+    var newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= cat.products.length) return;
+    var temp = cat.products[idx];
+    cat.products[idx] = cat.products[newIdx];
+    cat.products[newIdx] = temp;
+    saveData();
+  }
+
   document.addEventListener("click", function(e) {
     var target = e.target;
+    if (target.closest(".btn-move-up")) {
+      var btn = target.closest(".btn-move-up");
+      moveRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10), -1);
+      return;
+    }
+    if (target.closest(".btn-move-down")) {
+      var btn = target.closest(".btn-move-down");
+      moveRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10), 1);
+      return;
+    }
     if (target.closest(".btn-del-row")) {
       var btn = target.closest(".btn-del-row");
       deleteRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10));
