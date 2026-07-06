@@ -661,7 +661,7 @@
     // Already has calculated result
     if (/=\s*[\d.]+$/.test(text)) return;
     // Match: number operator number
-    var match = text.match(/^([\d.]+)\s*([×xX*+/\÷\-])\s*([\d.]+)$/);
+    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)$/);
     if (!match) return;
     var a = parseFloat(match[1]);
     var op = match[2];
@@ -678,11 +678,11 @@
     cell.dispatchEvent(new Event('input', {bubbles: true}));
   }
 
-  document.addEventListener("blur", function(e) {
+  document.addEventListener("focusout", function(e) {
     if (e.target.matches("td.price[contenteditable]")) {
       autoCalculate(e.target);
     }
-  }, true);
+  });
 
   document.addEventListener("keydown", function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }

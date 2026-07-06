@@ -691,7 +691,7 @@
     var text = cell.textContent.trim();
     if (!text) return;
     if (/=\s*[\d.]+$/.test(text)) return;
-    var match = text.match(/^([\d.]+)\s*([×xX*+/\÷\-])\s*([\d.]+)$/);
+    var match = text.match(/^([\d.]+)\s*([×xX*+\/\÷\-])\s*([\d.]+)$/);
     if (!match) return;
     var a = parseFloat(match[1]), op = match[2], b = parseFloat(match[3]), result;
     if (op === '+' || op === '＋') result = a + b;
@@ -704,11 +704,11 @@
     cell.dispatchEvent(new Event('input', {bubbles: true}));
   }
 
-  document.addEventListener("blur", function(e) {
+  document.addEventListener("focusout", function(e) {
     if (e.target.matches("td.price[contenteditable]")) {
       autoCalculate(e.target);
     }
-  }, true);
+  });
 
   document.addEventListener("keydown", function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); syncDOMtoData(); saveData(); }
