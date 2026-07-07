@@ -245,6 +245,7 @@
 
   .hamburger { display: none; }
   .sidebar-overlay { display: none; }
+  .mobile-actions { display: none; }
 
   @media (max-width: 768px) {
     body { padding-left: 0 !important; }
@@ -252,10 +253,10 @@
     .header h1 { font-size: 1.15rem; }
     .header .subtitle { display: none; }
     .header .update-time { font-size: 0.68rem; margin-top: 1px; }
-    .search-bar { margin-top: 4px; padding-left: 4px; }
-    .search-input { padding: 7px 10px; font-size: 0.8rem; max-width: calc(100% - 8px); }
-    .container { padding: 0 12px 24px; }
-    .toolbar { gap: 6px; padding: 6px 12px; margin: 0 44px 0 4px; justify-content: flex-start; }
+    .search-bar { margin-top: 4px; padding-left: 4px; display: flex; gap: 6px; align-items: center; }
+    .search-input { padding: 7px 10px; font-size: 0.8rem; flex: 1; min-width: 0; }
+    .container { padding: 10px 12px 24px; }
+    .toolbar { display: none; }
     .toolbar .btn { padding: 7px 12px; font-size: 0.75rem; }
     .toolbar span { display: none !important; }
     .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -270,6 +271,8 @@
     .category-icon { width: 30px; height: 30px; font-size: 1rem; }
     .sidebar, .sidebar-toggle { display: none; }
     .sidebar.mobile-open { display: flex; position: fixed; left: 0; top: 0; height: 100vh; width: 240px; z-index: 350; border-radius: 0; border: none; border-right: 1px solid var(--border); box-shadow: 4px 0 20px rgba(0,0,0,0.15); transform: none; padding-top: 16px; overflow-y: auto; }
+    .mobile-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .mobile-actions .btn-sm { padding: 6px 8px; font-size: 0.75rem; min-width: auto; white-space: nowrap; }
     .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 340; }
     .sidebar-overlay.open { display: block; }
     .hamburger { display: flex !important; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 360; width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
@@ -321,6 +324,11 @@
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>
+	    <span class="mobile-actions">
+	      <button class="btn btn-save btn-sm" id="btnSaveM"><span class="icon">💾</span></button>
+	      <button class="btn btn-export btn-sm" id="btnExportM"><span class="icon">📥</span></button>
+	      <button class="btn btn-reset btn-sm" id="btnResetM"><span class="icon">🔄</span></button>
+	    </span>
   </div>
 </div>
 
