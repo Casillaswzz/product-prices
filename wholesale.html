@@ -238,18 +238,53 @@
   .back-to-top.visible { opacity: 1; pointer-events: auto; }
   .back-to-top:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(calc(-50% - 2px)); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3); }
 
+
+  .hamburger { display: none; }
+  .sidebar-overlay { display: none; }
+
   @media (max-width: 768px) {
-    .header h1 { font-size: 1.3rem; }
-    .container { padding: 10px; }
-    .tabs { gap: 4px; }
-    .tab { padding: 5px 10px; font-size: 0.75rem; }
-    thead th, tbody td { padding: 7px 10px; font-size: 0.8rem; }
+    body { padding-left: 0 !important; }
+    .header { padding: 12px 48px 12px; position: sticky; top: 0; }
+    .header h1 { font-size: 1.15rem; }
+    .header .subtitle { display: none; }
+    .header .update-time { font-size: 0.68rem; margin-top: 1px; }
+    .search-bar { margin-top: 4px; }
+    .search-input { padding: 7px 10px; font-size: 0.8rem; }
+    .container { padding: 10px 12px 24px; }
+    .toolbar { gap: 6px; padding: 10px 12px; }
+    .toolbar .btn { padding: 7px 12px; font-size: 0.75rem; }
+    .toolbar span { display: none !important; }
     .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .toolbar { gap: 6px; }
-    .btn { padding: 6px 12px; font-size: 0.78rem; }
+    .summary-card { padding: 10px 12px; }
+    .summary-card .value { font-size: 1.1rem; }
+    .tabs { flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { flex-shrink: 0; padding: 6px 12px; font-size: 0.75rem; }
+    .category { margin-bottom: 20px; scroll-margin-top: 120px; }
+    .category-header { padding-bottom: 8px; margin-bottom: 8px; }
+    .category-title { font-size: 1rem; }
+    .category-icon { width: 30px; height: 30px; font-size: 1rem; }
     .sidebar, .sidebar-toggle { display: none; }
-    .back-to-top { top: auto; bottom: 20px; right: 16px; transform: none; width: 38px; height: 38px; font-size: 1rem; }
-    body { padding-left: 0; }
+    .sidebar.mobile-open { display: flex; position: fixed; left: 0; top: 0; height: 100vh; width: 240px; z-index: 350; border-radius: 0; border: none; border-right: 1px solid var(--border); box-shadow: 4px 0 20px rgba(0,0,0,0.15); transform: none; padding-top: 16px; overflow-y: auto; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 340; }
+    .sidebar-overlay.open { display: block; }
+    .hamburger { display: flex !important; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 360; width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); cursor: pointer; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+    .hamburger span { display: block; width: 18px; height: 2px; background: white; border-radius: 1px; transition: all 0.2s; }
+    /* 卡片视图 */
+    .table-wrapper { border-radius: 8px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tbody tr { padding: 12px; margin-bottom: 8px; background: var(--card-bg); border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+    tbody tr:last-child { margin-bottom: 0; }
+    td { padding: 5px 0; border: none !important; }
+    td.product-name { font-weight: 600; font-size: 0.95rem; padding-bottom: 4px; }
+    td.price { text-align: left !important; font-size: 0.9rem; padding-bottom: 6px; }
+    td.price:before { content: "💰 价格："; font-weight: 500; color: var(--text-secondary); font-family: inherit; }
+    td.row-actions { text-align: left !important; padding-top: 4px; display: flex; gap: 6px; }
+    .btn-move-up, .btn-move-down, .btn-del-row { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--bg); border-radius: 8px; }
+    .btn-add-row { width: 100%; justify-content: center; padding: 10px; }
+    .back-to-top { top: auto; bottom: 20px; right: 16px; transform: none; width: 40px; height: 40px; font-size: 1rem; }
+    .footer { font-size: 0.7rem; padding: 16px; }
   }
 
   @media (prefers-color-scheme: dark) {
@@ -275,6 +310,7 @@
 <body>
 
 <div class="header">
+  <button class="hamburger" id="hamburgerBtn" aria-label="菜单"><span></span><span></span><span></span></button>
   <h1>🤿 产品出库价格表</h1>
   <div class="subtitle">Diving Equipment Export Price List · 双击单元格即可编辑</div>
   <div class="update-time" id="updateTime">数据已加载</div>
@@ -285,6 +321,7 @@
 </div>
 
 <nav class="sidebar" id="sidebar"></nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <button class="sidebar-toggle" id="sidebarToggle" title="展开/收起分类导航">分类导航</button>
 <button class="back-to-top" id="backToTop" title="回到顶部">⬆</button>
 
@@ -745,6 +782,23 @@
       else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); }
     }
     sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); });
+	    // 移动端侧边栏切换
+	    var hamburgerBtn = document.getElementById("hamburgerBtn");
+	    var sidebarOverlay = document.getElementById("sidebarOverlay");
+	    hamburgerBtn.addEventListener("click", function() {
+	      sidebar.classList.toggle("mobile-open");
+	      sidebarOverlay.classList.toggle("open");
+	    });
+	    sidebarOverlay.addEventListener("click", function() {
+	      sidebar.classList.remove("mobile-open");
+	      sidebarOverlay.classList.remove("open");
+	    });
+	    // 点击侧边栏菜单项后自动关闭
+	    sidebar.addEventListener("click", function(e) {
+	      if (e.target.closest(".sidebar-item") || e.target.closest(".sidebar-page-link") || e.target.closest("#sidebarTopBtn")) {
+	        setTimeout(function() { sidebar.classList.remove("mobile-open"); sidebarOverlay.classList.remove("open"); }, 200);
+	      }
+	    });
     applySidebarOffset();
 
     var backToTop = document.getElementById("backToTop");
