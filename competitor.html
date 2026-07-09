@@ -199,7 +199,7 @@
 
 <div class="container">
   <div class="toolbar">
-    <button class="btn btn-save" id="btnSave"><span class="icon">💾</span> 保存更改</button>
+    <button class="btn btn-save" id="btnSave"><span class="icon">📱</span> 同步到手机</button>
     <button class="btn btn-export" id="btnExport"><span class="icon">📥</span> 导出 CSV</button>
     <button class="btn btn-reset" id="btnReset"><span class="icon">🔄</span> 恢复原始数据</button>
     <button class="btn" id="btnExportJSON" style="background:#fefce8;border-color:#fde68a;color:#92400e;"><span class="icon">📤</span> 导出 JSON</button>
@@ -356,15 +356,18 @@
       });
     });
   }
-  function saveData() {
+  function autoSave() {
     syncDOMtoData();
     var now = new Date().toISOString().slice(0, 10);
     localStorage.setItem("competitor-price-data", JSON.stringify(categories));
     localStorage.setItem("competitor-price-data-version", now);
-    document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存：" + new Date().toLocaleString("zh-CN") + "）";
-    renderAll(document.getElementById("searchInput").value);
+    document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + new Date().toLocaleString("zh-CN") + "）";
+  }
 
-    // Auto-download JSON for cross-device sync
+  function saveData() {
+    autoSave();
+    // Download JSON for cross-device sync
+    var now = new Date().toISOString().slice(0, 10);
     var wrapper = { version: now, updated: new Date().toISOString(), categories: categories };
     var blob = new Blob([JSON.stringify(wrapper, null, 2)], { type: "application/json;charset=utf-8" });
     var url = URL.createObjectURL(blob);
@@ -373,7 +376,7 @@
     a.download = "competitor.json";
     a.click();
     URL.revokeObjectURL(url);
-    showToast("✅ 数据已保存！JSON 已下载，请放入仓库 data/ 目录并 git push 即可同步到手机", "success");
+    showToast("📱 同步文件已下载，放入仓库 data/ 目录并 git push 即可同步到手机", "success");
   }
   function resetData() {
     if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
@@ -456,6 +459,7 @@
     for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
     if (!cat) return; cat.products.push(["新产品名称", "0"]);
     renderAll(document.getElementById("searchInput").value);
+    autoSave();
     setTimeout(function() {
       var catDiv = document.getElementById("cat-" + catId); if (!catDiv) return;
       var rows = catDiv.querySelectorAll("tbody tr"); if (!rows.length) return;
@@ -470,8 +474,8 @@
     if (!confirm("确定删除「" + cat.products[idx][0] + "」吗？")) return;
     syncDOMtoData();
     cat.products.splice(idx, 1);
-    localStorage.setItem("competitor-price-data", JSON.stringify(categories));
     renderAll(document.getElementById("searchInput").value);
+    autoSave();
     showToast("🗑️ 已删除");
   }
   function moveRow(catId, idx, direction) {
@@ -481,8 +485,8 @@
     var newIdx = idx + direction;
     if (newIdx < 0 || newIdx >= cat.products.length) return;
     var temp = cat.products[idx]; cat.products[idx] = cat.products[newIdx]; cat.products[newIdx] = temp;
-    localStorage.setItem("competitor-price-data", JSON.stringify(categories));
     renderAll(document.getElementById("searchInput").value);
+    autoSave();
   }
   document.addEventListener("click", function(e) {
     var t = e.target;
@@ -530,6 +534,9 @@
   document.addEventListener("focusout", function(e) {
     if (e.target.matches("td.price[contenteditable]")) {
       autoCalculate(e.target);
+    }
+    if (e.target.matches("td[contenteditable]")) {
+      autoSave();
     }
   });
   document.addEventListener("keydown", function(e) {
