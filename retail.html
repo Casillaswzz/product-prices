@@ -467,15 +467,41 @@
 
   function loadData() {
     var saved = localStorage.getItem("product-retail-price-data");
+    var savedVersion = localStorage.getItem("product-retail-price-data-version") || "";
+
+    // Fast initial load from localStorage or fallback
     if (saved) {
-      try { categories = JSON.parse(saved); document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）"; return; }
-      catch(e) {}
+      try { categories = JSON.parse(saved); } catch(e) { categories = JSON.parse(JSON.stringify(ORIGINAL_DATA)); }
+    } else {
+      categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
     }
-    resetToOriginal();
+
+    // Background sync: try to fetch server data for latest version
+    fetch('data/retail.json')
+      .then(function(res) { if (!res.ok) throw new Error('no server data'); return res.json(); })
+      .then(function(wrapper) {
+        var serverCats = wrapper.categories || wrapper;
+        var serverVer = wrapper.version || "";
+        if (saved && savedVersion && savedVersion >= serverVer) {
+          document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）";
+          return;
+        }
+        // Server data is newer — use it and cache locally
+        categories = JSON.parse(JSON.stringify(serverCats));
+        localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+        localStorage.setItem("product-retail-price-data-version", serverVer);
+        document.getElementById("updateTime").textContent = "数据来源：服务器同步（" + serverVer + "）";
+        renderAll(document.getElementById("searchInput").value);
+      })
+      .catch(function() {
+        if (saved) { document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）"; }
+        else { document.getElementById("updateTime").textContent = "数据来源：产品零售价格.docx"; }
+      });
   }
 
   function resetToOriginal() {
     categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+    localStorage.removeItem("product-retail-price-data-version");
     document.getElementById("updateTime").textContent = "数据来源：产品零售价格.docx";
   }
 
@@ -510,16 +536,29 @@
 
   function saveData() {
     syncDOMtoData();
+    var now = new Date().toISOString().slice(0, 10);
     localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+    localStorage.setItem("product-retail-price-data-version", now);
     document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存：" + new Date().toLocaleString("zh-CN") + "）";
     renderAll(document.getElementById("searchInput").value);
-    showToast("✅ 数据已保存到浏览器本地存储", "success");
+
+    // Auto-download JSON for cross-device sync
+    var wrapper = { version: now, updated: new Date().toISOString(), categories: categories };
+    var blob = new Blob([JSON.stringify(wrapper, null, 2)], { type: "application/json;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "retail.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("✅ 数据已保存！JSON 已下载，请放入仓库 data/ 目录并 git push 即可同步到手机", "success");
   }
 
   function resetData() {
     if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
       resetToOriginal();
       localStorage.removeItem("product-retail-price-data");
+      localStorage.removeItem("product-retail-price-data-version");
       renderAll("");
       document.getElementById("searchInput").value = "";
       showToast("🔄 已恢复为原始数据");
