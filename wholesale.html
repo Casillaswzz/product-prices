@@ -46,7 +46,20 @@
   }
   .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 2px; }
   .header .subtitle { font-size: 0.85rem; opacity: 0.7; font-weight: 400; }
-  .header .update-time { font-size: 0.75rem; opacity: 0.5; margin-top: 2px; }
+  .header .update-time { font-size: 0.75rem; opacity: 0.5; margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; background: #94a3b8; transition: background 0.3s; }
+  .sync-dot.synced { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+  .sync-dot.syncing { background: #eab308; animation: pulse 1s infinite; }
+  .sync-dot.error { background: #ef4444; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .sync-setup { display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 18px; margin: 0 24px 16px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .sync-setup.show { display: block; }
+  .sync-setup h3 { font-size: 0.9rem; margin-bottom: 8px; color: #166534; }
+  .sync-setup p { font-size: 0.78rem; color: #15803d; margin-bottom: 10px; line-height: 1.5; }
+  .sync-setup input { width: 100%; padding: 8px 12px; border: 1.5px solid #bbf7d0; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; font-family: monospace; }
+  .sync-setup .setup-actions { display: flex; gap: 8px; }
+  .sync-setup .setup-actions .btn { font-size: 0.8rem; padding: 6px 14px; }
 
   .toolbar {
     display: flex; justify-content: center; gap: 10px;
@@ -315,7 +328,7 @@
   <button class="hamburger" id="hamburgerBtn" aria-label="菜单" title="分类导航">☰</button>
   <h1>🤿 产品出库价格表</h1>
   <div class="subtitle">Diving Equipment Export Price List · 双击单元格即可编辑</div>
-  <div class="update-time" id="updateTime">数据已加载</div>
+  <div class="update-time"><span id="updateTime">数据已加载</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>
@@ -334,14 +347,26 @@
 
 <div class="container">
   <div class="toolbar">
-    <button class="btn btn-save" id="btnSave"><span class="icon">📱</span> 同步到手机</button>
+    <button class="btn" id="btnSyncSetup" style="background:#f0fdf4;border-color:#86efac;color:#166534;"><span class="icon">⚙️</span> 自动同步设置</button>
     <button class="btn btn-export" id="btnExport"><span class="icon">📥</span> 导出 CSV</button>
     <button class="btn btn-reset" id="btnReset"><span class="icon">🔄</span> 恢复原始数据</button>
     <button class="btn" id="btnExportJSON" style="background:#fefce8;border-color:#fde68a;color:#92400e;"><span class="icon">📤</span> 导出 JSON</button>
 	    <button class="btn" id="btnImportJSON" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534;"><span class="icon">📥</span> 导入 JSON</button>
 	    <input type="file" id="importFileInput" accept=".json" style="display:none;">
-	    <span style="font-size:0.78rem;color:var(--text-secondary);display:flex;align-items:center;margin-left:8px;">💡 双击单元格编辑 | 改动后记得点保存 | Ctrl+S 快捷保存</span>
+	    <span style="font-size:0.78rem;color:var(--text-secondary);display:flex;align-items:center;margin-left:8px;">💡 双击单元格编辑 · 自动保存到云端</span>
   </div>
+
+  <!-- 自动同步设置面板 -->
+  <div class="sync-setup" id="syncSetup">
+    <h3>⚙️ 自动同步到手机</h3>
+    <p>设置 GitHub Token 后，每次编辑都会自动推送到云端，手机端即时同步。<br>前往 <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> 创建 <b>Fine-grained token</b>，选择仓库 <b>Casillaswzz/product-prices</b>，权限勾选 <b>Contents (Read & Write)</b>。</p>
+    <input type="password" id="githubTokenInput" placeholder="粘贴 GitHub Token...">
+    <div class="setup-actions">
+      <button class="btn btn-save" id="btnSaveToken">✅ 保存并启用自动同步</button>
+      <button class="btn" id="btnClearToken">🗑️ 清除 Token</button>
+    </div>
+  </div>
+
   <div class="summary-grid" id="summaryGrid"></div>
   <div class="tabs" id="tabs"></div>
   <div id="content"></div>
@@ -506,21 +531,57 @@
     localStorage.setItem("product-price-data", JSON.stringify(categories));
     localStorage.setItem("product-price-data-version", now);
     document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + new Date().toLocaleString("zh-CN") + "）";
+    scheduleSync();
+  }
+
+  var syncTimer = null;
+  function scheduleSync() {
+    var token = localStorage.getItem("github-sync-token");
+    if (!token) return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncToGitHub, 3000);
+  }
+
+  function updateSyncStatus(status) {
+    var dot = document.getElementById("syncDot");
+    if (!dot) return;
+    dot.className = "sync-dot";
+    if (status === "syncing") dot.className = "sync-dot syncing";
+    else if (status === "synced") dot.className = "sync-dot synced";
+    else if (status === "error") dot.className = "sync-dot error";
+  }
+
+  function syncToGitHub() {
+    var token = localStorage.getItem("github-sync-token");
+    if (!token) return;
+    updateSyncStatus("syncing");
+    var wrapper = { version: new Date().toISOString().slice(0,10), updated: new Date().toISOString(), categories: categories };
+    var content = JSON.stringify(wrapper, null, 2);
+    var base64 = btoa(unescape(encodeURIComponent(content)));
+    var filename = "data/wholesale.json";
+
+    fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/" + filename, {
+      headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
+    })
+    .then(function(r) { if (!r.ok) throw new Error("fetch sha failed"); return r.json(); })
+    .then(function(data) {
+      return fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/" + filename, {
+        method: "PUT",
+        headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "自动同步: " + new Date().toLocaleString("zh-CN"), content: base64, sha: data.sha })
+      });
+    })
+    .then(function(r) {
+      if (r.ok) { updateSyncStatus("synced"); }
+      else { updateSyncStatus("error"); console.error("GitHub sync failed:", r.status); }
+    })
+    .catch(function(err) { updateSyncStatus("error"); console.error("GitHub sync error:", err); });
   }
 
   function saveData() {
     autoSave();
-    // Download JSON for cross-device sync
-    var now = new Date().toISOString().slice(0, 10);
-    var wrapper = { version: now, updated: new Date().toISOString(), categories: categories };
-    var blob = new Blob([JSON.stringify(wrapper, null, 2)], { type: "application/json;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "wholesale.json";
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast("📱 同步文件已下载，放入仓库 data/ 目录并 git push 即可同步到手机", "success");
+    scheduleSync();
+    showToast("✅ 已保存，正在同步到云端...", "success");
   }
 
   function resetData() {
@@ -817,7 +878,32 @@
     }
   }
 
-  document.getElementById("btnSave").addEventListener("click", saveData);
+  // 自动同步设置按钮
+  var syncSetup = document.getElementById("syncSetup");
+  document.getElementById("btnSyncSetup").addEventListener("click", function() {
+    syncSetup.classList.toggle("show");
+    var token = localStorage.getItem("github-sync-token");
+    if (token) document.getElementById("githubTokenInput").value = token;
+  });
+  document.getElementById("btnSaveToken").addEventListener("click", function() {
+    var token = document.getElementById("githubTokenInput").value.trim();
+    if (!token) { showToast("❌ 请输入 GitHub Token", ""); return; }
+    localStorage.setItem("github-sync-token", token);
+    syncSetup.classList.remove("show");
+    updateSyncStatus("syncing");
+    showToast("✅ Token 已保存！编辑数据后将自动同步到云端", "success");
+    syncToGitHub();
+  });
+  document.getElementById("btnClearToken").addEventListener("click", function() {
+    if (confirm("确定清除 Token 并停止自动同步吗？")) {
+      localStorage.removeItem("github-sync-token");
+      document.getElementById("githubTokenInput").value = "";
+      updateSyncStatus("");
+      showToast("🗑️ Token 已清除，自动同步已停止");
+    }
+  });
+  // 移动端保存按钮仍可用
+  document.getElementById("btnSaveM").addEventListener("click", saveData);
   document.getElementById("btnExport").addEventListener("click", exportCSV);
   document.getElementById("btnExportJSON").addEventListener("click", exportJSON);
   document.getElementById("btnImportJSON").addEventListener("click", function() { document.getElementById("importFileInput").click(); });
@@ -861,6 +947,16 @@
   document.addEventListener("DOMContentLoaded", function() {
     loadData();
     renderAll("");
+    // 检查是否已配置自动同步
+    var token = localStorage.getItem("github-sync-token");
+    if (token) {
+      updateSyncStatus("syncing");
+      document.getElementById("githubTokenInput").value = token;
+      syncToGitHub();
+    } else {
+      updateSyncStatus("");
+      setTimeout(function() { showToast("💡 点击「⚙️ 自动同步设置」配置 GitHub Token，实现编辑后自动同步到手机", ""); }, 1500);
+    }
     var input = document.getElementById("searchInput");
     input.addEventListener("input", function() { renderAll(input.value); });
     input.addEventListener("keydown", function(e) { if (e.key === "Escape") { input.value = ""; renderAll(""); } });
