@@ -535,7 +535,7 @@
     el.textContent = msg;
     el.className = "toast " + (type || "") + " show";
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function() { el.classList.remove("show"); }, 2000);
+    toastTimer = setTimeout(function() { el.classList.remove("show"); }, 3000);
   }
 
   function syncDOMtoData() {
@@ -559,12 +559,19 @@
   }
 
   function autoSave() {
-    syncDOMtoData();
-    var now = new Date().toISOString().slice(0, 10);
-    localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
-    localStorage.setItem("product-retail-price-data-version", now);
-    document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + new Date().toLocaleString("zh-CN") + "）";
-    scheduleSync();
+    try {
+      syncDOMtoData();
+      var now = new Date().toISOString().slice(0, 10);
+      localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
+      localStorage.setItem("product-retail-price-data-version", now);
+      var timeStr = new Date().toLocaleString("zh-CN");
+      document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + timeStr + "）";
+      showToast("✅ 已自动保存 " + timeStr.slice(-8), "success");
+      scheduleSync();
+    } catch(e) {
+      console.error("autoSave error:", e);
+      showToast("❌ 自动保存失败，请刷新后重试", "");
+    }
   }
 
   var syncTimer = null;
