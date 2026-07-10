@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-10",
-  "updated": "2026-07-10T00:26:52.086581",
+  "version": "2026-07-11",
+  "updated": "2026-07-11T00:00:00.000000",
   "categories": [
     {
       "id": "mask",
@@ -321,6 +321,39 @@
           "7800"
         ]
       ]
+    },
+    {
+      "id": "gloves",
+      "name": "手套&头套系列",
+      "icon": "🧤",
+      "iconClass": "gloves",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": []
+    },
+    {
+      "id": "reel",
+      "name": "线轮&象拔系列",
+      "icon": "🧵",
+      "iconClass": "reel",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": []
+    },
+    {
+      "id": "tactic",
+      "name": "Tactic系列",
+      "icon": "🎯",
+      "iconClass": "tactic",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": []
     },
     {
       "id": "accessory",
