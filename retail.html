@@ -533,11 +533,13 @@
     if (saved) {
       try { categories = JSON.parse(saved); } catch(e) { categories = JSON.parse(JSON.stringify(ORIGINAL_DATA)); }
       // auto-migrate: add new categories from ORIGINAL_DATA not in saved data
-      if (savedVersion !== DATA_VERSION) {
+      var migrationVer = localStorage.getItem("product-retail-price-migration") || "";
+      if (migrationVer !== DATA_VERSION) {
         categories = migrateData(categories);
         localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
-        localStorage.setItem("product-retail-price-data-version", DATA_VERSION);
-        savedVersion = DATA_VERSION; // 更新局部变量，防止后续服务器旧数据覆盖
+        localStorage.setItem("product-retail-price-data-version", "0"); // 触发服务器同步
+        localStorage.setItem("product-retail-price-migration", DATA_VERSION);
+        savedVersion = "0";
       }
     } else {
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
@@ -569,6 +571,7 @@
   function resetToOriginal() {
     categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
     localStorage.removeItem("product-retail-price-data-version");
+    localStorage.removeItem("product-retail-price-migration");
     document.getElementById("updateTime").textContent = "数据来源：产品零售价格.docx";
   }
 
@@ -672,6 +675,7 @@
       resetToOriginal();
       localStorage.removeItem("product-retail-price-data");
       localStorage.removeItem("product-retail-price-data-version");
+      localStorage.removeItem("product-retail-price-migration");
       renderAll("");
       document.getElementById("searchInput").value = "";
       showToast("🔄 已恢复为原始数据");
