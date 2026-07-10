@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>产品零售价格表</title>
 <style>
   :root {
@@ -506,7 +509,7 @@
     }
   ];
 
-  var DATA_VERSION = "2025-07-11-3cats"; // 新增手套&头套、线轮&象拔、Tactic系列
+  var DATA_VERSION = "2026-07-11.3cats"; // 新增手套&头套、线轮&象拔、Tactic系列（版本号>=服务器日期，防止覆盖）
 
   var categories = [];
 
@@ -541,7 +544,7 @@
     }
 
     // Background sync: try to fetch server data for latest version
-    fetch('data/retail.json')
+    fetch('data/retail.json?v=' + DATA_VERSION)
       .then(function(res) { if (!res.ok) throw new Error('no server data'); return res.json(); })
       .then(function(wrapper) {
         var serverCats = wrapper.categories || wrapper;
