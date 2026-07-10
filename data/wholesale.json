@@ -1,6 +1,6 @@
 {
   "version": "2026-07-10",
-  "updated": "2026-07-10T00:26:52.086162",
+  "updated": "2026-07-10T19:26:44.469Z",
   "categories": [
     {
       "id": "mask",
@@ -17,6 +17,14 @@
           "340"
         ],
         [
+          "TUSA M110",
+          "720 / CB"
+        ],
+        [
+          "TUSA M212",
+          "405"
+        ],
+        [
           "TUSA M1010",
           "515"
         ],
@@ -25,24 +33,20 @@
           "586"
         ],
         [
-          "TUSA M212",
-          "405"
-        ],
-        [
-          "TUSA M110 银角大王",
-          "720 / CB"
-        ],
-        [
           "TUSA M1007S",
           "1120"
+        ],
+        [
+          "TUSA 面镜带",
+          "92"
         ],
         [
           "TUSA 干式呼吸管",
           "240"
         ],
         [
-          "TUSA 面镜带",
-          "92"
+          "Apollo 85cc 铝合金",
+          "850"
         ],
         [
           "Apollo 95CC 不锈钢",
@@ -53,16 +57,12 @@
           "2240"
         ],
         [
-          "面镜 Apollo 85cc 铝合金",
-          "850"
+          "Apollo 防雾贴",
+          "80"
         ],
         [
           "Apollo 近视镜片",
           "320/片"
-        ],
-        [
-          "Apollo 防雾贴",
-          "80"
         ],
         [
           "国产大神面镜",
@@ -73,8 +73,16 @@
           "105"
         ],
         [
-          "四元素 Seeker 面镜",
+          "四元素 面镜带",
+          "227.5"
+        ],
+        [
+          "四元素 Seeker",
           "1800×0.7=1260"
+        ],
+        [
+          "Cressi Cressi F1",
+          "211.25"
         ],
         [
           "Gull Vader / Gull Vader Fanette",
@@ -86,7 +94,7 @@
         ],
         [
           "Super Bullet Mini",
-          "CB"
+          "280"
         ]
       ]
     },
@@ -221,12 +229,16 @@
           "259 / 339"
         ],
         [
-          "天空森林D7+Max",
-          "405"
+          "虎鲸D710",
+          "372"
         ],
         [
           "探险家M1500",
           "200"
+        ],
+        [
+          "天空森林D7+Max",
+          "405"
         ]
       ]
     },
@@ -247,6 +259,10 @@
         [
           "Gull Supermew",
           "850"
+        ],
+        [
+          "OMS Slipstream FIN",
+          "800"
         ]
       ]
     },
@@ -261,16 +277,36 @@
       ],
       "products": [
         [
-          "佳明G2",
+          "佳明 G2",
           "5480×0.75=4110"
+        ],
+        [
+          "Suunto Nautic",
+          "4199"
+        ],
+        [
+          "Suunto Nautic S",
+          "2939"
+        ],
+        [
+          "Shearwater Tern Tx",
+          "2800"
         ],
         [
           "Shearwater Perdix 2",
           "3900"
         ],
         [
-          "Shearwater Tern Tx",
-          "CB"
+          "Shearwater Swit 传感器",
+          "2200"
+        ],
+        [
+          "Shearwater Peregrine TX",
+          "3700"
+        ],
+        [
+          "Shearwater Peregrine Dark",
+          "2800"
         ]
       ]
     },
@@ -285,12 +321,12 @@
       ],
       "products": [
         [
-          "Scubapro MK25 EVO/G260/赠R105 OCT/钢表+高压管",
-          "6281.4"
+          "Atomic Z3 水货",
+          "1890"
         ],
         [
-          "Scubapro S620ti 白色Yoke/赠R105 备用/钢表+高压管",
-          "7279.8"
+          "Atomic TFX 水货",
+          "12600"
         ]
       ]
     },
