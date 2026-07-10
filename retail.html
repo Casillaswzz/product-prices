@@ -740,7 +740,7 @@
         if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visibleIndices.push({ p: p, i: i });
       });
       totalVisible += visibleIndices.length;
-      var hiddenClass = visibleIndices.length === 0 ? "hidden" : "";
+      var hiddenClass = (filterLower && visibleIndices.length === 0) ? "hidden" : "";
       return '<div class="category ' + hiddenClass + '" id="cat-' + cat.id + '">'
         + '<div class="category-header"><div class="category-header-left">'
         + '<div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div>'
