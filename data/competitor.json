@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T06:32:57.690Z",
+  "updated": "2026-07-11T06:33:15.024Z",
   "categories": [
     {
       "id": "mask",
@@ -440,7 +440,7 @@
     },
     {
       "id": "wetsuit",
-      "name": "湿衣&斗篷&背心&短裤",
+      "name": "湿衣&斗篷系列",
       "icon": "🦺",
       "iconClass": "wetsuit",
       "columns": [
