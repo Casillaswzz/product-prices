@@ -217,9 +217,7 @@
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>
 	    <span class="mobile-actions">
-	      <button class="btn btn-save btn-sm" id="btnSaveM"><span class="icon">💾</span></button>
-	      <button class="btn btn-export btn-sm" id="btnExportM"><span class="icon">📥</span></button>
-	      <button class="btn btn-reset btn-sm" id="btnResetM"><span class="icon">🔄</span></button>
+	      <button class="btn btn-save btn-sm" id="btnSaveM" title="保存并同步"><span class="icon">🔄</span></button>
 	    </span>
   </div>
 </div>
@@ -758,7 +756,19 @@
     }
   });
   // 移动端保存按钮仍可用
-  document.getElementById("btnSaveM").addEventListener("click", saveData);
+  document.getElementById("btnSaveM").addEventListener("click", function() {
+    saveData();
+    fetch('data/competitor.json?v=' + DATA_VERSION)
+      .then(function(res) { if (!res.ok) throw new Error('no data'); return res.json(); })
+      .then(function(wrapper) {
+        categories = JSON.parse(JSON.stringify(wrapper.categories || wrapper));
+        localStorage.setItem("competitor-price-data", JSON.stringify(categories));
+        localStorage.setItem("competitor-price-data-version", wrapper.version || "");
+        renderAll(document.getElementById("searchInput").value);
+        showToast("✅ 已同步最新数据", "success");
+      })
+      .catch(function() {});
+  });
   document.getElementById("btnExport").addEventListener("click", exportCSV);
   document.getElementById("btnExportJSON").addEventListener("click", exportJSON);
   document.getElementById("btnImportJSON").addEventListener("click", function() { document.getElementById("importFileInput").click(); });
