@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T04:08:32.829Z",
+  "updated": "2026-07-11T04:08:46.198Z",
   "categories": [
     {
       "id": "mask",
@@ -289,6 +289,10 @@
           "2939"
         ],
         [
+          "SUUNTO OCEAN",
+          "4199"
+        ],
+        [
           "Shearwater Tern Tx",
           "2800"
         ],
@@ -307,10 +311,6 @@
         [
           "Shearwater Peregrine Dark",
           "2800"
-        ],
-        [
-          "SUUNTO OCEAN",
-          "4199"
         ]
       ]
     },
