@@ -74,7 +74,9 @@
   .category-icon.computer { background: #fee2e2; } .category-icon.buoyancy { background: #e8e0f0; }
   .category-icon.regulator { background: #fff7ed; } .category-icon.bag { background: #f1f5f9; }
 .category-icon.vest { background: #f0fdf4; }
-  .category-title { font-size: 1.15rem; font-weight: 700; }
+  .category-title { font-size: 1.15rem; font-weight: 700; cursor: text; border-radius: 4px; padding: 2px 6px; margin: -2px -6px; transition: all 0.15s; }
+.category-title:hover { background: #eef2ff; box-shadow: inset 0 0 0 1px #a5b4fc; }
+.category-title:focus { outline: none; background: #eef2ff; box-shadow: inset 0 0 0 2px var(--accent); }
   .category-count { font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; }
   .table-wrapper { background: var(--card-bg); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -117,6 +119,10 @@
   .sidebar-item .si-icon { font-size: 0.8rem; flex-shrink: 0; width: 18px; text-align: center; }
   .sidebar-item .si-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
   .sidebar-item .si-count { font-size: 0.55rem; opacity: 0.6; background: var(--border); padding: 0 4px; border-radius: 6px; line-height: 1.3; }
+.sidebar-item.dragging { opacity: 0.35; }
+.sidebar-item.drag-over { border-top: 2px solid var(--accent); padding-top: 1px; }
+.drag-handle { cursor: grab; opacity: 0.35; font-size: 0.6rem; margin-right: 1px; flex-shrink: 0; letter-spacing: 1px; line-height: 1; }
+.drag-handle:active { cursor: grabbing; }
   .sidebar-divider { height: 1px; background: var(--border); margin: 6px 4px; }
   .sidebar-page-link { display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 5px; border: none; background: transparent; cursor: pointer; font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; transition: all 0.15s; text-align: left; width: 100%; text-decoration: none; }
   .sidebar-page-link:hover { background: #eef2ff; color: var(--text); }
@@ -513,7 +519,7 @@
       var visibleIndices = []; cat.products.forEach(function(p, i) { if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visibleIndices.push({ p: p, i: i }); });
       totalVisible += visibleIndices.length;
       return '<div class="category ' + (visibleIndices.length === 0 ? "hidden" : "") + '" id="cat-' + cat.id + '">'
-        + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
+        + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title" contenteditable="true">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
         + '<div class="table-wrapper"><table><thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead><tbody>'
         + visibleIndices.map(function(item) {
             return '<tr data-idx="' + item.i + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="上移">▲</button><button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="下移">▼</button><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button></td></tr>';
@@ -525,7 +531,7 @@
   }
   function renderSidebar() {
     var html = categories.map(function(cat) {
-      return '<button class="sidebar-item" data-cat="' + cat.id + '"><span class="si-icon">' + cat.icon + '</span><span class="si-name">' + cat.name + '</span><span class="si-count">' + cat.products.length + '</span></button>';
+      return '<button class="sidebar-item" draggable="true" data-cat="' + cat.id + '"><span class="drag-handle" title="拖拽排序">⋮⋮</span><span class="si-icon">' + cat.icon + '</span><span class="si-name">' + cat.name + '</span><span class="si-count">' + cat.products.length + '</span></button>';
     }).join("");
     html += '<div class="sidebar-divider"></div>';
     html += '<a href="wholesale.html" class="sidebar-page-link">📦 出库价格</a>';
@@ -627,6 +633,19 @@
     if (e.target.matches("td.price[contenteditable]")) {
       autoCalculate(e.target);
     }
+    if (e.target.matches(".category-title[contenteditable]")) {
+      var newName = e.target.textContent.trim();
+      if (!newName) { renderAll(document.getElementById("searchInput").value); return; }
+      var catDiv = e.target.closest(".category");
+      if (catDiv) {
+        var catId = catDiv.id.replace("cat-", "");
+        for (var i = 0; i < categories.length; i++) {
+          if (categories[i].id === catId) { categories[i].name = newName; break; }
+        }
+        renderSidebar();
+        autoSave();
+      }
+    }
     if (e.target.matches("td[contenteditable]")) {
       autoSave();
     }
@@ -641,6 +660,23 @@
     var el = document.getElementById("cat-" + id);
     if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); }); var tab = document.querySelector('.tab[data-cat="' + id + '"]'); if (tab) tab.classList.add("active"); }
   }
+
+  function getCategoryIndexById(id) {
+    for (var i = 0; i < categories.length; i++) {
+      if (categories[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  function reorderCategories(fromIndex, toIndex) {
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= categories.length || toIndex >= categories.length) return;
+    var item = categories.splice(fromIndex, 1)[0];
+    categories.splice(toIndex, 0, item);
+    var searchVal = document.getElementById("searchInput").value;
+    renderAll(searchVal);
+    autoSave();
+  }
+
   // 自动同步设置按钮
   var syncSetup = document.getElementById("syncSetup");
   document.getElementById("btnSyncSetup").addEventListener("click", function() {
@@ -739,7 +775,38 @@
 	      if (e.target.closest(".sidebar-item") || e.target.closest(".sidebar-page-link") || e.target.closest("#sidebarTopBtn")) {
 	        setTimeout(function() { sidebar.classList.remove("mobile-open"); sidebarOverlay.classList.remove("open"); }, 200);
 	      }
-	    }); applySidebarOffset();
+	    });
+    // 侧边栏拖拽排序
+    var dragSrcIndex = -1;
+    sidebar.addEventListener("dragstart", function(e) {
+      var item = e.target.closest(".sidebar-item");
+      if (!item) return;
+      dragSrcIndex = getCategoryIndexById(item.getAttribute("data-cat"));
+      item.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", item.getAttribute("data-cat"));
+    });
+    sidebar.addEventListener("dragover", function(e) {
+      e.preventDefault();
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("drag-over"); });
+      var item = e.target.closest(".sidebar-item");
+      if (item) { item.classList.add("drag-over"); e.dataTransfer.dropEffect = "move"; }
+    });
+    sidebar.addEventListener("drop", function(e) {
+      e.preventDefault();
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      var item = e.target.closest(".sidebar-item");
+      if (item && dragSrcIndex >= 0) {
+        var toIndex = getCategoryIndexById(item.getAttribute("data-cat"));
+        if (toIndex >= 0 && dragSrcIndex !== toIndex) reorderCategories(dragSrcIndex, toIndex);
+      }
+      dragSrcIndex = -1;
+    });
+    sidebar.addEventListener("dragend", function(e) {
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("dragging", "drag-over"); });
+      dragSrcIndex = -1;
+    });
+    applySidebarOffset();
     var backToTop = document.getElementById("backToTop"); window.addEventListener("scroll", function() { if (window.scrollY > 400) backToTop.classList.add("visible"); else backToTop.classList.remove("visible"); updateActiveSidebarItem(); });
     backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); }); setTimeout(updateActiveSidebarItem, 200);
   });

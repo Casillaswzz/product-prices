@@ -144,7 +144,9 @@
 
   .category-icon.accessory { background: #f1f5f9; }
 .category-icon.vest { background: #f0fdf4; }
-  .category-title { font-size: 1.15rem; font-weight: 700; }
+  .category-title { font-size: 1.15rem; font-weight: 700; cursor: text; border-radius: 4px; padding: 2px 6px; margin: -2px -6px; transition: all 0.15s; }
+  .category-title:hover { background: #eff6ff; box-shadow: inset 0 0 0 1px #93c5fd; }
+  .category-title:focus { outline: none; background: #eff6ff; box-shadow: inset 0 0 0 2px var(--accent); }
   .category-count { font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; }
 
   .table-wrapper { background: var(--card-bg); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
@@ -231,6 +233,10 @@
   .sidebar-item .si-icon { font-size: 0.85rem; flex-shrink: 0; width: 20px; text-align: center; }
   .sidebar-item .si-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
   .sidebar-item .si-count { font-size: 0.58rem; opacity: 0.6; background: var(--border); padding: 0 4px; border-radius: 6px; line-height: 1.3; }
+  .sidebar-item.dragging { opacity: 0.35; }
+  .sidebar-item.drag-over { border-top: 2px solid var(--accent); padding-top: 3px; }
+  .drag-handle { cursor: grab; opacity: 0.35; font-size: 0.6rem; margin-right: 1px; flex-shrink: 0; letter-spacing: 1px; line-height: 1; }
+  .drag-handle:active { cursor: grabbing; }
 
   .sidebar-divider { height: 1px; background: var(--border); margin: 6px 4px; }
   .sidebar-page-link {
@@ -758,7 +764,7 @@
       return '<div class="category ' + hiddenClass + '" id="cat-' + cat.id + '">'
         + '<div class="category-header"><div class="category-header-left">'
         + '<div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div>'
-        + '<div><span class="category-title">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div>'
+        + '<div><span class="category-title" contenteditable="true">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div>'
         + '</div></div>'
         + '<div class="table-wrapper"><table>'
         + '<thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead>'
@@ -790,7 +796,8 @@
   function renderSidebar() {
     var sidebar = document.getElementById("sidebar");
     var html = categories.map(function(cat) {
-      return '<button class="sidebar-item" data-cat="' + cat.id + '">'
+      return '<button class="sidebar-item" draggable="true" data-cat="' + cat.id + '">'
+        + '<span class="drag-handle" title="拖拽排序">⋮⋮</span>'
         + '<span class="si-icon">' + cat.icon + '</span>'
         + '<span class="si-name">' + cat.name + '</span>'
         + '<span class="si-count">' + cat.products.length + '</span></button>';
@@ -937,6 +944,19 @@
     if (e.target.matches("td.price[contenteditable]")) {
       autoCalculate(e.target);
     }
+    if (e.target.matches(".category-title[contenteditable]")) {
+      var newName = e.target.textContent.trim();
+      if (!newName) { renderAll(document.getElementById("searchInput").value); return; }
+      var catDiv = e.target.closest(".category");
+      if (catDiv) {
+        var catId = catDiv.id.replace("cat-", "");
+        for (var i = 0; i < categories.length; i++) {
+          if (categories[i].id === catId) { categories[i].name = newName; break; }
+        }
+        renderSidebar();
+        autoSave();
+      }
+    }
     if (e.target.matches("td[contenteditable]")) {
       autoSave();
     }
@@ -960,6 +980,22 @@
       var tab = document.querySelector('.tab[data-cat="' + id + '"]');
       if (tab) tab.classList.add("active");
     }
+  }
+
+  function getCategoryIndexById(id) {
+    for (var i = 0; i < categories.length; i++) {
+      if (categories[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  function reorderCategories(fromIndex, toIndex) {
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= categories.length || toIndex >= categories.length) return;
+    var item = categories.splice(fromIndex, 1)[0];
+    categories.splice(toIndex, 0, item);
+    var searchVal = document.getElementById("searchInput").value;
+    renderAll(searchVal);
+    autoSave();
   }
 
   // 自动同步设置按钮
@@ -1072,6 +1108,37 @@
 	        setTimeout(function() { sidebar.classList.remove("mobile-open"); sidebarOverlay.classList.remove("open"); }, 200);
 	      }
 	    });
+    // 侧边栏拖拽排序
+    var dragSrcIndex = -1;
+    sidebar.addEventListener("dragstart", function(e) {
+      var item = e.target.closest(".sidebar-item");
+      if (!item) return;
+      dragSrcIndex = getCategoryIndexById(item.getAttribute("data-cat"));
+      item.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", item.getAttribute("data-cat"));
+    });
+    sidebar.addEventListener("dragover", function(e) {
+      e.preventDefault();
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("drag-over"); });
+      var item = e.target.closest(".sidebar-item");
+      if (item) { item.classList.add("drag-over"); e.dataTransfer.dropEffect = "move"; }
+    });
+    sidebar.addEventListener("drop", function(e) {
+      e.preventDefault();
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      var item = e.target.closest(".sidebar-item");
+      if (item && dragSrcIndex >= 0) {
+        var toIndex = getCategoryIndexById(item.getAttribute("data-cat"));
+        if (toIndex >= 0 && dragSrcIndex !== toIndex) reorderCategories(dragSrcIndex, toIndex);
+      }
+      dragSrcIndex = -1;
+    });
+    sidebar.addEventListener("dragend", function(e) {
+      sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("dragging", "drag-over"); });
+      dragSrcIndex = -1;
+    });
+
     applySidebarOffset();
 
     var backToTop = document.getElementById("backToTop");
