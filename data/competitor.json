@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T06:45:31.262Z",
+  "updated": "2026-07-11T06:45:36.882Z",
   "categories": [
     {
       "id": "mask",
@@ -344,7 +344,7 @@
     },
     {
       "id": "gloves",
-      "name": "手套&头套&靴子系列",
+      "name": "手套&头套系列",
       "icon": "🧤",
       "iconClass": "gloves",
       "columns": [
