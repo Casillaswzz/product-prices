@@ -486,9 +486,9 @@
       if (migrationVer !== DATA_VERSION) {
         categories = migrateData(categories);
         localStorage.setItem("product-price-data", JSON.stringify(categories));
-        localStorage.setItem("product-price-data-version", "0");
+        localStorage.setItem("product-price-data-version", DATA_VERSION);
         localStorage.setItem("product-price-migration", DATA_VERSION);
-        savedVersion = "0";
+        savedVersion = DATA_VERSION;
       }
     } else {
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));

@@ -349,9 +349,9 @@
       if (migrationVer !== DATA_VERSION) {
         categories = migrateData(categories);
         localStorage.setItem("competitor-price-data", JSON.stringify(categories));
-        localStorage.setItem("competitor-price-data-version", "0");
+        localStorage.setItem("competitor-price-data-version", DATA_VERSION);
         localStorage.setItem("competitor-price-migration", DATA_VERSION);
-        savedVersion = "0";
+        savedVersion = DATA_VERSION;
       }
     } else {
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));

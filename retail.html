@@ -543,9 +543,9 @@
       if (migrationVer !== DATA_VERSION) {
         categories = migrateData(categories);
         localStorage.setItem("product-retail-price-data", JSON.stringify(categories));
-        localStorage.setItem("product-retail-price-data-version", "0"); // 触发服务器同步
+        localStorage.setItem("product-retail-price-data-version", DATA_VERSION);
         localStorage.setItem("product-retail-price-migration", DATA_VERSION);
-        savedVersion = "0";
+        savedVersion = DATA_VERSION;
       }
     } else {
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
