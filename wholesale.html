@@ -172,6 +172,12 @@
   .btn-move-up:hover { background: #f0f9ff; color: #0ea5e9; border-color: #bae6fd; }
   .btn-move-down:hover { background: #f0f9ff; color: #0ea5e9; border-color: #bae6fd; }
 
+  .row-drag-handle { cursor: grab; opacity: 0.35; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 30px; vertical-align: middle; margin-right: 2px; }
+  .row-drag-handle:active { cursor: grabbing; opacity: 0.7; }
+  .row-drag-handle:hover { opacity: 0.7; }
+  tbody tr.dragging { opacity: 0.35; }
+  tbody tr.drag-over { border-top: 2px solid var(--accent); }
+
   .add-row-area { padding: 10px 16px; text-align: center; border-top: 1px dashed var(--border); }
   .btn-add-row {
     padding: 7px 20px; border-radius: 6px; border: 1.5px dashed #cbd5e1;
@@ -732,10 +738,11 @@
         + '<tbody>'
         + (visibleIndices.length > 0 ? visibleIndices.map(function(item) {
             var name = item.p[0], price = item.p[1], idx = item.i;
-            return '<tr data-idx="' + idx + '">'
+            return '<tr draggable="true" data-idx="' + idx + '" data-cat="' + cat.id + '">'
               + '<td class="product-name" contenteditable="true">' + highlightMatch(name, filterLower) + '</td>'
               + '<td class="price ' + getPriceClass(price) + '" contenteditable="true">' + highlightMatch(price, filterLower) + '</td>'
               + '<td class="row-actions">'
+              + '<span class="row-drag-handle" title="拖拽排序">⋮⋮</span>'
               + '<button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + idx + '" title="上移">▲</button>'
               + '<button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + idx + '" title="下移">▼</button>'
               + '<button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + idx + '" title="删除此行">✕</button>'
@@ -835,6 +842,18 @@
     var temp = cat.products[idx];
     cat.products[idx] = cat.products[newIdx];
     cat.products[newIdx] = temp;
+    renderAll(document.getElementById("searchInput").value);
+    autoSave();
+  }
+
+  function moveRowTo(catId, fromIdx, toIdx) {
+    syncDOMtoData();
+    var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat || fromIdx < 0 || toIdx < 0 || fromIdx >= cat.products.length || toIdx >= cat.products.length) return;
+    if (fromIdx === toIdx) return;
+    var item = cat.products.splice(fromIdx, 1)[0];
+    cat.products.splice(toIdx, 0, item);
     renderAll(document.getElementById("searchInput").value);
     autoSave();
   }
@@ -1138,6 +1157,38 @@
     sidebar.addEventListener("dragend", function(e) {
       sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("dragging", "drag-over"); });
       dragSrcIndex = -1;
+    });
+
+    // 产品行拖拽排序
+    var rowDrag = { cat: null, idx: -1 };
+    document.addEventListener("dragstart", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat")) return;
+      rowDrag.cat = tr.getAttribute("data-cat");
+      rowDrag.idx = parseInt(tr.getAttribute("data-idx"), 10);
+      tr.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    document.addEventListener("dragover", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat") || tr.getAttribute("data-cat") !== rowDrag.cat) return;
+      e.preventDefault();
+      document.querySelectorAll("tr.drag-over").forEach(function(el) { el.classList.remove("drag-over"); });
+      tr.classList.add("drag-over");
+      e.dataTransfer.dropEffect = "move";
+    });
+    document.addEventListener("drop", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat") || tr.getAttribute("data-cat") !== rowDrag.cat) return;
+      e.preventDefault();
+      document.querySelectorAll("tr.drag-over, tr.dragging").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      var toIdx = parseInt(tr.getAttribute("data-idx"), 10);
+      if (rowDrag.idx >= 0 && rowDrag.idx !== toIdx) moveRowTo(rowDrag.cat, rowDrag.idx, toIdx);
+      rowDrag = { cat: null, idx: -1 };
+    });
+    document.addEventListener("dragend", function(e) {
+      document.querySelectorAll("tr.drag-over, tr.dragging").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      rowDrag = { cat: null, idx: -1 };
     });
 
     applySidebarOffset();

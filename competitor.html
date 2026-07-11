@@ -100,6 +100,12 @@
   .btn-move-up, .btn-move-down { width: 30px; height: 30px; border-radius: 6px; border: 1px solid transparent; background: transparent; cursor: pointer; font-size: 1rem; color: #94a3b8; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
   .btn-move-up:hover { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
   .btn-move-down:hover { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
+
+  .row-drag-handle { cursor: grab; opacity: 0.35; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 30px; vertical-align: middle; margin-right: 2px; }
+  .row-drag-handle:active { cursor: grabbing; opacity: 0.7; }
+  .row-drag-handle:hover { opacity: 0.7; }
+  tbody tr.dragging { opacity: 0.35; }
+  tbody tr.drag-over { border-top: 2px solid var(--accent); }
   .add-row-area { padding: 10px 16px; text-align: center; border-top: 1px dashed var(--border); }
   .btn-add-row { padding: 7px 20px; border-radius: 6px; border: 1.5px dashed #cbd5e1; background: transparent; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-add-row:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
@@ -528,7 +534,7 @@
         + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title" contenteditable="true">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
         + '<div class="table-wrapper"><table><thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead><tbody>'
         + (visibleIndices.length > 0 ? visibleIndices.map(function(item) {
-            return '<tr data-idx="' + item.i + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="上移">▲</button><button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="下移">▼</button><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button></td></tr>';
+            return '<tr draggable="true" data-idx="' + item.i + '" data-cat="' + cat.id + '"><td class="product-name" contenteditable="true">' + highlightMatch(item.p[0], filterLower) + '</td><td class="price ' + getPriceClass(item.p[1]) + '" contenteditable="true">' + highlightMatch(item.p[1], filterLower) + '</td><td class="row-actions"><span class="row-drag-handle" title="拖拽排序">⋮⋮</span><button class="btn-move-up" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="上移">▲</button><button class="btn-move-down" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="下移">▼</button><button class="btn-del-row" data-cat="' + cat.id + '" data-idx="' + item.i + '" title="删除此行">✕</button></td></tr>';
           }).join("") : '<tr class="empty-hint"><td colspan="3" style="text-align:center;color:var(--text-secondary);padding:14px 16px;font-size:0.82rem;">暂无产品，点击下方「＋」添加</td></tr>')
         + '</tbody></table><div class="add-row-area"><button class="btn-add-row" data-cat="' + cat.id + '">＋ 添加新产品</button></div></div></div>';
     }).join("");
@@ -597,6 +603,18 @@
     renderAll(document.getElementById("searchInput").value);
     autoSave();
   }
+  function moveRowTo(catId, fromIdx, toIdx) {
+    syncDOMtoData();
+    var cat = null;
+    for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
+    if (!cat || fromIdx < 0 || toIdx < 0 || fromIdx >= cat.products.length || toIdx >= cat.products.length) return;
+    if (fromIdx === toIdx) return;
+    var item = cat.products.splice(fromIdx, 1)[0];
+    cat.products.splice(toIdx, 0, item);
+    renderAll(document.getElementById("searchInput").value);
+    autoSave();
+  }
+
   document.addEventListener("click", function(e) {
     var t = e.target;
     if (t.closest("#sidebarAddCat")) { addCategory(); return; }
@@ -843,6 +861,38 @@
       sidebar.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("dragging", "drag-over"); });
       dragSrcIndex = -1;
     });
+    // 产品行拖拽排序
+    var rowDrag = { cat: null, idx: -1 };
+    document.addEventListener("dragstart", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat")) return;
+      rowDrag.cat = tr.getAttribute("data-cat");
+      rowDrag.idx = parseInt(tr.getAttribute("data-idx"), 10);
+      tr.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    document.addEventListener("dragover", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat") || tr.getAttribute("data-cat") !== rowDrag.cat) return;
+      e.preventDefault();
+      document.querySelectorAll("tr.drag-over").forEach(function(el) { el.classList.remove("drag-over"); });
+      tr.classList.add("drag-over");
+      e.dataTransfer.dropEffect = "move";
+    });
+    document.addEventListener("drop", function(e) {
+      var tr = e.target.closest("tr[draggable]");
+      if (!tr || !tr.getAttribute("data-cat") || tr.getAttribute("data-cat") !== rowDrag.cat) return;
+      e.preventDefault();
+      document.querySelectorAll("tr.drag-over, tr.dragging").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      var toIdx = parseInt(tr.getAttribute("data-idx"), 10);
+      if (rowDrag.idx >= 0 && rowDrag.idx !== toIdx) moveRowTo(rowDrag.cat, rowDrag.idx, toIdx);
+      rowDrag = { cat: null, idx: -1 };
+    });
+    document.addEventListener("dragend", function(e) {
+      document.querySelectorAll("tr.drag-over, tr.dragging").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
+      rowDrag = { cat: null, idx: -1 };
+    });
+
     applySidebarOffset();
     var backToTop = document.getElementById("backToTop"); window.addEventListener("scroll", function() { if (window.scrollY > 400) backToTop.classList.add("visible"); else backToTop.classList.remove("visible"); updateActiveSidebarItem(); });
     backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); }); setTimeout(updateActiveSidebarItem, 200);
