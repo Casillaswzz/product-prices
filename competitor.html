@@ -518,7 +518,7 @@
     content.innerHTML = categories.map(function(cat) {
       var visibleIndices = []; cat.products.forEach(function(p, i) { if (!filterLower || p[0].toLowerCase().indexOf(filterLower) !== -1) visibleIndices.push({ p: p, i: i }); });
       totalVisible += visibleIndices.length;
-      return '<div class="category ' + (visibleIndices.length === 0 ? "hidden" : "") + '" id="cat-' + cat.id + '">'
+      return '<div class="category ' + ((filterLower && visibleIndices.length === 0) ? "hidden" : "") + '" id="cat-' + cat.id + '">'
         + '<div class="category-header"><div class="category-header-left"><div class="category-icon ' + cat.iconClass + '">' + cat.icon + '</div><div><span class="category-title" contenteditable="true">' + cat.name + '</span><span class="category-count">· ' + visibleIndices.length + ' 款产品</span></div></div></div>'
         + '<div class="table-wrapper"><table><thead><tr><th class="col-name">' + cat.columns[0] + '</th><th class="col-price">' + cat.columns[1] + '</th><th class="col-actions">操作</th></tr></thead><tbody>'
         + visibleIndices.map(function(item) {
