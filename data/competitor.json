@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T06:30:26.420Z",
+  "updated": "2026-07-11T06:30:37.908Z",
   "categories": [
     {
       "id": "mask",
@@ -492,7 +492,7 @@
     },
     {
       "id": "vest",
-      "name": "背心&技潜短裤系列",
+      "name": "背心&短裤系列",
       "icon": "🎽",
       "iconClass": "vest",
       "columns": [
