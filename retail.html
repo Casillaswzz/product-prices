@@ -143,6 +143,7 @@
 .category-icon.tactic { background: #f5f3ff; }
 
   .category-icon.accessory { background: #f1f5f9; }
+.category-icon.vest { background: #f0fdf4; }
   .category-title { font-size: 1.15rem; font-weight: 700; }
   .category-count { font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; }
 
@@ -441,6 +442,11 @@
       ]
     },
     {
+      id: "vest", name: "背心&技潜短裤系列", icon: "🎽", iconClass: "vest",
+      columns: ["产品名称", "零售价格"],
+      products: []
+    },
+    {
       id: "boots", name: "潜水靴系列", icon: "👢", iconClass: "boots",
       columns: ["产品名称", "零售价格"],
       products: [
@@ -509,7 +515,7 @@
     }
   ];
 
-  var DATA_VERSION = "2026-07-11.3cats"; // 新增手套&头套、线轮&象拔、Tactic系列（版本号>=服务器日期，防止覆盖）
+  var DATA_VERSION = "2026-07-11.4cats"; // 新增背心&技潜短裤系列
 
   var categories = [];
 
