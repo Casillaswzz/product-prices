@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-11.vest",
-  "updated": "2026-07-11T12:00:00.000Z",
+  "version": "2026-07-11",
+  "updated": "2026-07-11T05:06:42.336Z",
   "categories": [
     {
       "id": "mask",
@@ -161,17 +161,6 @@
           "266.4"
         ]
       ]
-    },
-    {
-      "id": "vest",
-      "name": "背心&技潜短裤系列",
-      "icon": "🎽",
-      "iconClass": "vest",
-      "columns": [
-        "产品名称",
-        "出库成本"
-      ],
-      "products": []
     },
     {
       "id": "accessory",
@@ -388,6 +377,17 @@
           "CB"
         ]
       ]
+    },
+    {
+      "id": "vest",
+      "name": "背心&技潜短裤系列",
+      "icon": "🎽",
+      "iconClass": "vest",
+      "columns": [
+        "产品名称",
+        "出库成本"
+      ],
+      "products": []
     }
   ]
 }
