@@ -238,6 +238,15 @@
   .drag-handle { cursor: grab; opacity: 0.35; font-size: 0.6rem; margin-right: 1px; flex-shrink: 0; letter-spacing: 1px; line-height: 1; }
   .drag-handle:active { cursor: grabbing; }
 
+  .sidebar-add-cat {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 5px 9px; margin: 2px 4px; border-radius: 5px;
+    border: 1px dashed var(--border); background: transparent; cursor: pointer;
+    font-size: 0.7rem; color: var(--text-secondary);
+    transition: all 0.15s; width: calc(100% - 8px);
+  }
+  .sidebar-add-cat:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
   .sidebar-divider { height: 1px; background: var(--border); margin: 6px 4px; }
   .sidebar-page-link {
     display: flex; align-items: center; gap: 5px; padding: 5px 9px;
@@ -802,6 +811,7 @@
         + '<span class="si-name">' + cat.name + '</span>'
         + '<span class="si-count">' + cat.products.length + '</span></button>';
     }).join("");
+    html += '<button class="sidebar-add-cat" id="sidebarAddCat" title="添加新分类">＋ 添加分类</button>';
     html += '<div class="sidebar-divider"></div>';
     html += '<a href="wholesale.html" class="sidebar-page-link">📦 出库价格</a>';
     html += '<span class="sidebar-page-link current">📍 零售价格</span>';
@@ -884,6 +894,7 @@
       moveRow(btn.getAttribute("data-cat"), parseInt(btn.getAttribute("data-idx"), 10), 1);
       return;
     }
+    if (target.closest("#sidebarAddCat")) { addCategory(); return; }
     if (target.closest("#sidebarTopBtn")) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     if (target.closest(".btn-del-row")) {
       var btn = target.closest(".btn-del-row");
@@ -980,6 +991,31 @@
       var tab = document.querySelector('.tab[data-cat="' + id + '"]');
       if (tab) tab.classList.add("active");
     }
+  }
+
+  function addCategory() {
+    var name = prompt("请输入新分类名称：");
+    if (!name || !name.trim()) return;
+    name = name.trim();
+    var baseId = name.replace(/[^a-zA-Z0-9一-鿿]/g, "").toLowerCase().slice(0, 10) || "custom";
+    var id = baseId, counter = 1;
+    while (categories.some(function(c) { return c.id === id; })) { id = baseId + "-" + counter; counter++; }
+    var icons = ["📦", "🏷️", "🔖", "📋", "🆕", "⭐", "💎", "🎯"];
+    categories.push({
+      id: id, name: name,
+      icon: icons[Math.floor(Math.random() * icons.length)],
+      iconClass: "other",
+      columns: categories.length > 0 ? categories[0].columns.slice() : ["产品名称", "零售价格"],
+      products: []
+    });
+    var searchVal = document.getElementById("searchInput").value;
+    renderAll(searchVal);
+    autoSave();
+    showToast("✅ 已添加分类：「" + name + "」", "success");
+    setTimeout(function() {
+      var el = document.getElementById("cat-" + id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
   }
 
   function getCategoryIndexById(id) {
