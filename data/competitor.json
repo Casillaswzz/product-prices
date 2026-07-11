@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T07:40:47.857Z",
+  "updated": "2026-07-11T08:00:45.244Z",
   "categories": [
     {
       "id": "mask",
@@ -685,6 +685,17 @@
           "130"
         ]
       ]
+    },
+    {
+      "id": "tactic系列",
+      "name": "Tactic系列",
+      "icon": "🏷️",
+      "iconClass": "other",
+      "columns": [
+        "产品名称",
+        "同行报价"
+      ],
+      "products": []
     }
   ]
 }
