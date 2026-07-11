@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T10:04:31.149Z",
+  "updated": "2026-07-11T10:04:40.521Z",
   "categories": [
     {
       "id": "mask",
@@ -333,10 +333,6 @@
       ],
       "products": [
         [
-          "Perdix 2",
-          "4400"
-        ],
-        [
           "Germin G2",
           "4233"
         ],
@@ -347,6 +343,10 @@
         [
           "Shearwater Tern Tx",
           "5300"
+        ],
+        [
+          "Shearwater Perdix 2",
+          "4400"
         ],
         [
           "Shearwater Perdix 3",
