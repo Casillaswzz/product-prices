@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T06:46:30.947Z",
+  "updated": "2026-07-11T06:47:42.510Z",
   "categories": [
     {
       "id": "mask",
@@ -373,12 +373,12 @@
           "249"
         ],
         [
-          "Bestdive 小丑鱼头套",
-          "188×0.5"
-        ],
-        [
           "Scubapro 棒球帽",
           "177"
+        ],
+        [
+          "Bestdive 小丑鱼头套",
+          "188×0.5"
         ]
       ]
     },
@@ -575,38 +575,6 @@
       ]
     },
     {
-      "id": "buoyancy",
-      "name": "浮力调节器系列",
-      "icon": "🎈",
-      "iconClass": "buoyancy",
-      "columns": [
-        "产品名称",
-        "同行报价"
-      ],
-      "products": [
-        [
-          "Razor 4.0",
-          "6180"
-        ],
-        [
-          "Razor 4.0 Ti",
-          "7000"
-        ],
-        [
-          "侧挂 SIDE16 Avenger",
-          "5099*0.75=3824.25"
-        ],
-        [
-          "CRESSI Travelight BCD 蓝色",
-          "3007.5"
-        ],
-        [
-          "TACTIC 黑色30LBS考杜拉气囊+银色铝合金背板",
-          "2250"
-        ]
-      ]
-    },
-    {
       "id": "regulator",
       "name": "调节器系列",
       "icon": "⚙️",
@@ -651,6 +619,38 @@
         [
           "Akuana 管线保护套",
           "30"
+        ]
+      ]
+    },
+    {
+      "id": "buoyancy",
+      "name": "浮力调节器系列",
+      "icon": "🎈",
+      "iconClass": "buoyancy",
+      "columns": [
+        "产品名称",
+        "同行报价"
+      ],
+      "products": [
+        [
+          "Razor 4.0",
+          "6180"
+        ],
+        [
+          "Razor 4.0 Ti",
+          "7000"
+        ],
+        [
+          "侧挂 SIDE16 Avenger",
+          "5099*0.75=3824.25"
+        ],
+        [
+          "CRESSI Travelight BCD 蓝色",
+          "3007.5"
+        ],
+        [
+          "TACTIC 黑色30LBS考杜拉气囊+银色铝合金背板",
+          "2250"
         ]
       ]
     },
