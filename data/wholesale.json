@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T04:08:10.372Z",
+  "updated": "2026-07-11T04:08:25.574Z",
   "categories": [
     {
       "id": "mask",
@@ -307,6 +307,10 @@
         [
           "Shearwater Peregrine Dark",
           "2800"
+        ],
+        [
+          "新产品名称",
+          "0"
         ]
       ]
     },
