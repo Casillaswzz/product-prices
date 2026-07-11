@@ -1,6 +1,6 @@
 {
   "version": "2026-07-11",
-  "updated": "2026-07-11T06:05:56.999Z",
+  "updated": "2026-07-11T06:28:58.496Z",
   "categories": [
     {
       "id": "mask",
@@ -233,17 +233,6 @@
           "2088"
         ]
       ]
-    },
-    {
-      "id": "vest",
-      "name": "背心&技潜短裤系列",
-      "icon": "🎽",
-      "iconClass": "vest",
-      "columns": [
-        "产品名称",
-        "零售价格"
-      ],
-      "products": []
     },
     {
       "id": "boots",
@@ -488,6 +477,17 @@
           "60"
         ]
       ]
+    },
+    {
+      "id": "vest",
+      "name": "背心&技潜短裤系列",
+      "icon": "🎽",
+      "iconClass": "vest",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": []
     }
   ]
 }
