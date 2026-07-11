@@ -460,7 +460,20 @@
     }
   ];
 
+  var DATA_VERSION = "2026-07-11.vest"; // 新增背心&技潜短裤系列
+
   var categories = [];
+
+  function migrateData(savedCats) {
+    var savedIds = {};
+    savedCats.forEach(function(c) { savedIds[c.id] = true; });
+    ORIGINAL_DATA.forEach(function(origCat) {
+      if (!savedIds[origCat.id]) {
+        savedCats.push(JSON.parse(JSON.stringify(origCat)));
+      }
+    });
+    return savedCats;
+  }
 
   function loadData() {
     var saved = localStorage.getItem("product-price-data");
@@ -469,6 +482,14 @@
     // Fast initial load from localStorage or fallback
     if (saved) {
       try { categories = JSON.parse(saved); } catch(e) { categories = JSON.parse(JSON.stringify(ORIGINAL_DATA)); }
+      var migrationVer = localStorage.getItem("product-price-migration") || "";
+      if (migrationVer !== DATA_VERSION) {
+        categories = migrateData(categories);
+        localStorage.setItem("product-price-data", JSON.stringify(categories));
+        localStorage.setItem("product-price-data-version", "0");
+        localStorage.setItem("product-price-migration", DATA_VERSION);
+        savedVersion = "0";
+      }
     } else {
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
     }
@@ -499,6 +520,7 @@
   function resetToOriginal() {
     categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
     localStorage.removeItem("product-price-data-version");
+    localStorage.removeItem("product-price-migration");
     document.getElementById("updateTime").textContent = "数据来源：产品出库价格.xlsx";
   }
 
@@ -602,6 +624,7 @@
       resetToOriginal();
       localStorage.removeItem("product-price-data");
       localStorage.removeItem("product-price-data-version");
+      localStorage.removeItem("product-price-migration");
       renderAll("");
       document.getElementById("searchInput").value = "";
       showToast("🔄 已恢复为原始数据");
