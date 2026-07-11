@@ -846,6 +846,25 @@
     applySidebarOffset();
     var backToTop = document.getElementById("backToTop"); window.addEventListener("scroll", function() { if (window.scrollY > 400) backToTop.classList.add("visible"); else backToTop.classList.remove("visible"); updateActiveSidebarItem(); });
     backToTop.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); }); setTimeout(updateActiveSidebarItem, 200);
+
+    // 每30秒检查服务器是否有更新（电脑→手机实时同步）
+    setInterval(function() {
+      if (document.activeElement && document.activeElement.matches('[contenteditable="true"]')) return;
+      fetch('data/competitor.json?v=' + DATA_VERSION)
+        .then(function(res) { if (!res.ok) throw new Error('no data'); return res.json(); })
+        .then(function(wrapper) {
+          var serverVer = wrapper.version || "";
+          var localVer = localStorage.getItem("competitor-price-data-version") || "";
+          if (serverVer && serverVer !== localVer) {
+            categories = JSON.parse(JSON.stringify(wrapper.categories || wrapper));
+            localStorage.setItem("competitor-price-data", JSON.stringify(categories));
+            localStorage.setItem("competitor-price-data-version", serverVer);
+            renderAll(document.getElementById("searchInput").value);
+            showToast("🔄 已同步最新数据", "success");
+          }
+        })
+        .catch(function() {});
+    }, 30000);
   });
 })();
 </script>
