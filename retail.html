@@ -204,15 +204,18 @@
 
   /* Sidebar */
   .sidebar {
-    position: fixed; left: 0; top: 64.29%; transform: translateY(-50%);
+    position: fixed; left: 0; top: 40%; transform: translateY(-50%);
     z-index: 200; display: flex; flex-direction: column; gap: 1px;
     background: var(--card-bg); border: 1px solid var(--border); border-left: none;
     border-radius: 0 10px 10px 0; box-shadow: 2px 0 12px rgba(0,0,0,0.08);
     padding: 8px 6px; width: 185px; transition: transform 0.3s;
+    max-height: 78vh; overflow-y: auto;
   }
   .sidebar.collapsed { transform: translate(-100%, -50%); }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .sidebar-toggle {
-    position: fixed; left: 185px; top: 64.29%; transform: translateY(-50%);
+    position: fixed; left: 185px; top: 40%; transform: translateY(-50%);
     z-index: 201; width: 20px; height: 54px; border-radius: 0 8px 8px 0;
     border: 1px solid var(--border); border-left: none; background: var(--card-bg);
     cursor: pointer; font-size: 0.65rem; color: var(--text-secondary);
