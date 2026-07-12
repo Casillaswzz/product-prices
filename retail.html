@@ -1165,11 +1165,16 @@
     var sidebarVisible = true;
     var sidebarWidth = 205;
     function applySidebarOffset() {
+      if (window.innerWidth <= 768) {
+        document.body.style.paddingLeft = "";
+        return;
+      }
       document.body.style.paddingLeft = sidebarVisible ? sidebarWidth + "px" : "22px";
       if (sidebarVisible) { sidebar.classList.remove("collapsed"); sidebarToggle.classList.remove("collapsed"); }
       else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); }
     }
     sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); });
+    window.addEventListener("resize", function() { applySidebarOffset(); });
 	    // 移动端侧边栏切换
 	    var hamburgerBtn = document.getElementById("hamburgerBtn");
 	    var sidebarOverlay = document.getElementById("sidebarOverlay");

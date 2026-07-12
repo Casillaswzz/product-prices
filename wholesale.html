@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>产品出库价格表</title>
 <style>
   :root {
@@ -1118,11 +1121,16 @@
     var sidebarVisible = true;
     var sidebarWidth = 205;
     function applySidebarOffset() {
+      if (window.innerWidth <= 768) {
+        document.body.style.paddingLeft = "";
+        return;
+      }
       document.body.style.paddingLeft = sidebarVisible ? sidebarWidth + "px" : "22px";
       if (sidebarVisible) { sidebar.classList.remove("collapsed"); sidebarToggle.classList.remove("collapsed"); }
       else { sidebar.classList.add("collapsed"); sidebarToggle.classList.add("collapsed"); }
     }
     sidebarToggle.addEventListener("click", function() { sidebarVisible = !sidebarVisible; applySidebarOffset(); });
+    window.addEventListener("resize", function() { applySidebarOffset(); });
 	    // 移动端侧边栏切换
 	    var hamburgerBtn = document.getElementById("hamburgerBtn");
 	    var sidebarOverlay = document.getElementById("sidebarOverlay");
