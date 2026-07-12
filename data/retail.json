@@ -1,6 +1,6 @@
 {
   "version": "2026-07-12",
-  "updated": "2026-07-12T15:35:16.316Z",
+  "updated": "2026-07-12T15:35:49.974Z",
   "categories": [
     {
       "id": "mask",
@@ -135,6 +135,34 @@
       ]
     },
     {
+      "id": "snorkel",
+      "name": "呼吸管",
+      "icon": "🤿",
+      "iconClass": "snorkel",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "国产湿式",
+          "55"
+        ],
+        [
+          "Tusa SP0101",
+          "240"
+        ],
+        [
+          "Tusa 干式呼吸管",
+          "300"
+        ],
+        [
+          "Gull Super Bullet & Mini",
+          "335 ~ 350"
+        ]
+      ]
+    },
+    {
       "id": "regulator",
       "name": "调节器系列",
       "icon": "⚙️",
@@ -187,34 +215,6 @@
         [
           "Diverite 背飞-实心钢板+25磅装甲囊(背垫+肩垫)",
           "8078"
-        ]
-      ]
-    },
-    {
-      "id": "snorkel",
-      "name": "呼吸管",
-      "icon": "🤿",
-      "iconClass": "snorkel",
-      "columns": [
-        "产品名称",
-        "零售价格"
-      ],
-      "products": [
-        [
-          "国产湿式",
-          "55"
-        ],
-        [
-          "Tusa SP0101",
-          "240"
-        ],
-        [
-          "Tusa 干式呼吸管",
-          "300"
-        ],
-        [
-          "Gull Super Bullet & Mini",
-          "335 ~ 350"
         ]
       ]
     },
