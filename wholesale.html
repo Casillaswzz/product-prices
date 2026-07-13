@@ -1203,7 +1203,10 @@
       e.preventDefault();
       document.querySelectorAll("tr.drag-over, tr.dragging").forEach(function(el) { el.classList.remove("drag-over", "dragging"); });
       var toIdx = parseInt(tr.getAttribute("data-idx"), 10);
-      if (rowDrag.idx >= 0 && rowDrag.idx !== toIdx) moveRowTo(rowDrag.cat, rowDrag.idx, toIdx);
+      if (rowDrag.idx >= 0 && rowDrag.idx !== toIdx) {
+        var _cat = rowDrag.cat, _from = rowDrag.idx, _to = toIdx;
+        requestAnimationFrame(function() { moveRowTo(_cat, _from, _to); });
+      }
       rowDrag = { cat: null, idx: -1 };
     });
     document.addEventListener("dragend", function(e) {
