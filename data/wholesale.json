@@ -1,6 +1,6 @@
 {
   "version": "2026-07-14",
-  "updated": "2026-07-14T15:55:16.730Z",
+  "updated": "2026-07-14T15:55:33.490Z",
   "categories": [
     {
       "id": "mask",
@@ -265,12 +265,12 @@
           "850"
         ],
         [
-          "OMS Slipstream FIN",
-          "800"
+          "OMS Jet Fin",
+          "1200"
         ],
         [
-          "OMS Jet Fin",
-          "0"
+          "OMS Slipstream FIN",
+          "800"
         ]
       ]
     },
