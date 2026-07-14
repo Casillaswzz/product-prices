@@ -1,6 +1,6 @@
 {
   "version": "2026-07-14",
-  "updated": "2026-07-14T15:59:51.344Z",
+  "updated": "2026-07-14T16:00:09.459Z",
   "categories": [
     {
       "id": "mask",
@@ -348,16 +348,16 @@
           "3900"
         ],
         [
+          "Shearwater Peregrine",
+          "2800"
+        ],
+        [
           "Shearwater Swit 传感器",
           "2200"
         ],
         [
           "Shearwater Peregrine TX",
           "3700"
-        ],
-        [
-          "Shearwater Peregrine Dark",
-          "2800"
         ]
       ]
     },
