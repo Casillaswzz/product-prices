@@ -1,6 +1,6 @@
 {
   "version": "2026-07-14",
-  "updated": "2026-07-14T16:05:08.672Z",
+  "updated": "2026-07-14T16:05:20.529Z",
   "categories": [
     {
       "id": "mask",
@@ -85,6 +85,10 @@
           "211.25"
         ],
         [
+          "Gull Luvos UV380",
+          "1090"
+        ],
+        [
           "Gull Vader / Gull Vader Fanette",
           "660"
         ],
@@ -99,10 +103,6 @@
         [
           "Scubapro 面镜带",
           "73.8"
-        ],
-        [
-          "Gull Luvos UV380",
-          "0"
         ]
       ]
     },
