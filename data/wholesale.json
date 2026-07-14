@@ -1,6 +1,6 @@
 {
   "version": "2026-07-14",
-  "updated": "2026-07-14T15:56:44.168Z",
+  "updated": "2026-07-14T15:56:48.216Z",
   "categories": [
     {
       "id": "mask",
@@ -220,7 +220,7 @@
     },
     {
       "id": "tactic",
-      "name": "Tactic",
+      "name": "Tactic系列",
       "icon": "🆕",
       "iconClass": "other",
       "columns": [
