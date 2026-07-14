@@ -1,6 +1,6 @@
 {
   "version": "2026-07-14",
-  "updated": "2026-07-14T15:58:59.962Z",
+  "updated": "2026-07-14T15:59:16.681Z",
   "categories": [
     {
       "id": "mask",
@@ -406,6 +406,17 @@
       "columns": [
         "产品名称",
         "出库成本"
+      ],
+      "products": []
+    },
+    {
+      "id": "手套头套系列",
+      "name": "手套&头套系列",
+      "icon": "📦",
+      "iconClass": "other",
+      "columns": [
+        "产品名称",
+        "出库价格"
       ],
       "products": []
     }
