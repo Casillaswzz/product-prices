@@ -1,6 +1,6 @@
 {
   "version": "2026-07-15",
-  "updated": "2026-07-15T14:47:09.522Z",
+  "updated": "2026-07-15T14:48:01.413Z",
   "categories": [
     {
       "id": "mask",
@@ -284,7 +284,7 @@
     },
     {
       "id": "smb",
-      "name": "象拔&线轮",
+      "name": "象拔&线轮系列",
       "icon": "🛟",
       "iconClass": "smb",
       "columns": [
