@@ -1,6 +1,6 @@
 {
   "version": "2026-07-17",
-  "updated": "2026-07-17T16:53:53.685Z",
+  "updated": "2026-07-17T16:54:01.201Z",
   "categories": [
     {
       "id": "mask",
@@ -633,12 +633,12 @@
           "10183"
         ],
         [
-          "Shearwater Peregrine",
-          "2800"
+          "Shearwater Swift GPS",
+          "2300"
         ],
         [
-          "Shearwater Swift GPS",
-          "0"
+          "Shearwater Peregrine",
+          "2800"
         ],
         [
           "Shearwater Peregrine Tx",
