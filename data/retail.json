@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-18T16:30:51.405Z",
-  "updated": "2026-07-18T16:30:54.407Z",
+  "version": "2026-07-18T16:31:04.338Z",
+  "updated": "2026-07-18T16:31:07.340Z",
   "categories": [
     {
       "id": "mask",
@@ -167,66 +167,6 @@
       ]
     },
     {
-      "id": "fins",
-      "name": "脚蹼系列",
-      "icon": "🦶",
-      "iconClass": "fins",
-      "columns": [
-        "产品名称",
-        "零售价格"
-      ],
-      "products": [
-        [
-          "OMS",
-          "1260～1380"
-        ],
-        [
-          "DiveR",
-          "4480"
-        ],
-        [
-          "Mares",
-          "990～1030"
-        ],
-        [
-          "Diverite",
-          "1000~1060"
-        ],
-        [
-          "Supermew",
-          "990～1000"
-        ],
-        [
-          "Seac Pro Pulsion",
-          "610"
-        ],
-        [
-          "Scubapro GO Sport",
-          "800"
-        ]
-      ]
-    },
-    {
-      "id": "light",
-      "name": "手电系列",
-      "icon": "🔦",
-      "iconClass": "light",
-      "columns": [
-        "产品名称",
-        "零售价格"
-      ],
-      "products": [
-        [
-          "虎鲸X7",
-          "466"
-        ],
-        [
-          "探险家M1500",
-          "205 / 252"
-        ]
-      ]
-    },
-    {
       "id": "regulator",
       "name": "调节器系列",
       "icon": "⚙️",
@@ -342,7 +282,67 @@
         ],
         [
           "Scubapro Delta 5mm",
-          "450~470"
+          "470"
+        ]
+      ]
+    },
+    {
+      "id": "light",
+      "name": "手电系列",
+      "icon": "🔦",
+      "iconClass": "light",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "虎鲸X7",
+          "466"
+        ],
+        [
+          "探险家M1500",
+          "205 / 252"
+        ]
+      ]
+    },
+    {
+      "id": "fins",
+      "name": "脚蹼系列",
+      "icon": "🦶",
+      "iconClass": "fins",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "OMS",
+          "1260～1380"
+        ],
+        [
+          "DiveR",
+          "4480"
+        ],
+        [
+          "Mares",
+          "950~990～1030"
+        ],
+        [
+          "Diverite",
+          "1000~1060"
+        ],
+        [
+          "Supermew",
+          "990～1000"
+        ],
+        [
+          "Seac Pro Pulsion",
+          "610"
+        ],
+        [
+          "Scubapro GO Sport",
+          "800"
         ]
       ]
     },
