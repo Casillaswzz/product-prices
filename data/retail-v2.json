@@ -1,0 +1,538 @@
+{
+  "version": "2026-07-18T16:31:04.338Z",
+  "updated": "2026-07-18T16:31:09.048Z",
+  "categories": [
+    {
+      "id": "mask",
+      "name": "面镜系列",
+      "icon": "🥽",
+      "iconClass": "mask",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "TUSA M19",
+          "1380"
+        ],
+        [
+          "TUSA M110",
+          "1050"
+        ],
+        [
+          "TUSA M212",
+          "530"
+        ],
+        [
+          "TUSA M1011",
+          "625"
+        ],
+        [
+          "TUSA M1010",
+          "780～800"
+        ],
+        [
+          "TUSA M1007",
+          "1120"
+        ],
+        [
+          "TUSA M2001",
+          ""
+        ],
+        [
+          "TUSA M3001",
+          "530 ~ 560"
+        ],
+        [
+          "TUSA M1010F",
+          "755"
+        ],
+        [
+          "国产近视镜片",
+          "99/片"
+        ],
+        [
+          "Apollo 不锈钢 UVAR",
+          "2060"
+        ],
+        [
+          "Apollo 不锈钢 黑色 type D",
+          "2280"
+        ],
+        [
+          "Apollo 60cc",
+          "1020"
+        ],
+        [
+          "Apollo 85cc",
+          "1020"
+        ],
+        [
+          "Apollo 95cc",
+          "1020"
+        ],
+        [
+          "Apollo 95cc 金色镀膜款",
+          "2680"
+        ],
+        [
+          "Apollo 95cc 不锈钢镀膜银色",
+          "2400"
+        ],
+        [
+          "Apollo 防雾贴",
+          "120"
+        ],
+        [
+          "Gull Vader",
+          "860 ~ 950"
+        ],
+        [
+          "Gull Vader Fanette",
+          "880 ~ 950"
+        ],
+        [
+          "Gull Luvos UV380",
+          "1290"
+        ],
+        [
+          "Cressi Z2",
+          "549"
+        ],
+        [
+          "复古面镜",
+          "480"
+        ],
+        [
+          "进口大神面镜",
+          "520"
+        ],
+        [
+          "国产大神面镜",
+          "88"
+        ],
+        [
+          "四元素 面镜带",
+          "330"
+        ],
+        [
+          "防雾贴 Seeker",
+          "68"
+        ],
+        [
+          "四元素 Seeker",
+          "1500～1520"
+        ],
+        [
+          "国产Apollo面镜",
+          "198"
+        ],
+        [
+          "Scubapro 面镜带",
+          "113~120"
+        ],
+        [
+          "SCUBAPRO CRYSTAL VU",
+          "560"
+        ]
+      ]
+    },
+    {
+      "id": "snorkel",
+      "name": "呼吸管",
+      "icon": "🤿",
+      "iconClass": "snorkel",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "国产湿式",
+          "55"
+        ],
+        [
+          "Tusa SP0101",
+          "240"
+        ],
+        [
+          "Tusa 干式呼吸管",
+          "300"
+        ],
+        [
+          "Gull Super Bullet & Mini",
+          "335 ~ 350"
+        ]
+      ]
+    },
+    {
+      "id": "regulator",
+      "name": "调节器系列",
+      "icon": "⚙️",
+      "iconClass": "regulator",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "ATOMIC SS1 钛",
+          "3800"
+        ],
+        [
+          "ATOMIC TFX DIN",
+          "16500"
+        ],
+        [
+          "ATOMIC B2 DIN+Z3+QMD单表",
+          "8500"
+        ],
+        [
+          "ATOMIC B2 DIN+Z3+Scubapro胶表",
+          "8700"
+        ],
+        [
+          "MK25 Evo / S620Ti / R105 OCT +钢表",
+          "8000"
+        ]
+      ]
+    },
+    {
+      "id": "buoyancy",
+      "name": "浮力调节器系列",
+      "icon": "🛟",
+      "iconClass": "buoyancy",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "国产瓶箍",
+          "220"
+        ],
+        [
+          "Razor 4.0 ti",
+          "7600"
+        ],
+        [
+          "Razor 配重包",
+          "220/个"
+        ],
+        [
+          "Diverite 背飞-实心钢板+25磅装甲囊(背垫+肩垫)",
+          "8078"
+        ]
+      ]
+    },
+    {
+      "id": "wetsuit",
+      "name": "湿衣&斗篷系列",
+      "icon": "🦺",
+      "iconClass": "wetsuit",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "四元素 水母衣",
+          "570"
+        ],
+        [
+          "Sharkskin T2上衣+裤子",
+          "3650"
+        ],
+        [
+          "Scubapro Everflex Yulex 3MM",
+          "2088"
+        ]
+      ]
+    },
+    {
+      "id": "vest",
+      "name": "背心&短裤系列",
+      "icon": "🎽",
+      "iconClass": "vest",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "Helios 技潜短裤",
+          "398"
+        ]
+      ]
+    },
+    {
+      "id": "boots",
+      "name": "潜水靴系列",
+      "icon": "👢",
+      "iconClass": "boots",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "Mares 薄底靴",
+          "357"
+        ],
+        [
+          "Scubapro Delta 5mm",
+          "470"
+        ]
+      ]
+    },
+    {
+      "id": "light",
+      "name": "手电系列",
+      "icon": "🔦",
+      "iconClass": "light",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "虎鲸X7",
+          "466"
+        ],
+        [
+          "探险家M1500",
+          "205 / 252"
+        ]
+      ]
+    },
+    {
+      "id": "fins",
+      "name": "脚蹼系列",
+      "icon": "🦶",
+      "iconClass": "fins",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "OMS",
+          "1260～1380"
+        ],
+        [
+          "DiveR",
+          "4480"
+        ],
+        [
+          "Mares",
+          "950~990～1030"
+        ],
+        [
+          "Diverite",
+          "1000~1060"
+        ],
+        [
+          "Supermew",
+          "990～1000"
+        ],
+        [
+          "Seac Pro Pulsion",
+          "610"
+        ],
+        [
+          "Scubapro GO Sport",
+          "800"
+        ]
+      ]
+    },
+    {
+      "id": "computer",
+      "name": "电脑表系列",
+      "icon": "⌚",
+      "iconClass": "computer",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "Germin G2",
+          ""
+        ],
+        [
+          "Germin Mk3i 43mm",
+          "10180 ~ 10680"
+        ],
+        [
+          "Suunto Nautic S",
+          "3650 ~ 3800"
+        ],
+        [
+          "Shearwater Tern Tx",
+          "5300"
+        ],
+        [
+          "Shearwater Perdix 2",
+          "4400"
+        ],
+        [
+          "Shearwater Perdix 3",
+          "7800"
+        ]
+      ]
+    },
+    {
+      "id": "accessory",
+      "name": "配件系列",
+      "icon": "🔧",
+      "iconClass": "accessory",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "脚蹼网包",
+          "80"
+        ],
+        [
+          "双头流钩",
+          "48"
+        ],
+        [
+          "ilab 防晒棒",
+          "72～79"
+        ],
+        [
+          "ilab 防晒小银管 30g",
+          "179"
+        ],
+        [
+          "四元素 90L",
+          "1250"
+        ],
+        [
+          "鹦鹉螺咬嘴",
+          "50 ~ 55"
+        ],
+        [
+          "Aquaplay防水包",
+          "499"
+        ],
+        [
+          "Aquaplay 防晒帽",
+          "189"
+        ]
+      ]
+    },
+    {
+      "id": "gloves",
+      "name": "手套&头套系列",
+      "icon": "🧤",
+      "iconClass": "gloves",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "四元素头套 3mm",
+          "520"
+        ],
+        [
+          "四元素手套 5mm",
+          "680"
+        ],
+        [
+          "四元素头套 7mm 带脖领",
+          "850"
+        ],
+        [
+          "Sharkskin T2 头套",
+          "0"
+        ],
+        [
+          "Seaplay 防晒手套",
+          "130~135"
+        ],
+        [
+          "Scubapro 黑色1.5mm 手套",
+          "320"
+        ]
+      ]
+    },
+    {
+      "id": "reel",
+      "name": "线轮&象拔系列",
+      "icon": "🧵",
+      "iconClass": "reel",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "塑料线轮",
+          "80~85"
+        ],
+        [
+          "ISLET 15米 实色线轮",
+          "310"
+        ],
+        [
+          "鹦鹉螺线轮 15米 铝合金",
+          "218"
+        ],
+        [
+          "鹦鹉螺线轮 15米 金色框红线",
+          "198"
+        ]
+      ]
+    },
+    {
+      "id": "tactic",
+      "name": "Tactic系列",
+      "icon": "🎯",
+      "iconClass": "tactic",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "Tactic 防水壳",
+          "130"
+        ],
+        [
+          "Tactic 1.5米象拔",
+          "100 ~ 120"
+        ],
+        [
+          "Tactic 1.8米象拔",
+          "150"
+        ],
+        [
+          "Tactic 小单头-银色",
+          "45"
+        ],
+        [
+          "Tactic 大单头-炫彩",
+          "58"
+        ],
+        [
+          "Tactic 小双头-黑色",
+          "55"
+        ],
+        [
+          "Tactic 小双头-炫彩",
+          "55"
+        ],
+        [
+          "Tactic 大双头-炫彩",
+          "60"
+        ]
+      ]
+    }
+  ]
+}

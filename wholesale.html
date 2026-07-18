@@ -363,7 +363,7 @@
   <button class="hamburger" id="hamburgerBtn" aria-label="菜单" title="分类导航">☰</button>
   <h1>🤿 产品出库价格表</h1>
   <div class="subtitle">Diving Equipment Export Price List · 双击单元格即可编辑</div>
-  <div class="update-time"><span id="updateTime">数据已加载</span><span style="font-size:0.65rem;opacity:0.6;border:1px solid currentColor;border-radius:4px;padding:0 5px;">v7.19</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
+  <div class="update-time"><span id="updateTime">数据已加载</span><span style="font-size:0.65rem;opacity:0.6;border:1px solid currentColor;border-radius:4px;padding:0 5px;">v7.20</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>
@@ -526,8 +526,9 @@
       categories = JSON.parse(JSON.stringify(ORIGINAL_DATA));
     }
 
+    lastKnownVersion = localStorage.getItem("product-price-data-version") || "";
     // Background sync: try to fetch server data for latest version
-    fetch('data/wholesale.json?v=' + DATA_VERSION)
+    fetch('data/wholesale-v2.json?v=' + DATA_VERSION)
       .then(function(res) { if (!res.ok) throw new Error('no server data'); return res.json(); })
       .then(function(wrapper) {
         var serverCats = wrapper.categories || wrapper;
@@ -540,6 +541,7 @@
         // 本地保留条件：版本不旧于服务器 / 有未同步的修改 / 正在编辑 / 服务器是旧版快照
         if ((curSaved && curVersion && curVersion >= serverVer) || isDirty() || isEditingCell() || (serverLegacy && !!curSaved)) {
           document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）";
+          if (curVersion && curVersion.indexOf("T") < 0) markDirty(); // 旧版页面写的本地修改，标脏补传
           if (isDirty()) scheduleSync(); // 有漏同步的修改 → 补同步到云端
           return;
         }
@@ -547,6 +549,7 @@
         categories = JSON.parse(JSON.stringify(serverCats));
         localStorage.setItem("product-price-data", JSON.stringify(categories));
         localStorage.setItem("product-price-data-version", serverVer);
+        lastKnownVersion = serverVer;
         document.getElementById("updateTime").textContent = "数据来源：服务器同步（" + serverVer.slice(0, 10) + "）";
         renderAll(document.getElementById("searchInput").value);
       })
@@ -596,9 +599,9 @@
   }
 
   // ===== 脏标记：记录"本地有修改但尚未成功同步到云端" =====
-  function markDirty() { localStorage.setItem("product-price-dirty", "1"); }
+  function markDirty() { localStorage.setItem("product-price-dirty", new Date().toISOString()); }
   function clearDirty() { localStorage.removeItem("product-price-dirty"); }
-  function isDirty() { return localStorage.getItem("product-price-dirty") === "1"; }
+  function isDirty() { return !!localStorage.getItem("product-price-dirty"); }
   function isEditingCell() {
     var el = document.activeElement;
     return !!(el && el.isContentEditable);
@@ -611,6 +614,7 @@
       var ver = new Date().toISOString();
       localStorage.setItem("product-price-data", JSON.stringify(categories));
       localStorage.setItem("product-price-data-version", ver);
+      lastKnownVersion = ver;
       markDirty();
       var timeStr = new Date().toLocaleString("zh-CN");
       document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + timeStr + "）";
@@ -634,6 +638,7 @@
 
   var syncTimer = null;
   var warnedNoToken = false;
+  var lastKnownVersion = ""; // 本标签页当前内存数据对应的版本
   function scheduleSync() {
     var token = localStorage.getItem("github-sync-token-v2");
     if (!token) {
@@ -662,10 +667,11 @@
     var token = localStorage.getItem("github-sync-token-v2");
     if (!token) return;
     updateSyncStatus("syncing");
+    var dirtySnapshot = localStorage.getItem("product-price-dirty");
     var wrapper = { version: localStorage.getItem("product-price-data-version") || new Date().toISOString(), updated: new Date().toISOString(), categories: categories };
     var content = JSON.stringify(wrapper, null, 2);
     var base64 = btoa(unescape(encodeURIComponent(content)));
-    var apiUrl = "https://api.github.com/repos/Casillaswzz/product-prices/contents/data/wholesale.json";
+    var apiUrl = "https://api.github.com/repos/Casillaswzz/product-prices/contents/data/wholesale-v2.json";
     var headers = { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" };
 
     function doPut(sha, useKeepalive) {
@@ -677,7 +683,7 @@
       return r.json().then(function(d) {
         if (d && d.content && d.content.sha) localStorage.setItem("product-price-sync-sha", d.content.sha);
       }).catch(function() {}).then(function() {
-        clearDirty();
+        if (localStorage.getItem("product-price-dirty") === dirtySnapshot) clearDirty();
         updateSyncStatus("synced");
       });
     }
@@ -733,9 +739,28 @@
     syncToGitHub(true);
   }
   window.addEventListener("pagehide", flushSync);
+
+  // 标签页被系统冻结/切后台期间，其他页面可能已更新数据；恢复可见时用 localStorage 最新数据对齐，
+  // 防止本标签页拿着过期的内存数据继续编辑并反向覆盖（iOS Safari 长期驻留页面尤其需要）
+  function reconcileFromStorage() {
+    if (isEditingCell()) return;
+    var v = localStorage.getItem("product-price-data-version") || "";
+    if (v && v !== lastKnownVersion) {
+      var s = localStorage.getItem("product-price-data");
+      if (s) {
+        try {
+          categories = JSON.parse(s);
+          lastKnownVersion = v;
+          renderAll(document.getElementById("searchInput").value);
+        } catch(e) {}
+      }
+    }
+  }
   document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === "hidden") flushSync();
+    else if (document.visibilityState === "visible") reconcileFromStorage();
   });
+  window.addEventListener("pageshow", function(e) { if (e.persisted) reconcileFromStorage(); });
 
   function saveData() {
     autoSave(true);
@@ -1143,7 +1168,7 @@
     // 只验证 Token 是否有效，不推送数据（避免用本机旧数据覆盖云端）；有漏同步的修改才补推
     if (isDirty()) { syncToGitHub(false); }
     else {
-      fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/data/wholesale.json", {
+      fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/data/wholesale-v2.json", {
         headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
       }).then(function(r) {
         if (r.ok) {
@@ -1343,19 +1368,23 @@
 
     // 每30秒检查服务器是否有更新（电脑→手机实时同步）
     setInterval(function() {
-      if (document.activeElement && document.activeElement.matches('[contenteditable="true"]')) return;
-      fetch('data/wholesale.json?v=' + DATA_VERSION)
+      if (isEditingCell() || isDirty()) return; // 正在编辑或本地有未同步修改：绝不采纳服务器数据
+      fetch('data/wholesale-v2.json?v=' + DATA_VERSION)
         .then(function(res) { if (!res.ok) throw new Error('no data'); return res.json(); })
         .then(function(wrapper) {
           var serverVer = wrapper.version || "";
           var localVer = localStorage.getItem("product-price-data-version") || "";
-          if (serverVer && serverVer !== localVer) {
-            categories = JSON.parse(JSON.stringify(wrapper.categories || wrapper));
-            localStorage.setItem("product-price-data", JSON.stringify(categories));
-            localStorage.setItem("product-price-data-version", serverVer);
-            renderAll(document.getElementById("searchInput").value);
-            showToast("🔄 已同步最新数据", "success");
-          }
+          if (!serverVer || serverVer.indexOf("T") < 0) return; // 空/旧版日期格式快照：不采纳
+          // 旧逻辑是"版本不同就覆盖"，会把正在等待同步（3秒防抖+API耗时窗口）的输入整表吞掉；
+          // 必须只采纳"严格更新"的版本
+          if (localVer && serverVer <= localVer) return;
+          if (isEditingCell() || isDirty()) return; // fetch 返回期间用户又开始编辑/产生了修改
+          categories = JSON.parse(JSON.stringify(wrapper.categories || wrapper));
+          localStorage.setItem("product-price-data", JSON.stringify(categories));
+          localStorage.setItem("product-price-data-version", serverVer);
+          lastKnownVersion = serverVer;
+          renderAll(document.getElementById("searchInput").value);
+          showToast("🔄 已同步最新数据", "success");
         })
         .catch(function() {});
     }, 30000);
