@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-18T16:28:20.779Z",
-  "updated": "2026-07-18T16:28:23.781Z",
+  "version": "2026-07-18T16:28:34.035Z",
+  "updated": "2026-07-18T16:28:37.037Z",
   "categories": [
     {
       "id": "mask",
@@ -189,16 +189,16 @@
           "8500"
         ],
         [
+          "ATOMIC B2 Yoke+Z3+DBT单表",
+          "8700"
+        ],
+        [
           "ATOMIC B2 DIN+Z3+Scubapro胶表",
           "8700"
         ],
         [
           "MK25 Evo / S620Ti / R105 OCT +钢表",
           "8000"
-        ],
-        [
-          "ATOMIC B2 yoke+Z3+DBT单表",
-          "0"
         ]
       ]
     },
