@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-18T17:03:23.300Z",
-  "updated": "2026-07-18T17:03:26.302Z",
+  "version": "2026-07-18T17:03:30.828Z",
+  "updated": "2026-07-18T17:03:30.828Z",
   "categories": [
     {
       "id": "mask",
@@ -289,12 +289,12 @@
           "16500"
         ],
         [
-          "ATOMIC B2 Yoke+Z3+DBT单表",
-          "8700"
-        ],
-        [
           "ATOMIC B2 DIN+Z3+QMD单表",
           "8500"
+        ],
+        [
+          "ATOMIC B2 Yoke+Z3+DBT单表",
+          "8700"
         ],
         [
           "ATOMIC B2 DIN+Z3+Scubapro胶表",
