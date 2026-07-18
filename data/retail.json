@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-18",
-  "updated": "2026-07-18T16:14:00.637Z",
+  "version": "2026-07-18T16:14:06.052Z",
+  "updated": "2026-07-18T16:14:09.054Z",
   "categories": [
     {
       "id": "mask",
@@ -187,6 +187,10 @@
         [
           "ATOMIC B2 DIN+Z3+QMD单表",
           "8500"
+        ],
+        [
+          "ATOMIC B2 din+Z3+Scubapro胶表",
+          "0"
         ],
         [
           "MK25 Evo / S620Ti / R105 OCT +钢表",
