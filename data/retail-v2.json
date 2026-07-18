@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-18T16:49:23.376Z",
-  "updated": "2026-07-18T16:49:23.377Z",
+  "version": "2026-07-18T16:49:33.445Z",
+  "updated": "2026-07-18T16:49:36.447Z",
   "categories": [
     {
       "id": "mask",
@@ -419,6 +419,42 @@
       ]
     },
     {
+      "id": "computer",
+      "name": "电脑表系列",
+      "icon": "⌚",
+      "iconClass": "computer",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "Germin G2",
+          ""
+        ],
+        [
+          "Germin Mk3i 43mm",
+          "10180 ~ 10680"
+        ],
+        [
+          "Suunto Nautic S",
+          "3650 ~ 3800"
+        ],
+        [
+          "Shearwater Tern Tx",
+          "5300"
+        ],
+        [
+          "Shearwater Perdix 2",
+          "4400"
+        ],
+        [
+          "Shearwater Perdix 3",
+          "7800"
+        ]
+      ]
+    },
+    {
       "id": "boots",
       "name": "潜水靴系列",
       "icon": "👢",
@@ -459,42 +495,6 @@
         [
           "探险家M1500",
           "205 / 252"
-        ]
-      ]
-    },
-    {
-      "id": "computer",
-      "name": "电脑表系列",
-      "icon": "⌚",
-      "iconClass": "computer",
-      "columns": [
-        "产品名称",
-        "零售价格"
-      ],
-      "products": [
-        [
-          "Germin G2",
-          ""
-        ],
-        [
-          "Germin Mk3i 43mm",
-          "10180 ~ 10680"
-        ],
-        [
-          "Suunto Nautic S",
-          "3650 ~ 3800"
-        ],
-        [
-          "Shearwater Tern Tx",
-          "5300"
-        ],
-        [
-          "Shearwater Perdix 2",
-          "4400"
-        ],
-        [
-          "Shearwater Perdix 3",
-          "7800"
         ]
       ]
     },
