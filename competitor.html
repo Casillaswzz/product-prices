@@ -215,7 +215,7 @@
   <button class="hamburger" id="hamburgerBtn" aria-label="菜单" title="分类导航">☰</button>
   <h1>🤝 常用同行报价表</h1>
   <div class="subtitle">Competitive Price Reference · 双击单元格即可编辑</div>
-  <div class="update-time"><span id="updateTime">数据已加载</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
+  <div class="update-time"><span id="updateTime">数据已加载</span><span style="font-size:0.65rem;opacity:0.6;border:1px solid currentColor;border-radius:4px;padding:0 5px;">v7.19</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>
@@ -386,8 +386,10 @@
         // 重新读取当前本地版本（拉取期间用户可能已编辑，不能用页面打开时的旧快照）
         var curSaved = localStorage.getItem("competitor-price-data");
         var curVersion = localStorage.getItem("competitor-price-data-version") || "";
-        // 本地保留条件：版本不旧于服务器 / 有未同步的修改 / 用户正在编辑单元格
-        if ((curSaved && curVersion && curVersion >= serverVer) || isDirty() || isEditingCell()) {
+        // 旧版缓存页面写入的"日期格式"版本号 = 污染快照，本地有数据时一律不采纳
+        var serverLegacy = serverVer.indexOf("T") < 0;
+        // 本地保留条件：版本不旧于服务器 / 有未同步的修改 / 正在编辑 / 服务器是旧版快照
+        if ((curSaved && curVersion && curVersion >= serverVer) || isDirty() || isEditingCell() || (serverLegacy && !!curSaved)) {
           document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）";
           if (isDirty()) scheduleSync(); // 有漏同步的修改 → 补同步到云端
           return;
@@ -458,10 +460,20 @@
     }
   }
 
+  // Token 键迁移 v2（2026-07-19）：残留的旧版缓存页面会开页即推送、覆盖云端记录。
+  // 把 Token 挪到新键并删除旧键后，同一浏览器里的旧版页面将无法再同步，只能读。
+  (function() {
+    var oldTok = localStorage.getItem("github-sync-token");
+    if (oldTok && !localStorage.getItem("github-sync-token-v2")) {
+      localStorage.setItem("github-sync-token-v2", oldTok);
+    }
+    if (oldTok) localStorage.removeItem("github-sync-token");
+  })();
+
   var syncTimer = null;
   var warnedNoToken = false;
   function scheduleSync() {
-    var token = localStorage.getItem("github-sync-token");
+    var token = localStorage.getItem("github-sync-token-v2");
     if (!token) {
       // 本机没配 Token：修改不会上云，明确告诉用户一次
       if (!warnedNoToken) {
@@ -485,7 +497,7 @@
 
   var tokenErrorShown = false;
   function syncToGitHub(flush) {
-    var token = localStorage.getItem("github-sync-token");
+    var token = localStorage.getItem("github-sync-token-v2");
     if (!token) return;
     updateSyncStatus("syncing");
     var wrapper = { version: localStorage.getItem("competitor-price-data-version") || new Date().toISOString(), updated: new Date().toISOString(), categories: categories };
@@ -554,7 +566,7 @@
     clearTimeout(inputSaveTimer);
     if (isEditingCell()) autoSave(true);
     if (!isDirty()) return;
-    if (!localStorage.getItem("github-sync-token")) return;
+    if (!localStorage.getItem("github-sync-token-v2")) return;
     clearTimeout(syncTimer);
     syncToGitHub(true);
   }
@@ -565,7 +577,7 @@
 
   function saveData() {
     autoSave(true);
-    if (localStorage.getItem("github-sync-token")) {
+    if (localStorage.getItem("github-sync-token-v2")) {
       clearTimeout(syncTimer);
       syncToGitHub(false); // 手动保存：立即同步，不等 3 秒
       showToast("✅ 已保存，正在同步到云端...", "success");
@@ -831,13 +843,13 @@
   var syncSetup = document.getElementById("syncSetup");
   document.getElementById("btnSyncSetup").addEventListener("click", function() {
     syncSetup.classList.toggle("show");
-    var token = localStorage.getItem("github-sync-token");
+    var token = localStorage.getItem("github-sync-token-v2");
     if (token) document.getElementById("githubTokenInput").value = token;
   });
   document.getElementById("btnSaveToken").addEventListener("click", function() {
     var token = document.getElementById("githubTokenInput").value.trim();
     if (!token) { showToast("❌ 请输入 GitHub Token", ""); return; }
-    localStorage.setItem("github-sync-token", token);
+    localStorage.setItem("github-sync-token-v2", token);
     syncSetup.classList.remove("show");
     updateSyncStatus("syncing");
     showToast("✅ Token 已保存！编辑数据后将自动同步到云端", "success");
@@ -859,7 +871,7 @@
   });
   document.getElementById("btnClearToken").addEventListener("click", function() {
     if (confirm("确定清除 Token 并停止自动同步吗？")) {
-      localStorage.removeItem("github-sync-token");
+      localStorage.removeItem("github-sync-token-v2");
       document.getElementById("githubTokenInput").value = "";
       updateSyncStatus("");
       showToast("🗑️ Token 已清除，自动同步已停止");
@@ -916,7 +928,7 @@
   document.addEventListener("DOMContentLoaded", function() {
     loadData(); renderAll("");
     // 检查是否已配置自动同步
-    var token = localStorage.getItem("github-sync-token");
+    var token = localStorage.getItem("github-sync-token-v2");
     if (token) {
       document.getElementById("githubTokenInput").value = token;
       // 注意：打开页面时绝不能无条件推送本机数据到云端（旧版会用本机旧数据覆盖云端新记录）。
