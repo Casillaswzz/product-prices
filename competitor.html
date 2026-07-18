@@ -383,20 +383,26 @@
       .then(function(wrapper) {
         var serverCats = wrapper.categories || wrapper;
         var serverVer = wrapper.version || "";
-        if (saved && savedVersion && savedVersion >= serverVer) {
+        // 重新读取当前本地版本（拉取期间用户可能已编辑，不能用页面打开时的旧快照）
+        var curSaved = localStorage.getItem("competitor-price-data");
+        var curVersion = localStorage.getItem("competitor-price-data-version") || "";
+        // 本地保留条件：版本不旧于服务器 / 有未同步的修改 / 用户正在编辑单元格
+        if ((curSaved && curVersion && curVersion >= serverVer) || isDirty() || isEditingCell()) {
           document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）";
+          if (isDirty()) scheduleSync(); // 有漏同步的修改 → 补同步到云端
           return;
         }
         // Server data is newer — use it and cache locally
         categories = JSON.parse(JSON.stringify(serverCats));
         localStorage.setItem("competitor-price-data", JSON.stringify(categories));
         localStorage.setItem("competitor-price-data-version", serverVer);
-        document.getElementById("updateTime").textContent = "数据来源：服务器同步（" + serverVer + "）";
+        document.getElementById("updateTime").textContent = "数据来源：服务器同步（" + serverVer.slice(0, 10) + "）";
         renderAll(document.getElementById("searchInput").value);
       })
       .catch(function() {
         if (saved) { document.getElementById("updateTime").textContent = "数据来源：本地存储（上次保存）"; }
         else { document.getElementById("updateTime").textContent = "数据来源：常用同行报价.xlsx"; }
+        if (isDirty()) scheduleSync(); // 拉取失败也要补同步本地修改
       });
   }
   function resetToOriginal() {
@@ -416,6 +422,8 @@
       var catId = catDiv.id.replace("cat-", ""), cat = null;
       for (var i = 0; i < categories.length; i++) { if (categories[i].id === catId) { cat = categories[i]; break; } }
       if (!cat) return;
+      var titleEl = catDiv.querySelector(".category-title");
+      if (titleEl) { var t = titleEl.textContent.trim(); if (t) cat.name = t; }
       catDiv.querySelectorAll("tbody tr").forEach(function(row) {
         var origIdx = parseInt(row.getAttribute("data-idx"), 10);
         var nc = row.querySelector(".product-name"), pc = row.querySelector(".price");
@@ -424,15 +432,25 @@
       });
     });
   }
-  function autoSave() {
+  // ===== 脏标记：记录"本地有修改但尚未成功同步到云端" =====
+  function markDirty() { localStorage.setItem("competitor-price-dirty", "1"); }
+  function clearDirty() { localStorage.removeItem("competitor-price-dirty"); }
+  function isDirty() { return localStorage.getItem("competitor-price-dirty") === "1"; }
+  function isEditingCell() {
+    var el = document.activeElement;
+    return !!(el && el.isContentEditable);
+  }
+  function autoSave(quiet) {
     try {
       syncDOMtoData();
-      var now = new Date().toISOString().slice(0, 10);
+      // 版本号用完整时间戳（同一天多次编辑也能正确比较新旧）
+      var ver = new Date().toISOString();
       localStorage.setItem("competitor-price-data", JSON.stringify(categories));
-      localStorage.setItem("competitor-price-data-version", now);
+      localStorage.setItem("competitor-price-data-version", ver);
+      markDirty();
       var timeStr = new Date().toLocaleString("zh-CN");
       document.getElementById("updateTime").textContent = "数据来源：本地存储（自动保存：" + timeStr + "）";
-      showToast("✅ 已自动保存 " + timeStr.slice(-8), "success");
+      if (!quiet) showToast("✅ 已自动保存 " + timeStr.slice(-8), "success");
       scheduleSync();
     } catch(e) {
       console.error("autoSave error:", e);
@@ -441,11 +459,19 @@
   }
 
   var syncTimer = null;
+  var warnedNoToken = false;
   function scheduleSync() {
     var token = localStorage.getItem("github-sync-token");
-    if (!token) return;
+    if (!token) {
+      // 本机没配 Token：修改不会上云，明确告诉用户一次
+      if (!warnedNoToken) {
+        warnedNoToken = true;
+        showToast("⚠️ 本设备未配置同步 Token，修改只保存在本机，不会同步到云端", "");
+      }
+      return;
+    }
     clearTimeout(syncTimer);
-    syncTimer = setTimeout(syncToGitHub, 3000);
+    syncTimer = setTimeout(function() { syncToGitHub(false); }, 3000);
   }
 
   function updateSyncStatus(status) {
@@ -457,44 +483,105 @@
     else if (status === "error") dot.className = "sync-dot error";
   }
 
-  function syncToGitHub() {
+  var tokenErrorShown = false;
+  function syncToGitHub(flush) {
     var token = localStorage.getItem("github-sync-token");
     if (!token) return;
     updateSyncStatus("syncing");
-    var wrapper = { version: new Date().toISOString().slice(0,10), updated: new Date().toISOString(), categories: categories };
-    var cnt = JSON.stringify(wrapper, null, 2);
-    var base64 = btoa(unescape(encodeURIComponent(cnt)));
-    var filename = "data/competitor.json";
+    var wrapper = { version: localStorage.getItem("competitor-price-data-version") || new Date().toISOString(), updated: new Date().toISOString(), categories: categories };
+    var content = JSON.stringify(wrapper, null, 2);
+    var base64 = btoa(unescape(encodeURIComponent(content)));
+    var apiUrl = "https://api.github.com/repos/Casillaswzz/product-prices/contents/data/competitor.json";
+    var headers = { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" };
 
-    fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/" + filename, {
-      headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
-    })
-    .then(function(r) { if (!r.ok) throw new Error("fetch sha failed"); return r.json(); })
-    .then(function(data) {
-      return fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/" + filename, {
-        method: "PUT",
-        headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "自动同步: " + new Date().toLocaleString("zh-CN"), content: base64, sha: data.sha })
+    function doPut(sha, useKeepalive) {
+      var body = { message: "自动同步: " + new Date().toLocaleString("zh-CN"), content: base64 };
+      if (sha) body.sha = sha;
+      return fetch(apiUrl, { method: "PUT", headers: headers, body: JSON.stringify(body), keepalive: !!useKeepalive });
+    }
+    function onSuccess(r) {
+      return r.json().then(function(d) {
+        if (d && d.content && d.content.sha) localStorage.setItem("competitor-price-sync-sha", d.content.sha);
+      }).catch(function() {}).then(function() {
+        clearDirty();
+        updateSyncStatus("synced");
       });
-    })
-    .then(function(r) {
-      if (r.ok) { updateSyncStatus("synced"); }
-      else { updateSyncStatus("error"); console.error("GitHub sync failed:", r.status); }
-    })
-    .catch(function(err) { updateSyncStatus("error"); console.error("GitHub sync error:", err); });
+    }
+    function onFail(r) {
+      updateSyncStatus("error");
+      if (r && (r.status === 401 || r.status === 403) && !tokenErrorShown) {
+        tokenErrorShown = true;
+        showToast("❌ 同步失败：Token 无效或已过期，请点「⚙️ 自动同步设置」重新配置", "");
+      }
+      console.error("GitHub sync failed:", r && r.status);
+    }
+
+    if (flush) {
+      // 页面即将关闭/切走：用缓存的 sha 直接单次 PUT，keepalive 保证请求在页面关闭后仍能发出
+      doPut(localStorage.getItem("competitor-price-sync-sha"), true)
+        .then(function(r) { if (r.ok) return onSuccess(r); onFail(r); })
+        .catch(function(err) { updateSyncStatus("error"); console.error("GitHub sync error:", err); });
+      return;
+    }
+
+    fetch(apiUrl, { headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" } })
+      .then(function(r) {
+        if (r.status === 404) return { sha: null };
+        if (!r.ok) throw r;
+        return r.json();
+      })
+      .then(function(data) { return doPut(data.sha, false); })
+      .then(function(r) {
+        if (r.ok) return onSuccess(r);
+        if (r.status === 409) {
+          // sha 冲突（云端刚被其他设备更新）：重取 sha 再写一次
+          return fetch(apiUrl, { headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" } })
+            .then(function(rr) { return rr.json(); })
+            .then(function(d2) { return doPut(d2.sha, false); })
+            .then(function(r2) { if (r2.ok) return onSuccess(r2); onFail(r2); });
+        }
+        onFail(r);
+      })
+      .catch(function(err) {
+        updateSyncStatus("error");
+        if (err && err.status) onFail(err);
+        else console.error("GitHub sync error:", err);
+      });
   }
+
+  // 页面关闭/切到后台时：先把正在编辑的内容落盘，再立即同步（不等 3 秒防抖）
+  function flushSync() {
+    clearTimeout(inputSaveTimer);
+    if (isEditingCell()) autoSave(true);
+    if (!isDirty()) return;
+    if (!localStorage.getItem("github-sync-token")) return;
+    clearTimeout(syncTimer);
+    syncToGitHub(true);
+  }
+  window.addEventListener("pagehide", flushSync);
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "hidden") flushSync();
+  });
 
   function saveData() {
-    autoSave();
-    scheduleSync();
-    showToast("✅ 已保存，正在同步到云端...", "success");
+    autoSave(true);
+    if (localStorage.getItem("github-sync-token")) {
+      clearTimeout(syncTimer);
+      syncToGitHub(false); // 手动保存：立即同步，不等 3 秒
+      showToast("✅ 已保存，正在同步到云端...", "success");
+    } else {
+      showToast("✅ 已保存到本机（未配置云端同步）", "success");
+    }
   }
   function resetData() {
-    if (confirm("确定要恢复为原始数据吗？所有未保存的修改将丢失。")) {
+    if (confirm("确定要恢复为原始数据吗？本机和云端的所有修改都将被覆盖！")) {
       resetToOriginal(); localStorage.removeItem("competitor-price-data");
-      localStorage.removeItem("competitor-price-data-version");
       localStorage.removeItem("competitor-price-migration");
+      // 恢复操作也要同步到云端，否则下次打开又会被云端旧数据覆盖
+      localStorage.setItem("competitor-price-data-version", new Date().toISOString());
+      markDirty();
       renderAll(""); document.getElementById("searchInput").value = ""; showToast("🔄 已恢复为原始数据");
+      scheduleSync();
     }
   }
   function exportCSV() {
@@ -633,12 +720,18 @@
       else scrollToCategory(catId);
     }
   });
+  var inputSaveTimer = null;
   document.addEventListener("input", function(e) {
     if (e.target.matches("td.price[contenteditable]")) {
       var text = e.target.textContent.trim(); e.target.classList.remove("price-simple", "price-calc");
       if (/[×xX*=+\-]/.test(text) && text.length > 6) e.target.classList.add("price-calc");
       else e.target.classList.add("price-simple");
       if (/=$/.test(text)) autoCalculate(e.target);
+    }
+    // 边输入边保存（静默防抖）：即使不失焦直接关页面/切走 App，内容也已落盘
+    if (e.target.matches("td[contenteditable], .category-title[contenteditable]")) {
+      clearTimeout(inputSaveTimer);
+      inputSaveTimer = setTimeout(function() { autoSave(true); }, 600);
     }
   });
 
@@ -748,7 +841,21 @@
     syncSetup.classList.remove("show");
     updateSyncStatus("syncing");
     showToast("✅ Token 已保存！编辑数据后将自动同步到云端", "success");
-    syncToGitHub();
+    // 只验证 Token 是否有效，不推送数据（避免用本机旧数据覆盖云端）；有漏同步的修改才补推
+    if (isDirty()) { syncToGitHub(false); }
+    else {
+      fetch("https://api.github.com/repos/Casillaswzz/product-prices/contents/data/competitor.json", {
+        headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
+      }).then(function(r) {
+        if (r.ok) {
+          r.json().then(function(d) { if (d && d.sha) localStorage.setItem("competitor-price-sync-sha", d.sha); }).catch(function() {});
+          updateSyncStatus("synced");
+        } else {
+          updateSyncStatus("error");
+          showToast("❌ Token 验证失败（" + r.status + "），请检查权限后重新设置", "");
+        }
+      }).catch(function() { updateSyncStatus("error"); });
+    }
   });
   document.getElementById("btnClearToken").addEventListener("click", function() {
     if (confirm("确定清除 Token 并停止自动同步吗？")) {
@@ -760,17 +867,9 @@
   });
   // 移动端保存按钮仍可用
   document.getElementById("btnSaveM").addEventListener("click", function() {
+    // 直接保存并立即同步。注意：不能在保存后马上拉服务器数据覆盖本地，
+    // 否则会用云端旧数据把刚输入的内容抹掉（旧版 bug）
     saveData();
-    fetch('data/competitor.json?v=' + DATA_VERSION)
-      .then(function(res) { if (!res.ok) throw new Error('no data'); return res.json(); })
-      .then(function(wrapper) {
-        categories = JSON.parse(JSON.stringify(wrapper.categories || wrapper));
-        localStorage.setItem("competitor-price-data", JSON.stringify(categories));
-        localStorage.setItem("competitor-price-data-version", wrapper.version || "");
-        renderAll(document.getElementById("searchInput").value);
-        showToast("✅ 已同步最新数据", "success");
-      })
-      .catch(function() {});
   });
   document.getElementById("btnExport").addEventListener("click", exportCSV);
   document.getElementById("btnExportJSON").addEventListener("click", exportJSON);
@@ -801,8 +900,11 @@
 	        }
 	        categories = data;
 	        localStorage.setItem("competitor-price-data", JSON.stringify(categories));
+	        localStorage.setItem("competitor-price-data-version", new Date().toISOString());
+	        markDirty();
 	        renderAll(document.getElementById("searchInput").value);
-	        showToast("📥 数据已导入（' + data.length + ' 个分类），请点击保存确认", "success");
+	        scheduleSync();
+	        showToast("📥 数据已导入（" + data.length + " 个分类），将自动同步到云端", "success");
 	      } catch(err) {
 	        showToast("❌ 导入失败：文件格式不正确", "");
 	      }
@@ -816,9 +918,11 @@
     // 检查是否已配置自动同步
     var token = localStorage.getItem("github-sync-token");
     if (token) {
-      updateSyncStatus("syncing");
       document.getElementById("githubTokenInput").value = token;
-      syncToGitHub();
+      // 注意：打开页面时绝不能无条件推送本机数据到云端（旧版会用本机旧数据覆盖云端新记录）。
+      // 只有存在"漏同步的本地修改"时才补推；否则等 loadData 拉取比对后决定数据方向。
+      if (isDirty()) { updateSyncStatus("syncing"); scheduleSync(); }
+      else { updateSyncStatus("synced"); }
     } else {
       updateSyncStatus("");
       setTimeout(function() { showToast("💡 点击「⚙️ 自动同步设置」配置 GitHub Token，实现编辑后自动同步到手机", ""); }, 1500);
