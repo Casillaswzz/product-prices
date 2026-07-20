@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-20T16:36:55.525Z",
-  "updated": "2026-07-20T16:36:58.527Z",
+  "version": "2026-07-20T17:10:53.999Z",
+  "updated": "2026-07-20T17:10:53.999Z",
   "categories": [
     {
       "id": "mask",
@@ -133,12 +133,12 @@
           "113~120"
         ],
         [
-          "Scubapro Crystal VU",
-          "560"
-        ],
-        [
           "Scubapro D-Mask",
           "950"
+        ],
+        [
+          "Scubapro Crystal VU",
+          "560"
         ]
       ]
     },
