@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-21T15:03:00.191Z",
-  "updated": "2026-07-21T15:03:03.193Z",
+  "version": "2026-07-21T15:03:10.444Z",
+  "updated": "2026-07-21T15:03:13.447Z",
   "categories": [
     {
       "id": "mask",
@@ -205,6 +205,14 @@
           "813"
         ],
         [
+          "Scubapro Go Sport",
+          "680"
+        ],
+        [
+          "Scubapro Seawing Nova",
+          "1225"
+        ],
+        [
           "Gull Warp 脚蹼",
           "1650"
         ],
@@ -223,14 +231,6 @@
         [
           "Waterproof 碳纤维脚蹼",
           "1386"
-        ],
-        [
-          "Scubapro Go Sport",
-          "680"
-        ],
-        [
-          "Scubapro Seawing Nova",
-          "1225"
         ]
       ]
     },
