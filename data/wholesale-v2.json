@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-22T17:50:10.992Z",
-  "updated": "2026-07-22T17:50:13.994Z",
+  "version": "2026-07-22T17:50:30.550Z",
+  "updated": "2026-07-22T17:50:33.552Z",
   "categories": [
     {
       "id": "mask",
@@ -119,6 +119,42 @@
         [
           "Super Bullet Mini",
           "280"
+        ]
+      ]
+    },
+    {
+      "id": "fins",
+      "name": "脚蹼系列",
+      "icon": "🦶",
+      "iconClass": "fins",
+      "columns": [
+        "产品名称",
+        "出库成本"
+      ],
+      "products": [
+        [
+          "Seac Propulsion",
+          "610"
+        ],
+        [
+          "MARES 四线",
+          "750"
+        ],
+        [
+          "Gull Supermew",
+          "850"
+        ],
+        [
+          "OMS Jet Fin",
+          "1200"
+        ],
+        [
+          "Scubapro GO Sport",
+          "648"
+        ],
+        [
+          "OMS Slipstream Fin",
+          "800"
         ]
       ]
     },
@@ -339,42 +375,6 @@
         [
           "天空森林 D7+Max",
           "405"
-        ]
-      ]
-    },
-    {
-      "id": "fins",
-      "name": "脚蹼系列",
-      "icon": "🦶",
-      "iconClass": "fins",
-      "columns": [
-        "产品名称",
-        "出库成本"
-      ],
-      "products": [
-        [
-          "Seac Propulsion",
-          "610"
-        ],
-        [
-          "MARES 四线",
-          "750"
-        ],
-        [
-          "Gull Supermew",
-          "850"
-        ],
-        [
-          "OMS Jet Fin",
-          "1200"
-        ],
-        [
-          "Scubapro GO Sport",
-          "648"
-        ],
-        [
-          "OMS Slipstream Fin",
-          "800"
         ]
       ]
     },
