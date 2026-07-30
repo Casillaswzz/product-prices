@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-30T09:58:54.344Z",
-  "updated": "2026-07-30T09:58:57.346Z",
+  "version": "2026-07-30T09:59:36.365Z",
+  "updated": "2026-07-30T09:59:39.367Z",
   "categories": [
     {
       "id": "mask",
@@ -623,6 +623,22 @@
         [
           "Keepdiving 腕带式指北针",
           "130"
+        ]
+      ]
+    },
+    {
+      "id": "aquaplay系列",
+      "name": "Aquaplay系列",
+      "icon": "🔖",
+      "iconClass": "other",
+      "columns": [
+        "产品名称",
+        "零售价格"
+      ],
+      "products": [
+        [
+          "新产品名称",
+          "0"
         ]
       ]
     }
