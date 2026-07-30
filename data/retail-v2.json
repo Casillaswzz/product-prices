@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-30T11:07:30.904Z",
-  "updated": "2026-07-30T11:07:33.906Z",
+  "version": "2026-07-30T11:07:39.365Z",
+  "updated": "2026-07-30T11:07:42.367Z",
   "categories": [
     {
       "id": "mask",
@@ -561,6 +561,10 @@
           "3650 ~ 3800"
         ],
         [
+          "Suunto Tank Pod",
+          "2500"
+        ],
+        [
           "Shearwater Tern Tx",
           "5300"
         ],
@@ -575,10 +579,6 @@
         [
           "Shearwater Peregrine",
           "2950～3100"
-        ],
-        [
-          "Suunto Tank pod",
-          "0"
         ]
       ]
     },
