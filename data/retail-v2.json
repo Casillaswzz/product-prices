@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-30T11:08:39.600Z",
-  "updated": "2026-07-30T11:08:42.601Z",
+  "version": "2026-07-30T11:09:12.935Z",
+  "updated": "2026-07-30T11:09:15.936Z",
   "categories": [
     {
       "id": "mask",
@@ -583,6 +583,10 @@
         [
           "Shearwater Peregrine",
           "2950～3100"
+        ],
+        [
+          "Shearwater Peregrine TX",
+          "4000"
         ]
       ]
     },
