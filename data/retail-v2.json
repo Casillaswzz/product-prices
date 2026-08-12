@@ -1,6 +1,6 @@
 {
-  "version": "2026-08-12T09:38:06.330Z",
-  "updated": "2026-08-12T09:38:09.332Z",
+  "version": "2026-08-12T09:38:41.580Z",
+  "updated": "2026-08-12T09:38:44.581Z",
   "categories": [
     {
       "id": "mask",
@@ -231,6 +231,10 @@
         [
           "Seac Pro Pulsion",
           "814"
+        ],
+        [
+          "Scubapro Jetfin",
+          "900"
         ],
         [
           "Scubapro GO Sport",
