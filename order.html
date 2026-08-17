@@ -124,7 +124,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.0</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.1</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -200,8 +200,8 @@ TUSA M1010 薄荷绿 1 780
     <summary>📖 使用说明</summary>
     <ol>
       <li>把原始订单整段粘贴到左边，右边自动生成模板文本，点「📋 一键复制」即可粘贴到微信等。</li>
-      <li>产品行按「名称 数量 价格」识别，替换为「（潜潮）名称 数量 潜潮价格」；数量大于 1 时合计自动按 价格×数量 计算。</li>
-      <li>收款行自动替换为「@联系人 需支付潜潮：价格相加 = 合计」，联系人和前缀可在顶部修改。</li>
+      <li>产品行按「名称 数量 价格」识别，替换为「（潜潮）名称 数量」（模板不显示价格）。</li>
+      <li>收款行自动替换为「@联系人 需支付潜潮」（不显示金额），联系人和前缀可在顶部修改；潜潮合计金额显示在右栏下方的状态栏里。</li>
       <li>带 ⚠ 的行表示没有匹配到对照表，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
       <li>产品对照表自动保存在本机浏览器里，建议定期「CSV 导出」备份；换设备或换浏览器时用「CSV 导入」恢复。</li>
       <li>一次只转换一单；多单请分开粘贴转换。</li>
@@ -244,11 +244,12 @@ TUSA M1010 薄荷绿 1 780
   }
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
-  var cfg = { contact: '@Connie（回复慢）', prefix: '潜潮' };
+  var cfg = { contact: '@Connie', prefix: '潜潮' };
   var rawCfg = localStorage.getItem(CFG_KEY);
   if (rawCfg) {
     try { var c = JSON.parse(rawCfg); cfg.contact = c.contact != null ? c.contact : cfg.contact; cfg.prefix = c.prefix || cfg.prefix; } catch (e) {}
   }
+  if (cfg.contact === '@Connie（回复慢）') cfg.contact = '@Connie';   // 旧默认值迁移：去掉（回复慢）备注
   function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
 
   /* ---------- 匹配 ---------- */
@@ -287,9 +288,8 @@ TUSA M1010 薄荷绿 1 780
     var terms = [], sum = 0;
 
     function paymentLine() {
-      if (!terms.length) return null;                       // 没有可计价的 → 保留原收款行
       var head = contact ? contact + ' ' : '';
-      return head + '需支付' + prefix + '：' + terms.join('+') + ' = ' + fmtTotal(sum);
+      return head + '需支付' + prefix;                       // 模板不显示金额，合计只在状态栏展示
     }
 
     lines.forEach(function (rawLine) {
@@ -312,7 +312,7 @@ TUSA M1010 薄荷绿 1 780
         if (row) {
           var nm = String(row.name || '').trim() || nameRaw;
           var price = fmtPrice(row.price);
-          out.push('（' + prefix + '）' + nm + m[2] + m[3] + m[4] + price);
+          out.push('（' + prefix + '）' + nm + m[2] + m[3]);   // 模板不显示价格
           matched++;
           terms.push(qty === 1 ? price : price + '×' + qty);
           sum += (parseFloat(row.price) || 0) * qty;
