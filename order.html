@@ -124,7 +124,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.2</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.3</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -197,7 +197,7 @@ TUSA M1010 薄荷绿 1 780
     <summary>📖 使用说明</summary>
     <ol>
       <li>把原始订单整段粘贴到左边，右边自动生成模板文本，点「📋 一键复制」即可粘贴到微信等。</li>
-      <li>产品行按「名称 数量 价格」识别，输出「（）名称 数量」（括号 + 产品名 + 数量，不带价格）。</li>
+      <li>产品行输出「（）名称 数量」——行尾最后一个独立数字视为数量，数量后面的数字、加减乘除一律丢弃（数量带量词如 1个、2件 也能识别）。</li>
       <li>收款行自动替换为「@联系人」（联系人可在顶部修改）；潜潮合计金额显示在右栏下方的状态栏里。</li>
       <li>没有匹配到对照表的产品会按原名输出「（）原名 数量」，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
       <li>产品对照表自动保存在本机浏览器里，建议定期「CSV 导出」备份；换设备或换浏览器时用「CSV 导入」恢复。</li>
@@ -214,8 +214,9 @@ TUSA M1010 薄荷绿 1 780
   var CFG_KEY = 'order-config-v1';
   var ZW = /[​-‏⁠﻿]/g;   // 微信粘贴常带零宽字符，全部去掉
   var TOTAL_RE = /(收款|应收|应付|合计|总计|总价|金额)/;
-  // 产品行：名称(可能以数字结尾) 数量 价格 —— 名称用懒惰匹配，保证最后两个数字是数量和价格
-  var PROD_RE = /^(.+?)(\s*)(\d+(?:\.\d+)?)(\s*)([\d][\d,]*(?:\.\d+)?)\s*$/;
+  // 产品行：名称(可能以数字结尾) 数量 价格 —— 名称用懒惰匹配，保证最后两个数字是数量和价格；
+  // 数量后加负向前瞻，防止把 1450 拆成数量145+价格0 之类
+  var PROD_RE = /^(.+?)(\s*)(\d+(?:\.\d+)?(?![\d.,]))(\s*)([\d][\d,]*(?:\.\d+)?)\s*$/;
 
   var SEED = [
     { kw: 'TUSA M1007SQM 粉色', name: 'TUSA M1007 粉框黑胶', price: 1120 },
@@ -281,10 +282,48 @@ TUSA M1010 薄荷绿 1 780
     var lines = srcEl.value.split('\n');
     var out = [];
     var matched = 0, parsed = 0, unmapped = 0;
-    var terms = [], sum = 0;
+    var sum = 0;
 
     function paymentLine() {
       return contact;                                       // 结尾只标 @联系人，不带任何文字
+    }
+
+    // 产品行输出：（）+ 名称 + 数量 —— 数量后面不输出任何数字/算式
+    function emitProduct(nameRaw, qty, sep) {
+      var row = findMap(nameRaw);
+      var nm = (row && String(row.name || '').trim()) || nameRaw;
+      out.push('（）' + nm + sep + qty);
+      if (row) {
+        matched++;
+        sum += (parseFloat(row.price) || 0) * (parseFloat(qty) || 1);
+      } else {
+        unmapped++;
+      }
+    }
+
+    // 宽松解析：行内最后一个独立数字 = 数量，数量后面的全部丢弃（价格、加减乘除等）。
+    // 带量词的数字（1个、2件…）优先视为数量。
+    var CLS = /[个件只套双盒包瓶支条张组对]/;
+    function findQty(t) {
+      var numRe = /\d+(?:\.\d+)?/g, mm, last = null, cls = null;
+      while ((mm = numRe.exec(t)) !== null) {
+        var after = t.charAt(mm.index + mm[0].length) || '';
+        if (/[a-zA-Z0-9.]/.test(after)) continue;            // 5mm、M110 里的数字不算
+        var standalone = after === '' || /[\s,，、;；)）(（:：×xX*+\-/]/.test(after) || CLS.test(after);
+        if (!standalone) continue;
+        last = mm;
+        if (CLS.test(after)) cls = mm;
+      }
+      var pick = cls || last;
+      if (!pick) return null;
+      var name = t.slice(0, pick.index).replace(/[\s×xX*+\-]+$/, '').trim();
+      if (!name || /[：:]/.test(name)) return null;          // 标题行（含冒号/开头就是数字）不算产品
+      var prev = t.charAt(pick.index - 1) || ' ';
+      var sep = /[\s×xX*+\-/]/.test(prev) ? ' ' : '';        // 原名粘连的数量保持粘连（紫色1）
+      if (/[×xX*+\-]/.test(prev)) {
+        name = name.replace(/\d+(?:\.\d+)?$/, '').replace(/[\s×xX*+\-]+$/, '').trim();  // 1×2 → 数量2
+      }
+      return { name: name, qty: pick[0], sep: sep };
     }
 
     lines.forEach(function (rawLine) {
@@ -292,29 +331,25 @@ TUSA M1010 薄荷绿 1 780
       var t = line.trim();
       if (!t) { out.push(line); return; }                   // 空行原样保留
 
-      if (TOTAL_RE.test(t)) {                               // 收款行 → 换成潜潮支付行
+      if (TOTAL_RE.test(t)) {                               // 收款行 → 换成 @联系人
         var p = paymentLine();
         out.push(p || line);
         return;
       }
 
-      var m = PROD_RE.exec(t);                              // 产品行
+      var m = PROD_RE.exec(t);                              // 标准产品行：名称 数量 价格
       if (m) {
-        parsed++;
         var nameRaw = m[1].trim();
-        var qty = parseFloat(m[3]) || 1;
-        var row = findMap(nameRaw);
-        if (row) {
-          var nm = String(row.name || '').trim() || nameRaw;
-          var price = fmtPrice(row.price);
-          out.push('（）' + nm + m[2] + m[3]);               // 括号 + 名称 + 数量，不带价格
-          matched++;
-          terms.push(qty === 1 ? price : price + '×' + qty);
-          sum += (parseFloat(row.price) || 0) * qty;
-        } else {
-          out.push('（）' + nameRaw + m[2] + m[3]);          // 未匹配：括号 + 原名 + 数量
-          unmapped++;
-        }
+        if (!nameRaw || /[：:]/.test(nameRaw)) { out.push(line); return; }  // 带冒号/无名称的行不转换
+        parsed++;
+        emitProduct(nameRaw, m[3], m[2]);
+        return;
+      }
+
+      var fq = findQty(t);                                  // 非常规行：最后一个独立数字 = 数量
+      if (fq) {
+        parsed++;
+        emitProduct(fq.name, fq.qty, fq.sep);
         return;
       }
 
