@@ -76,11 +76,11 @@
   .btn-gray:hover { background: #cbd5e1; }
 
   /* 对照表 */
-  details.map, details.help {
+  details.map {
     background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
     margin-top: 16px; padding: 0 16px 16px; box-shadow: 0 1px 4px rgba(15,23,42,0.05);
   }
-  details.map summary, details.help summary {
+  details.map summary {
     padding: 14px 0; font-weight: 600; font-size: 0.95rem; cursor: pointer;
     display: flex; align-items: center; gap: 8px; user-select: none;
   }
@@ -111,7 +111,6 @@
   .del-btn:hover { background: #fee2e2; }
   .map-hint { font-size: 0.78rem; color: #94a3b8; margin-top: 10px; line-height: 1.6; }
   .map-wrap { overflow-x: auto; }
-  .help ol { margin: 4px 0 6px 20px; font-size: 0.85rem; color: #475569; line-height: 1.9; }
   .empty-hint { color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem; }
 
   @media (max-width: 900px) {
@@ -124,7 +123,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.3</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.4</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -193,17 +192,6 @@ TUSA M1010 薄荷绿 1 780
     </p>
   </details>
 
-  <details class="help">
-    <summary>📖 使用说明</summary>
-    <ol>
-      <li>把原始订单整段粘贴到左边，右边自动生成模板文本，点「📋 一键复制」即可粘贴到微信等。</li>
-      <li>产品行输出「（）名称 数量」——行尾最后一个独立数字视为数量，数量后面的数字、加减乘除一律丢弃（数量带量词如 1个、2件 也能识别）。</li>
-      <li>收款行自动替换为「@联系人」（联系人可在顶部修改）；潜潮合计金额显示在右栏下方的状态栏里。</li>
-      <li>没有匹配到对照表的产品会按原名输出「（）原名 数量」，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
-      <li>产品对照表自动保存在本机浏览器里，建议定期「CSV 导出」备份；换设备或换浏览器时用「CSV 导入」恢复。</li>
-      <li>一次只转换一单；多单请分开粘贴转换。</li>
-    </ol>
-  </details>
 </main>
 
 <script>
@@ -316,14 +304,27 @@ TUSA M1010 薄荷绿 1 780
       }
       var pick = cls || last;
       if (!pick) return null;
-      var name = t.slice(0, pick.index).replace(/[\s×xX*+\-]+$/, '').trim();
+      var name = t.slice(0, pick.index);
+      var qty = pick[0];
+
+      // 选中数字前面紧跟着「数字×数字 」算式（如 99*2 780）：数量取算式最后一个数字，算式和价格全部丢弃
+      var ar = null;
+      if (!cls && pick === last) {
+        ar = /(\d+(?:\.\d+)?)\s*[×xX*+\-]\s*(\d+(?:\.\d+)?)\s*$/.exec(name);
+        if (ar) {
+          name = name.slice(0, name.length - ar[0].length);
+          qty = ar[2];
+        }
+      }
+
+      name = name.replace(/[\s×xX*+\-]+$/, '').trim();
       if (!name || /[：:]/.test(name)) return null;          // 标题行（含冒号/开头就是数字）不算产品
       var prev = t.charAt(pick.index - 1) || ' ';
       var sep = /[\s×xX*+\-/]/.test(prev) ? ' ' : '';        // 原名粘连的数量保持粘连（紫色1）
-      if (/[×xX*+\-]/.test(prev)) {
+      if (!ar && /[×xX*+\-]/.test(prev)) {
         name = name.replace(/\d+(?:\.\d+)?$/, '').replace(/[\s×xX*+\-]+$/, '').trim();  // 1×2 → 数量2
       }
-      return { name: name, qty: pick[0], sep: sep };
+      return { name: name, qty: qty, sep: sep };
     }
 
     lines.forEach(function (rawLine) {
@@ -340,10 +341,12 @@ TUSA M1010 薄荷绿 1 780
       var m = PROD_RE.exec(t);                              // 标准产品行：名称 数量 价格
       if (m) {
         var nameRaw = m[1].trim();
-        if (!nameRaw || /[：:]/.test(nameRaw)) { out.push(line); return; }  // 带冒号/无名称的行不转换
-        parsed++;
-        emitProduct(nameRaw, m[3], m[2]);
-        return;
+        // 名称带冒号/算式的不算正常产品行，交给下方宽松解析处理
+        if (nameRaw && !/[：:]/.test(nameRaw) && !/[×xX*+]/.test(nameRaw)) {
+          parsed++;
+          emitProduct(nameRaw, m[3], m[2]);
+          return;
+        }
       }
 
       var fq = findQty(t);                                  // 非常规行：最后一个独立数字 = 数量
