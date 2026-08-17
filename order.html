@@ -108,7 +108,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.9</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.10</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -166,7 +166,7 @@ TUSA M1010 薄荷绿 1 780
       </table>
     </div>
     <p class="map-hint">
-      💡 匹配规则：订单产品名与「产品」列完全一致优先，否则按包含匹配（取最长，英文不分大小写）。
+      💡 匹配规则：订单产品名与「产品」列完全一致优先，否则按包含匹配（取最长，英文不分大小写）；都没有时按名称相似度（≥65%）找最相近的产品带价，状态栏会提示「相近 N 行」请人工核对。
       匹配上的产品行会在数量后自动带上金额（口径同合计，如「潜潮：680」取 680、「1800×0.7=1260」取 1260）。
       未匹配的行按原名输出、不计入合计 —— 在这里补一行产品和出库价格即可，右侧立即更新。
       可点「⬇️ 从产品出库价格导入」把产品出库价格表的数据一键同步进来。
@@ -211,8 +211,18 @@ TUSA M1010 薄荷绿 1 780
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
   /* ---------- 匹配 ---------- */
-  function norm(s) {
-    return String(s || '').replace(ZW, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  var SIM_THRESHOLD = 0.65;                  // 相近匹配阈值（字符二元组 Dice 相似度）
+  function grams(s) {
+    var m = {}, i;
+    for (i = 0; i < s.length - 1; i++) m[s.substr(i, 2)] = 1;
+    return m;
+  }
+  function countKeys(m) { var c = 0, k; for (k in m) c++; return c; }
+  function sim(a, b) {                       // 0-1；不足 2 字不比较
+    if (a.length < 2 || b.length < 2) return 0;
+    var ga = grams(a), gb = grams(b), inter = 0, k;
+    for (k in ga) if (gb[k]) inter++;
+    return 2 * inter / (countKeys(ga) + countKeys(gb));
   }
   function findMap(nameRaw) {
     var n = norm(nameRaw);
@@ -220,10 +230,19 @@ TUSA M1010 薄荷绿 1 780
     for (i = 0; i < rows.length; i++) {
       var k = norm(rows[i].kw);
       if (!k) continue;
-      if (k === n) return rows[i];           // 完全一致优先
+      if (k === n) return { row: rows[i], fuzzy: false };  // 完全一致优先
       if (n.indexOf(k) !== -1 && k.length > bestLen) { best = rows[i]; bestLen = k.length; }
     }
-    return best;
+    if (best) return { row: best, fuzzy: false };          // 包含匹配（取最长）
+    var cn = n.replace(/ /g, ''), bestSim = 0, bestRow = null;
+    for (i = 0; i < rows.length; i++) {
+      var k2 = norm(rows[i].kw);
+      if (!k2) continue;
+      var s = sim(cn, k2.replace(/ /g, ''));
+      if (s > bestSim) { bestSim = s; bestRow = rows[i]; }
+    }
+    if (bestSim >= SIM_THRESHOLD) return { row: bestRow, fuzzy: true };  // 相近匹配（人工核对）
+    return null;
   }
 
   /* ---------- 数字格式 ---------- */
@@ -244,7 +263,7 @@ TUSA M1010 薄荷绿 1 780
   function generate() {
     var lines = srcEl.value.split('\n');
     var out = [];
-    var matched = 0, parsed = 0, unmapped = 0;
+    var matched = 0, parsed = 0, unmapped = 0, fuzzy = 0;
     var sum = 0;
 
     function paymentLine() {
@@ -253,12 +272,14 @@ TUSA M1010 薄荷绿 1 780
 
     // 产品行输出：（）+ 名称 + 数量 —— 匹配到价格时在数量后自动追加匹配金额（口径同潜潮合计）
     function emitProduct(nameRaw, qty, sep) {
-      var row = findMap(nameRaw);
+      var hit = findMap(nameRaw);
+      var row = hit ? hit.row : null;
       var amt = row ? numOfPrice(row.price) : 0;
-      var suffix = (row && amt > 0) ? ' ' + (Math.round(amt * 100) / 100) : '';
-      out.push('（）' + nameRaw + sep + qty + suffix);      // 名称用原始订单名称，价格表只管出库价格
-      if (row) {
+      var hasPrice = row && amt > 0;
+      out.push('（）' + nameRaw + sep + qty + (hasPrice ? ' ' + (Math.round(amt * 100) / 100) : ''));
+      if (row && (hasPrice || !hit.fuzzy)) {                // 相近匹配但价格为空 → 仍算未匹配
         matched++;
+        if (hit.fuzzy) fuzzy++;
         sum += amt * (parseFloat(qty) || 1);
       } else {
         unmapped++;
@@ -339,10 +360,12 @@ TUSA M1010 薄荷绿 1 780
     });
 
     outEl.value = out.join('\n');
-    var status = '✅ 已匹配 ' + matched + '/' + parsed + ' 款 · 潜潮合计 ¥' + fmtTotal(sum);
+    var status = '✅ 已匹配 ' + matched + '/' + parsed + ' 款';
+    if (fuzzy > 0) status += '（相近 ' + fuzzy + ' 行，请核对）';
+    status += ' · 潜潮合计 ¥' + fmtTotal(sum);
     if (unmapped > 0) status += ' · 未匹配 ' + unmapped + ' 行';
     statusEl.textContent = status;
-    statusEl.className = unmapped > 0 ? 'warn' : '';
+    statusEl.className = (unmapped > 0 || fuzzy > 0) ? 'warn' : '';
   }
 
   /* ---------- 对照表渲染 ---------- */
