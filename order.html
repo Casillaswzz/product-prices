@@ -25,19 +25,6 @@
   }
   main { max-width: 1280px; margin: 0 auto; padding: 18px 16px 60px; }
 
-  /* 顶部配置 */
-  .config {
-    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
-    padding: 10px 14px; margin-bottom: 14px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
-    font-size: 0.88rem; color: #475569;
-  }
-  .config label { display: flex; align-items: center; gap: 6px; }
-  .config input {
-    border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 0.9rem;
-    width: 240px; outline: none; background: #f8fafc;
-  }
-  .config input:focus { border-color: #2563eb; background: #fff; }
-
   /* 双栏 */
   .panes { display: flex; gap: 16px; align-items: stretch; }
   .pane {
@@ -116,24 +103,16 @@
   @media (max-width: 900px) {
     .panes { flex-direction: column; }
     .pane textarea { min-height: 300px; }
-    .config input { width: 100%; }
-    .config label { flex: 1; }
   }
 </style>
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.5</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.6</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
 <main>
-  <div class="config">
-    <label>📇 联系人
-      <input id="cfgContact" placeholder="如：@Connie">
-    </label>
-  </div>
-
   <div class="panes">
     <section class="pane">
       <div class="pane-head">📥 原始订单 <span class="tip">粘贴后右侧自动生成</span></div>
@@ -166,7 +145,7 @@ TUSA M1010 薄荷绿 1 780
   </div>
 
   <details class="map" open>
-    <summary>🗂️ 产品对照表 <span class="cnt" id="mapCount"></span></summary>
+    <summary>🗂️ 常用出库价格表 <span class="cnt" id="mapCount"></span></summary>
     <div class="map-tools">
       🔍 <input type="text" id="mapSearch" placeholder="搜索关键词或潜潮名称">
       <button class="btn btn-blue" id="btnAdd">＋ 添加一行</button>
@@ -199,7 +178,6 @@ TUSA M1010 薄荷绿 1 780
   'use strict';
 
   var LS_KEY = 'order-map-data-v1';
-  var CFG_KEY = 'order-config-v1';
   var ZW = /[​-‏⁠﻿]/g;   // 微信粘贴常带零宽字符，全部去掉
   var TOTAL_RE = /(收款|应收|应付|合计|总计|总价|金额)/;
   // 产品行：名称(可能以数字结尾) 数量 价格 —— 名称用懒惰匹配，保证最后两个数字是数量和价格；
@@ -230,14 +208,6 @@ TUSA M1010 薄荷绿 1 780
   }
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
-  var cfg = { contact: '@Connie' };
-  var rawCfg = localStorage.getItem(CFG_KEY);
-  if (rawCfg) {
-    try { var c = JSON.parse(rawCfg); if (c.contact != null) cfg.contact = c.contact; } catch (e) {}
-  }
-  if (cfg.contact === '@Connie（回复慢）') cfg.contact = '@Connie';   // 旧默认值迁移：去掉（回复慢）备注
-  function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
-
   /* ---------- 匹配 ---------- */
   function norm(s) {
     return String(s || '').replace(ZW, '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -266,14 +236,13 @@ TUSA M1010 薄荷绿 1 780
 
   /* ---------- 生成 ---------- */
   function generate() {
-    var contact = cfg.contact.trim();
     var lines = srcEl.value.split('\n');
     var out = [];
     var matched = 0, parsed = 0, unmapped = 0;
     var sum = 0;
 
     function paymentLine() {
-      return contact;                                       // 结尾只标 @联系人，不带任何文字
+      return '@Connie';                                     // 结尾只标 @Connie，不带任何文字
     }
 
     // 产品行输出：（）+ 名称 + 数量 —— 数量后面不输出任何数字/算式
@@ -379,7 +348,7 @@ TUSA M1010 薄荷绿 1 780
     var tb = $('mapBody');
     tb.innerHTML = '';
     if (!list.length) {
-      tb.innerHTML = '<tr><td colspan="4" class="empty-hint">' + (q ? '没有匹配「' + q + '」的行' : '对照表为空，点「＋ 添加一行」开始录入') + '</td></tr>';
+      tb.innerHTML = '<tr><td colspan="4" class="empty-hint">' + (q ? '没有匹配「' + q + '」的行' : '价格表为空，点「＋ 添加一行」开始录入') + '</td></tr>';
     }
     list.forEach(function (r) {
       var idx = rows.indexOf(r);
@@ -420,7 +389,7 @@ TUSA M1010 薄荷绿 1 780
     var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = '订单对照表-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.download = '常用出库价格表-' + new Date().toISOString().slice(0, 10) + '.csv';
     a.click();
     URL.revokeObjectURL(a.href);
   });
@@ -437,7 +406,7 @@ TUSA M1010 薄荷绿 1 780
         imported.push({ kw: (p[0] || '').trim(), name: (p[1] || '').trim(), price: (p[2] || '').trim() });
       });
       if (!imported.length) { alert('CSV 里没有数据行'); return; }
-      if (!confirm('导入 ' + imported.length + ' 行，将替换当前对照表（当前 ' + rows.length + ' 行），确定？')) return;
+      if (!confirm('导入 ' + imported.length + ' 行，将替换当前价格表（当前 ' + rows.length + ' 行），确定？')) return;
       rows = imported;
       saveRows(); renderMap(); generate();
     };
@@ -485,10 +454,7 @@ TUSA M1010 薄荷绿 1 780
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(generate, 250);
   });
-  $('cfgContact').addEventListener('input', function () { cfg.contact = this.value; saveCfg(); generate(); });
-
   /* ---------- 初始化 ---------- */
-  $('cfgContact').value = cfg.contact;
   renderMap();
   generate();
 })();
