@@ -124,17 +124,14 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.1</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.2</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
 <main>
   <div class="config">
     <label>📇 联系人
-      <input id="cfgContact" placeholder="如：@Connie（回复慢）">
-    </label>
-    <label>🏷️ 前缀
-      <input id="cfgPrefix" placeholder="如：潜潮">
+      <input id="cfgContact" placeholder="如：@Connie">
     </label>
   </div>
 
@@ -192,7 +189,7 @@ TUSA M1010 薄荷绿 1 780
     </div>
     <p class="map-hint">
       💡 匹配规则：先按「关键词 = 产品名」完全一致匹配，再按「产品名包含关键词」匹配（取最长关键词，英文不分大小写）。
-      未匹配的产品行在右侧会加 ⚠ 标记、不计入合计 —— 在这里补一行关键词和价格即可，右侧立即更新。
+      未匹配的产品行会按原名输出（不加潜潮名称）、不计入合计 —— 在这里补一行关键词和价格即可，右侧立即更新。
     </p>
   </details>
 
@@ -200,9 +197,9 @@ TUSA M1010 薄荷绿 1 780
     <summary>📖 使用说明</summary>
     <ol>
       <li>把原始订单整段粘贴到左边，右边自动生成模板文本，点「📋 一键复制」即可粘贴到微信等。</li>
-      <li>产品行按「名称 数量 价格」识别，替换为「（潜潮）名称 数量」（模板不显示价格）。</li>
-      <li>收款行自动替换为「@联系人 需支付潜潮」（不显示金额），联系人和前缀可在顶部修改；潜潮合计金额显示在右栏下方的状态栏里。</li>
-      <li>带 ⚠ 的行表示没有匹配到对照表，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
+      <li>产品行按「名称 数量 价格」识别，输出「（）名称 数量」（括号 + 产品名 + 数量，不带价格）。</li>
+      <li>收款行自动替换为「@联系人」（联系人可在顶部修改）；潜潮合计金额显示在右栏下方的状态栏里。</li>
+      <li>没有匹配到对照表的产品会按原名输出「（）原名 数量」，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
       <li>产品对照表自动保存在本机浏览器里，建议定期「CSV 导出」备份；换设备或换浏览器时用「CSV 导入」恢复。</li>
       <li>一次只转换一单；多单请分开粘贴转换。</li>
     </ol>
@@ -244,10 +241,10 @@ TUSA M1010 薄荷绿 1 780
   }
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
-  var cfg = { contact: '@Connie', prefix: '潜潮' };
+  var cfg = { contact: '@Connie' };
   var rawCfg = localStorage.getItem(CFG_KEY);
   if (rawCfg) {
-    try { var c = JSON.parse(rawCfg); cfg.contact = c.contact != null ? c.contact : cfg.contact; cfg.prefix = c.prefix || cfg.prefix; } catch (e) {}
+    try { var c = JSON.parse(rawCfg); if (c.contact != null) cfg.contact = c.contact; } catch (e) {}
   }
   if (cfg.contact === '@Connie（回复慢）') cfg.contact = '@Connie';   // 旧默认值迁移：去掉（回复慢）备注
   function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
@@ -281,15 +278,13 @@ TUSA M1010 薄荷绿 1 780
   /* ---------- 生成 ---------- */
   function generate() {
     var contact = cfg.contact.trim();
-    var prefix = cfg.prefix.trim() || '潜潮';
     var lines = srcEl.value.split('\n');
     var out = [];
     var matched = 0, parsed = 0, unmapped = 0;
     var terms = [], sum = 0;
 
     function paymentLine() {
-      var head = contact ? contact + ' ' : '';
-      return head + '需支付' + prefix;                       // 模板不显示金额，合计只在状态栏展示
+      return contact;                                       // 结尾只标 @联系人，不带任何文字
     }
 
     lines.forEach(function (rawLine) {
@@ -312,28 +307,23 @@ TUSA M1010 薄荷绿 1 780
         if (row) {
           var nm = String(row.name || '').trim() || nameRaw;
           var price = fmtPrice(row.price);
-          out.push('（' + prefix + '）' + nm + m[2] + m[3]);   // 模板不显示价格
+          out.push('（）' + nm + m[2] + m[3]);               // 括号 + 名称 + 数量，不带价格
           matched++;
           terms.push(qty === 1 ? price : price + '×' + qty);
           sum += (parseFloat(row.price) || 0) * qty;
         } else {
-          out.push('⚠ ' + t);
+          out.push('（）' + nameRaw + m[2] + m[3]);          // 未匹配：括号 + 原名 + 数量
           unmapped++;
         }
         return;
       }
 
-      if (/\d$/.test(t)) {                                  // 像产品行但没识别出数量/价格
-        out.push('⚠ ' + t);
-        unmapped++;
-      } else {
-        out.push(line);                                     // 客户名、经手人等标题行原样保留
-      }
+      out.push(line);                                       // 其他行（客户名、经手人等）原样保留
     });
 
     outEl.value = out.join('\n');
     var status = '✅ 已匹配 ' + matched + '/' + parsed + ' 款 · 潜潮合计 ¥' + fmtTotal(sum);
-    if (unmapped > 0) status += ' · ⚠ 未匹配 ' + unmapped + ' 行';
+    if (unmapped > 0) status += ' · 未匹配 ' + unmapped + ' 行';
     statusEl.textContent = status;
     statusEl.className = unmapped > 0 ? 'warn' : '';
   }
@@ -455,11 +445,9 @@ TUSA M1010 薄荷绿 1 780
     debounceTimer = setTimeout(generate, 250);
   });
   $('cfgContact').addEventListener('input', function () { cfg.contact = this.value; saveCfg(); generate(); });
-  $('cfgPrefix').addEventListener('input', function () { cfg.prefix = this.value; saveCfg(); generate(); });
 
   /* ---------- 初始化 ---------- */
   $('cfgContact').value = cfg.contact;
-  $('cfgPrefix').value = cfg.prefix;
   renderMap();
   generate();
 })();
