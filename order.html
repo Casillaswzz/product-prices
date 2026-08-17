@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>订单转换 · 原始订单 → 潜潮模板</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #eef2f7; min-height: 100vh; color: #1e293b;
+  }
+  header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 50%, #2563eb 100%);
+    color: #fff; padding: 22px 24px;
+  }
+  header h1 { font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  header .sub { font-size: 0.82rem; color: rgba(255,255,255,0.75); margin-top: 6px; }
+  .badge {
+    font-size: 0.7rem; background: rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35);
+    padding: 2px 8px; border-radius: 999px; font-weight: 500;
+  }
+  main { max-width: 1280px; margin: 0 auto; padding: 18px 16px 60px; }
+
+  /* 顶部配置 */
+  .config {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 10px 14px; margin-bottom: 14px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+    font-size: 0.88rem; color: #475569;
+  }
+  .config label { display: flex; align-items: center; gap: 6px; }
+  .config input {
+    border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 0.9rem;
+    width: 240px; outline: none; background: #f8fafc;
+  }
+  .config input:focus { border-color: #2563eb; background: #fff; }
+
+  /* 双栏 */
+  .panes { display: flex; gap: 16px; align-items: stretch; }
+  .pane {
+    flex: 1; min-width: 0; background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+  }
+  .pane-head {
+    padding: 12px 16px; font-weight: 600; font-size: 0.95rem;
+    border-bottom: 1px solid #e2e8f0; background: #f8fafc;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .pane-head .tip { font-size: 0.75rem; color: #94a3b8; font-weight: 400; }
+  .pane textarea {
+    flex: 1; width: 100%; border: none; outline: none; resize: vertical;
+    padding: 14px 16px; font-size: 14px; line-height: 1.75; font-family: inherit; min-height: 420px;
+  }
+  #src { background: #fbfdff; }
+  #out { background: #f4fbf6; }
+  .pane-tools {
+    padding: 10px 14px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  #status { font-size: 0.8rem; color: #059669; margin-left: auto; }
+  #status.warn { color: #b45309; }
+
+  .btn {
+    border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn-blue { background: #2563eb; color: #fff; }
+  .btn-blue:hover { background: #1d4ed8; }
+  .btn-green { background: #059669; color: #fff; }
+  .btn-green:hover { background: #047857; }
+  .btn-gray { background: #e2e8f0; color: #334155; }
+  .btn-gray:hover { background: #cbd5e1; }
+
+  /* 对照表 */
+  details.map, details.help {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    margin-top: 16px; padding: 0 16px 16px; box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+  }
+  details.map summary, details.help summary {
+    padding: 14px 0; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+    display: flex; align-items: center; gap: 8px; user-select: none;
+  }
+  summary .cnt { font-size: 0.75rem; color: #64748b; font-weight: 400; margin-left: auto; }
+  .map-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .map-tools input[type="text"] {
+    border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 10px; font-size: 0.88rem;
+    width: 260px; outline: none; background: #f8fafc;
+  }
+  .map-tools input:focus { border-color: #2563eb; background: #fff; }
+  .btn-file { position: relative; overflow: hidden; }
+  .btn-file input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 0.78rem; color: #64748b; background: #f1f5f9;
+    padding: 8px 10px; border: 1px solid #e2e8f0; white-space: nowrap;
+  }
+  td { padding: 5px 8px; border: 1px solid #e2e8f0; }
+  td input {
+    width: 100%; border: 1px solid transparent; border-radius: 6px; padding: 6px 8px;
+    font-size: 0.88rem; outline: none; background: transparent; font-family: inherit;
+  }
+  td input:hover { border-color: #cbd5e1; }
+  td input:focus { border-color: #2563eb; background: #fff; }
+  td.price input { text-align: right; }
+  td.del { width: 44px; text-align: center; }
+  .del-btn { border: none; background: none; color: #ef4444; cursor: pointer; font-size: 0.95rem; padding: 4px 8px; border-radius: 6px; }
+  .del-btn:hover { background: #fee2e2; }
+  .map-hint { font-size: 0.78rem; color: #94a3b8; margin-top: 10px; line-height: 1.6; }
+  .map-wrap { overflow-x: auto; }
+  .help ol { margin: 4px 0 6px 20px; font-size: 0.85rem; color: #475569; line-height: 1.9; }
+  .empty-hint { color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem; }
+
+  @media (max-width: 900px) {
+    .panes { flex-direction: column; }
+    .pane textarea { min-height: 300px; }
+    .config input { width: 100%; }
+    .config label { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧾 订单转换 <span class="badge">v1.0</span></h1>
+  <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
+</header>
+
+<main>
+  <div class="config">
+    <label>📇 联系人
+      <input id="cfgContact" placeholder="如：@Connie（回复慢）">
+    </label>
+    <label>🏷️ 前缀
+      <input id="cfgPrefix" placeholder="如：潜潮">
+    </label>
+  </div>
+
+  <div class="panes">
+    <section class="pane">
+      <div class="pane-head">📥 原始订单 <span class="tip">粘贴后右侧自动生成</span></div>
+      <textarea id="src" placeholder="把微信里收到的原始订单整段粘贴到这里，例如：
+
+65、客户名称：EVA
+
+销售性质：零售
+
+经手人：iker
+
+TUSA M1007SQM 粉色 1 1450
+TUSA M1010 薄荷绿 1 780
+
+收款金额：1450+780 = 2,230"></textarea>
+      <div class="pane-tools">
+        <button class="btn btn-gray" id="btnSample">📄 载入示例</button>
+        <button class="btn btn-gray" id="btnClear">🧹 清空</button>
+      </div>
+    </section>
+
+    <section class="pane">
+      <div class="pane-head">📤 潜潮模板文本 <span class="tip">可手动修改；左侧改动会重新生成覆盖</span></div>
+      <textarea id="out" placeholder="生成结果会显示在这里…"></textarea>
+      <div class="pane-tools">
+        <button class="btn btn-green" id="btnCopy">📋 一键复制</button>
+        <span id="status"></span>
+      </div>
+    </section>
+  </div>
+
+  <details class="map" open>
+    <summary>🗂️ 产品对照表 <span class="cnt" id="mapCount"></span></summary>
+    <div class="map-tools">
+      🔍 <input type="text" id="mapSearch" placeholder="搜索关键词或潜潮名称">
+      <button class="btn btn-blue" id="btnAdd">＋ 添加一行</button>
+      <button class="btn btn-gray" id="btnExport">⬇️ CSV 导出</button>
+      <label class="btn btn-gray btn-file">⬆️ CSV 导入<input type="file" id="csvFile" accept=".csv,text/csv"></label>
+    </div>
+    <div class="map-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:38%">关键词（原始订单里出现的字样）</th>
+            <th style="width:38%">潜潮名称（留空 = 沿用原名）</th>
+            <th style="width:14%">潜潮价格</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="mapBody"></tbody>
+      </table>
+    </div>
+    <p class="map-hint">
+      💡 匹配规则：先按「关键词 = 产品名」完全一致匹配，再按「产品名包含关键词」匹配（取最长关键词，英文不分大小写）。
+      未匹配的产品行在右侧会加 ⚠ 标记、不计入合计 —— 在这里补一行关键词和价格即可，右侧立即更新。
+    </p>
+  </details>
+
+  <details class="help">
+    <summary>📖 使用说明</summary>
+    <ol>
+      <li>把原始订单整段粘贴到左边，右边自动生成模板文本，点「📋 一键复制」即可粘贴到微信等。</li>
+      <li>产品行按「名称 数量 价格」识别，替换为「（潜潮）名称 数量 潜潮价格」；数量大于 1 时合计自动按 价格×数量 计算。</li>
+      <li>收款行自动替换为「@联系人 需支付潜潮：价格相加 = 合计」，联系人和前缀可在顶部修改。</li>
+      <li>带 ⚠ 的行表示没有匹配到对照表，请在下方产品对照表补录后重贴订单（或直接在右侧手工改）。</li>
+      <li>产品对照表自动保存在本机浏览器里，建议定期「CSV 导出」备份；换设备或换浏览器时用「CSV 导入」恢复。</li>
+      <li>一次只转换一单；多单请分开粘贴转换。</li>
+    </ol>
+  </details>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var LS_KEY = 'order-map-data-v1';
+  var CFG_KEY = 'order-config-v1';
+  var ZW = /[​-‏⁠﻿]/g;   // 微信粘贴常带零宽字符，全部去掉
+  var TOTAL_RE = /(收款|应收|应付|合计|总计|总价|金额)/;
+  // 产品行：名称(可能以数字结尾) 数量 价格 —— 名称用懒惰匹配，保证最后两个数字是数量和价格
+  var PROD_RE = /^(.+?)(\s*)(\d+(?:\.\d+)?)(\s*)([\d][\d,]*(?:\.\d+)?)\s*$/;
+
+  var SEED = [
+    { kw: 'TUSA M1007SQM 粉色', name: 'TUSA M1007 粉框黑胶', price: 1120 },
+    { kw: 'TUSA M1010 薄荷绿', name: '', price: 515 },
+    { kw: '鹦鹉螺 咬嘴 紫色', name: '', price: 30 },
+    { kw: '鹦鹉螺 咬嘴 薄荷色', name: '', price: 30 },
+    { kw: 'Scubapro Delta 5mm 潜水靴 黑色 S码', name: '', price: 354.6 }
+  ];
+
+  var SAMPLE = '65、客户名称：EVA\n\n销售性质：零售\n\n经手人：iker\n\nTUSA M1007SQM 粉色 1 1450\nTUSA M1010 薄荷绿 1 780\n鹦鹉螺 咬嘴 紫色1 50\n鹦鹉螺 咬嘴 薄荷色1 50\nScubapro Delta 5mm 潜水靴 黑色 S码 1 450\n\n收款金额：1450+780+50+50+450 = 2,780';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var srcEl = $('src'), outEl = $('out'), statusEl = $('status');
+
+  /* ---------- 数据 ---------- */
+  var rows = [];
+  var raw = localStorage.getItem(LS_KEY);
+  if (raw) {
+    try { rows = JSON.parse(raw); } catch (e) { rows = []; }
+  }
+  if (!Array.isArray(rows) || rows.length === 0) {
+    rows = SEED.map(function (r) { return { kw: r.kw, name: r.name, price: r.price }; });
+  }
+  function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
+
+  var cfg = { contact: '@Connie（回复慢）', prefix: '潜潮' };
+  var rawCfg = localStorage.getItem(CFG_KEY);
+  if (rawCfg) {
+    try { var c = JSON.parse(rawCfg); cfg.contact = c.contact != null ? c.contact : cfg.contact; cfg.prefix = c.prefix || cfg.prefix; } catch (e) {}
+  }
+  function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
+
+  /* ---------- 匹配 ---------- */
+  function norm(s) {
+    return String(s || '').replace(ZW, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+  function findMap(nameRaw) {
+    var n = norm(nameRaw);
+    var i, best = null, bestLen = 0;
+    for (i = 0; i < rows.length; i++) {
+      var k = norm(rows[i].kw);
+      if (!k) continue;
+      if (k === n) return rows[i];           // 完全一致优先
+      if (n.indexOf(k) !== -1 && k.length > bestLen) { best = rows[i]; bestLen = k.length; }
+    }
+    return best;
+  }
+
+  /* ---------- 数字格式 ---------- */
+  function fmtPrice(p) {                     // 行内单价：不千分位，去掉多余小数
+    var v = parseFloat(p);
+    if (isNaN(v)) return String(p).trim();
+    return String(Math.round(v * 100) / 100);
+  }
+  function fmtTotal(x) {                     // 合计：千分位
+    return (Math.round(x * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  /* ---------- 生成 ---------- */
+  function generate() {
+    var contact = cfg.contact.trim();
+    var prefix = cfg.prefix.trim() || '潜潮';
+    var lines = srcEl.value.split('\n');
+    var out = [];
+    var matched = 0, parsed = 0, unmapped = 0;
+    var terms = [], sum = 0;
+
+    function paymentLine() {
+      if (!terms.length) return null;                       // 没有可计价的 → 保留原收款行
+      var head = contact ? contact + ' ' : '';
+      return head + '需支付' + prefix + '：' + terms.join('+') + ' = ' + fmtTotal(sum);
+    }
+
+    lines.forEach(function (rawLine) {
+      var line = rawLine.replace(ZW, '');
+      var t = line.trim();
+      if (!t) { out.push(line); return; }                   // 空行原样保留
+
+      if (TOTAL_RE.test(t)) {                               // 收款行 → 换成潜潮支付行
+        var p = paymentLine();
+        out.push(p || line);
+        return;
+      }
+
+      var m = PROD_RE.exec(t);                              // 产品行
+      if (m) {
+        parsed++;
+        var nameRaw = m[1].trim();
+        var qty = parseFloat(m[3]) || 1;
+        var row = findMap(nameRaw);
+        if (row) {
+          var nm = String(row.name || '').trim() || nameRaw;
+          var price = fmtPrice(row.price);
+          out.push('（' + prefix + '）' + nm + m[2] + m[3] + m[4] + price);
+          matched++;
+          terms.push(qty === 1 ? price : price + '×' + qty);
+          sum += (parseFloat(row.price) || 0) * qty;
+        } else {
+          out.push('⚠ ' + t);
+          unmapped++;
+        }
+        return;
+      }
+
+      if (/\d$/.test(t)) {                                  // 像产品行但没识别出数量/价格
+        out.push('⚠ ' + t);
+        unmapped++;
+      } else {
+        out.push(line);                                     // 客户名、经手人等标题行原样保留
+      }
+    });
+
+    outEl.value = out.join('\n');
+    var status = '✅ 已匹配 ' + matched + '/' + parsed + ' 款 · 潜潮合计 ¥' + fmtTotal(sum);
+    if (unmapped > 0) status += ' · ⚠ 未匹配 ' + unmapped + ' 行';
+    statusEl.textContent = status;
+    statusEl.className = unmapped > 0 ? 'warn' : '';
+  }
+
+  /* ---------- 对照表渲染 ---------- */
+  function renderMap() {
+    var q = norm($('mapSearch').value);
+    var list = rows;
+    if (q) list = rows.filter(function (r) {
+      return norm(r.kw).indexOf(q) !== -1 || norm(r.name).indexOf(q) !== -1;
+    });
+    var tb = $('mapBody');
+    tb.innerHTML = '';
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="4" class="empty-hint">' + (q ? '没有匹配「' + q + '」的行' : '对照表为空，点「＋ 添加一行」开始录入') + '</td></tr>';
+    }
+    list.forEach(function (r) {
+      var idx = rows.indexOf(r);
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><input class="i-kw" placeholder="原始订单里的产品名，如：TUSA M1007SQM 粉色"></td>' +
+        '<td><input class="i-name" placeholder="留空则沿用原名"></td>' +
+        '<td class="price"><input class="i-price" placeholder="0" inputmode="decimal"></td>' +
+        '<td class="del"><button class="del-btn" title="删除此行">✕</button></td>';
+      var kwEl = tr.querySelector('.i-kw'), nameEl = tr.querySelector('.i-name'), priceEl = tr.querySelector('.i-price');
+      kwEl.value = r.kw; nameEl.value = r.name; priceEl.value = r.price;
+      function bind(el, key) {
+        el.addEventListener('input', function () {
+          r[key] = el.value;
+          saveRows();
+          generate();
+        });
+      }
+      bind(kwEl, 'kw'); bind(nameEl, 'name'); bind(priceEl, 'price');
+      tr.querySelector('.del-btn').addEventListener('click', function () {
+        rows.splice(idx, 1);
+        saveRows(); renderMap(); generate();
+      });
+      tb.appendChild(tr);
+    });
+    $('mapCount').textContent = rows.length + ' 行';
+  }
+
+  /* ---------- CSV ---------- */
+  function csvField(f) {
+    f = String(f == null ? '' : f);
+    return /[",\n]/.test(f) ? '"' + f.replace(/"/g, '""') + '"' : f;
+  }
+  $('btnExport').addEventListener('click', function () {
+    var csv = '关键词,潜潮名称,潜潮价格\n' + rows.map(function (r) {
+      return csvField(r.kw) + ',' + csvField(r.name) + ',' + csvField(r.price);
+    }).join('\n');
+    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '订单对照表-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  $('csvFile').addEventListener('change', function () {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var lines = String(reader.result).replace(/^﻿/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+      if (lines[0] && lines[0].indexOf('关键词') !== -1) lines.shift();
+      var imported = [];
+      lines.forEach(function (l) {
+        var p = l.split(',');
+        imported.push({ kw: (p[0] || '').trim(), name: (p[1] || '').trim(), price: (p[2] || '').trim() });
+      });
+      if (!imported.length) { alert('CSV 里没有数据行'); return; }
+      if (!confirm('导入 ' + imported.length + ' 行，将替换当前对照表（当前 ' + rows.length + ' 行），确定？')) return;
+      rows = imported;
+      saveRows(); renderMap(); generate();
+    };
+    reader.readAsText(file, 'utf-8');
+    this.value = '';
+  });
+  $('btnAdd').addEventListener('click', function () {
+    rows.push({ kw: '', name: '', price: '' });
+    saveRows(); renderMap(); generate();
+    var tb = $('mapBody');
+    tb.lastElementChild.querySelector('.i-kw').focus();
+  });
+  $('mapSearch').addEventListener('input', renderMap);
+
+  /* ---------- 其他交互 ---------- */
+  $('btnSample').addEventListener('click', function () {
+    srcEl.value = SAMPLE;
+    generate();
+  });
+  $('btnClear').addEventListener('click', function () {
+    if (srcEl.value && !confirm('清空左边原始订单？')) return;
+    srcEl.value = '';
+    generate();
+  });
+  $('btnCopy').addEventListener('click', function () {
+    var btn = this;
+    function done() {
+      var old = btn.textContent;
+      btn.textContent = '✅ 已复制';
+      btn.classList.add('btn-blue'); btn.classList.remove('btn-green');
+      setTimeout(function () { btn.textContent = old; btn.classList.remove('btn-blue'); btn.classList.add('btn-green'); }, 1500);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(outEl.value).then(done).catch(function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      outEl.select();
+      document.execCommand('copy');
+      done();
+    }
+  });
+
+  var debounceTimer = null;
+  srcEl.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(generate, 250);
+  });
+  $('cfgContact').addEventListener('input', function () { cfg.contact = this.value; saveCfg(); generate(); });
+  $('cfgPrefix').addEventListener('input', function () { cfg.prefix = this.value; saveCfg(); generate(); });
+
+  /* ---------- 初始化 ---------- */
+  $('cfgContact').value = cfg.contact;
+  $('cfgPrefix').value = cfg.prefix;
+  renderMap();
+  generate();
+})();
+</script>
+</body>
+</html>
