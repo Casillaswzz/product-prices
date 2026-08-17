@@ -108,7 +108,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.8</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.9</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -167,6 +167,7 @@ TUSA M1010 薄荷绿 1 780
     </div>
     <p class="map-hint">
       💡 匹配规则：订单产品名与「产品」列完全一致优先，否则按包含匹配（取最长，英文不分大小写）。
+      匹配上的产品行会在数量后自动带上金额（口径同合计，如「潜潮：680」取 680、「1800×0.7=1260」取 1260）。
       未匹配的行按原名输出、不计入合计 —— 在这里补一行产品和出库价格即可，右侧立即更新。
       可点「⬇️ 从产品出库价格导入」把产品出库价格表的数据一键同步进来。
     </p>
@@ -250,13 +251,15 @@ TUSA M1010 薄荷绿 1 780
       return '@Connie';                                     // 结尾只标 @Connie，不带任何文字
     }
 
-    // 产品行输出：（）+ 名称 + 数量 —— 数量后面不输出任何数字/算式
+    // 产品行输出：（）+ 名称 + 数量 —— 匹配到价格时在数量后自动追加匹配金额（口径同潜潮合计）
     function emitProduct(nameRaw, qty, sep) {
       var row = findMap(nameRaw);
-      out.push('（）' + nameRaw + sep + qty);               // 名称用原始订单名称，价格表只管出库价格
+      var amt = row ? numOfPrice(row.price) : 0;
+      var suffix = (row && amt > 0) ? ' ' + (Math.round(amt * 100) / 100) : '';
+      out.push('（）' + nameRaw + sep + qty + suffix);      // 名称用原始订单名称，价格表只管出库价格
       if (row) {
         matched++;
-        sum += numOfPrice(row.price) * (parseFloat(qty) || 1);
+        sum += amt * (parseFloat(qty) || 1);
       } else {
         unmapped++;
       }
