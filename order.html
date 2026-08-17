@@ -123,7 +123,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.4</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.5</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -292,12 +292,13 @@ TUSA M1010 薄荷绿 1 780
     // 宽松解析：行内最后一个独立数字 = 数量，数量后面的全部丢弃（价格、加减乘除等）。
     // 带量词的数字（1个、2件…）优先视为数量。
     var CLS = /[个件只套双盒包瓶支条张组对]/;
+    var OPS = /[×xX*+\-=＝]/;
     function findQty(t) {
       var numRe = /\d+(?:\.\d+)?/g, mm, last = null, cls = null;
       while ((mm = numRe.exec(t)) !== null) {
         var after = t.charAt(mm.index + mm[0].length) || '';
         if (/[a-zA-Z0-9.]/.test(after)) continue;            // 5mm、M110 里的数字不算
-        var standalone = after === '' || /[\s,，、;；)）(（:：×xX*+\-/]/.test(after) || CLS.test(after);
+        var standalone = after === '' || /[\s,，、;；)）(（:：=＝]/.test(after) || OPS.test(after) || CLS.test(after);
         if (!standalone) continue;
         last = mm;
         if (CLS.test(after)) cls = mm;
@@ -307,22 +308,24 @@ TUSA M1010 薄荷绿 1 780
       var name = t.slice(0, pick.index);
       var qty = pick[0];
 
-      // 选中数字前面紧跟着「数字×数字 」算式（如 99*2 780）：数量取算式最后一个数字，算式和价格全部丢弃
+      // 选中数字前面紧跟着算式：数量取算式最后一个数字，算式（含 =结果）和价格全部丢弃
+      // 如 99*2=198 → 2；99*2 780 → 2
       var ar = null;
       if (!cls && pick === last) {
-        ar = /(\d+(?:\.\d+)?)\s*[×xX*+\-]\s*(\d+(?:\.\d+)?)\s*$/.exec(name);
+        ar = /(\d+(?:\.\d+)?)\s*[×xX*+\-]\s*(\d+(?:\.\d+)?)\s*[=＝]\s*$/.exec(name)
+          || /(\d+(?:\.\d+)?)\s*[×xX*+\-]\s*(\d+(?:\.\d+)?)\s*$/.exec(name);
         if (ar) {
           name = name.slice(0, name.length - ar[0].length);
           qty = ar[2];
         }
       }
 
-      name = name.replace(/[\s×xX*+\-]+$/, '').trim();
+      name = name.replace(/[\s×xX*+\-=＝]+$/, '').trim();
       if (!name || /[：:]/.test(name)) return null;          // 标题行（含冒号/开头就是数字）不算产品
       var prev = t.charAt(pick.index - 1) || ' ';
-      var sep = /[\s×xX*+\-/]/.test(prev) ? ' ' : '';        // 原名粘连的数量保持粘连（紫色1）
-      if (!ar && /[×xX*+\-]/.test(prev)) {
-        name = name.replace(/\d+(?:\.\d+)?$/, '').replace(/[\s×xX*+\-]+$/, '').trim();  // 1×2 → 数量2
+      var sep = /[\s×xX*+\-=＝]/.test(prev) ? ' ' : '';       // 原名粘连的数量保持粘连（紫色1）
+      if (!ar && OPS.test(prev)) {
+        name = name.replace(/\d+(?:\.\d+)?$/, '').replace(/[\s×xX*+\-=＝]+$/, '').trim();  // 1×2 → 数量2
       }
       return { name: name, qty: qty, sep: sep };
     }
