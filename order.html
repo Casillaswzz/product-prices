@@ -108,7 +108,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.7</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.8</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -149,6 +149,7 @@ TUSA M1010 薄荷绿 1 780
     <div class="map-tools">
       🔍 <input type="text" id="mapSearch" placeholder="搜索产品名称">
       <button class="btn btn-blue" id="btnAdd">＋ 添加一行</button>
+      <button class="btn btn-blue" id="btnImport">⬇️ 从产品出库价格导入</button>
       <button class="btn btn-gray" id="btnExport">⬇️ CSV 导出</button>
       <label class="btn btn-gray btn-file">⬆️ CSV 导入<input type="file" id="csvFile" accept=".csv,text/csv"></label>
     </div>
@@ -167,6 +168,7 @@ TUSA M1010 薄荷绿 1 780
     <p class="map-hint">
       💡 匹配规则：订单产品名与「产品」列完全一致优先，否则按包含匹配（取最长，英文不分大小写）。
       未匹配的行按原名输出、不计入合计 —— 在这里补一行产品和出库价格即可，右侧立即更新。
+      可点「⬇️ 从产品出库价格导入」把产品出库价格表的数据一键同步进来。
     </p>
   </details>
 
@@ -224,10 +226,14 @@ TUSA M1010 薄荷绿 1 780
   }
 
   /* ---------- 数字格式 ---------- */
-  function fmtPrice(p) {                     // 行内单价：不千分位，去掉多余小数
-    var v = parseFloat(p);
-    if (isNaN(v)) return String(p).trim();
-    return String(Math.round(v * 100) / 100);
+  function numOfPrice(p) {                   // 从价格字符串取数字：潜潮：680 → 680；1800×0.7=1260 → 1260；720 / CB → 720
+    var s = String(p == null ? '' : p);
+    var m = /潜潮[：:]\s*([\d.]+)/.exec(s);
+    if (m) return parseFloat(m[1]) || 0;
+    m = /=\s*([\d.]+)/.exec(s);
+    if (m) return parseFloat(m[1]) || 0;
+    var v = parseFloat(s);
+    return isNaN(v) ? 0 : v;
   }
   function fmtTotal(x) {                     // 合计：千分位
     return (Math.round(x * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -250,7 +256,7 @@ TUSA M1010 薄荷绿 1 780
       out.push('（）' + nameRaw + sep + qty);               // 名称用原始订单名称，价格表只管出库价格
       if (row) {
         matched++;
-        sum += (parseFloat(row.price) || 0) * (parseFloat(qty) || 1);
+        sum += numOfPrice(row.price) * (parseFloat(qty) || 1);
       } else {
         unmapped++;
       }
@@ -416,6 +422,49 @@ TUSA M1010 薄荷绿 1 780
     saveRows(); renderMap(); generate();
     var tb = $('mapBody');
     tb.lastElementChild.querySelector('.i-kw').focus();
+  });
+
+  /* 从产品出库价格页面的云端数据一键导入 */
+  var WHOLESALE_URL = 'https://raw.githubusercontent.com/Casillaswzz/product-prices/main/data/wholesale-v2.json';
+  $('btnImport').addEventListener('click', function () {
+    var btn = this;
+    btn.textContent = '⏳ 导入中…';
+    btn.disabled = true;
+    fetch(WHOLESALE_URL, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (data) {
+        var items = [];
+        (data.categories || []).forEach(function (cat) {
+          (cat.products || []).forEach(function (p) {
+            var name = String(p[0] || '').trim();
+            if (name) items.push({ kw: name, price: String(p[1] == null ? '' : p[1]).trim() });
+          });
+        });
+        if (!items.length) { alert('出库价格表里没有产品数据'); return; }
+        var newRows = rows.slice();                       // 先算差异，确认后再真正合并
+        var added = 0, updated = 0;
+        items.forEach(function (it) {
+          var existing = null;
+          for (var i = 0; i < newRows.length; i++) {
+            if (norm(newRows[i].kw) === norm(it.kw)) { existing = newRows[i]; break; }
+          }
+          if (existing) {
+            if (String(existing.price).trim() !== it.price) { existing.price = it.price; updated++; }
+          } else {
+            newRows.push({ kw: it.kw, price: it.price });
+            added++;
+          }
+        });
+        if (!added && !updated) { alert('没有新变化：' + items.length + ' 款已全部存在且价格相同'); return; }
+        if (!confirm('从产品出库价格表导入 ' + items.length + ' 款：\n新增 ' + added + ' 款、更新价格 ' + updated + ' 款。\n确定合并到当前价格表？')) return;
+        rows = newRows;
+        saveRows(); renderMap(); generate();
+        alert('导入完成 ✅ 新增 ' + added + ' 款、更新 ' + updated + ' 款');
+      })
+      .catch(function (e) {
+        alert('导入失败：' + e.message + '（请检查网络后重试）');
+      })
+      .then(function () { btn.textContent = '⬇️ 从产品出库价格导入'; btn.disabled = false; });
   });
   $('mapSearch').addEventListener('input', renderMap);
 
