@@ -108,7 +108,7 @@
 </head>
 <body>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.10</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.11</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
@@ -211,6 +211,9 @@ TUSA M1010 薄荷绿 1 780
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
 
   /* ---------- 匹配 ---------- */
+  function norm(s) {
+    return String(s || '').replace(ZW, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
   var SIM_THRESHOLD = 0.65;                  // 相近匹配阈值（字符二元组 Dice 相似度）
   function grams(s) {
     var m = {}, i;
