@@ -355,15 +355,19 @@
     .summary-card { background: #1e293b; }
     .btn-add-row { border-color: #475569; }
   }
+  .home-btn { position: fixed; top: 12px; right: 12px; z-index: 1000; display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; text-decoration: none; background: rgba(255,255,255,0.94); color: #0ea5e9; border: 1.5px solid rgba(0,0,0,0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.18); transition: transform .15s, box-shadow .15s; }
+  .home-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.28); }
 </style>
 </head>
 <body>
+
+<a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页选择界面">🏠 主页</a>
 
 <div class="header">
   <button class="hamburger" id="hamburgerBtn" aria-label="菜单" title="分类导航">☰</button>
   <h1>🤿 产品出库价格表</h1>
   <div class="subtitle">Diving Equipment Export Price List · 双击单元格即可编辑</div>
-  <div class="update-time"><span id="updateTime">数据已加载</span><span style="font-size:0.65rem;opacity:0.6;border:1px solid currentColor;border-radius:4px;padding:0 5px;">v7.20</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
+  <div class="update-time"><span id="updateTime">数据已加载</span><span style="font-size:0.65rem;opacity:0.6;border:1px solid currentColor;border-radius:4px;padding:0 5px;">v7.21</span><span class="sync-dot" id="syncDot" title="同步状态"></span></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索产品名称...（按 Esc 清除）">
     <span class="result-count" id="resultCount"></span>

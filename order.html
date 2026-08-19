@@ -104,11 +104,14 @@
     .panes { flex-direction: column; }
     .pane textarea { min-height: 300px; }
   }
+  .home-btn { position: fixed; top: 12px; right: 12px; z-index: 1000; display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; text-decoration: none; background: rgba(255,255,255,0.94); color: #2563eb; border: 1.5px solid rgba(0,0,0,0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.18); transition: transform .15s, box-shadow .15s; }
+  .home-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.28); }
 </style>
 </head>
 <body>
+<a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页选择界面">🏠 主页</a>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.11</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.12</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
 </header>
 
