@@ -113,7 +113,7 @@
 <body>
 <a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页选择界面">🏠 主页</a>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.13</span></h1>
+  <h1>🧾 订单转换 <span class="badge">v1.14</span></h1>
   <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本（CB 出库优先，未命中查潜潮同行价）</div>
 </header>
 
@@ -171,10 +171,10 @@ Scubapro D-mask 黑色 1 950
       </table>
     </div>
     <p class="map-hint">
-      💡 产品行先查本表：命中且有价格 → 输出「（CB）名称 数量 价格」；未命中再查下方「潜潮同行价格表」→ 输出「（潜潮）名称 数量 价格」。
+      💡 产品行先查本表、未命中再查下方「潜潮同行价格表」（CB 出库优先），命中且有价格 → 输出「（）名称 数量 价格」。
       匹配规则：完全一致优先，其次包含匹配（取最长，英文不分大小写），再按名称相似度（≥65%）相近匹配（状态栏提示「相近 N 行」请核对）。
       价格解析口径同合计，如「潜潮：680」取 680、「1800×0.7=1260」取 1260、「720 / CB」取 720。未匹配的行按原名输出、不计入合计。
-      收款/收货/表头（品牌 型号…）行自动丢弃，末尾统一生成支付块：@Connie需支付 + 潜潮合计 + CB ERP出库清单。
+      收款/收货/表头（品牌 型号…）行自动丢弃，末尾只输出 @Connie需支付，潜潮/CB 数据自行补充（合计参考状态栏）。
     </p>
   </details>
 
@@ -201,7 +201,7 @@ Scubapro D-mask 黑色 1 950
     </div>
     <p class="map-hint">
       💡 潜潮价格来自「常用同行报价」页数据，可点「⬇️ 从同行报价导入」一键同步（合并式：同名更新价格、新名追加）。
-      同一产品两张表都有价格时按 CB 出库优先输出。此表匹配上的行计入「潜潮：合计元」，CB 匹配上的行计入「CB ERP出库：」清单。
+      同一产品两张表都有价格时按 CB 出库优先取价。潜潮/CB 各自合计显示在状态栏（如「潜潮 ¥714 · CB ¥1,260」），供手动补充支付信息时参考。
     </p>
   </details>
 
@@ -317,22 +317,22 @@ Scubapro D-mask 黑色 1 950
     var qcItems = [], cbItems = [];
     var sawProduct = false;
 
-    // 产品行输出：先查 CB 出库表（命中且有价格 → （CB）），再查潜潮同行表（→ （潜潮）），
-    // 都没有价格 → 原名输出「（）名称 数量」不计入合计
+    // 产品行输出：前缀统一「（）」，价格先查 CB 出库表、未命中再查潜潮同行表（CB 优先），
+    // 都没价格 → 「（）名称 数量」不计入合计
     function emitProduct(nameRaw, qty, sep) {
       var hit1 = findMapIn(rows, nameRaw);
       var hit2 = findMapIn(rows2, nameRaw);
       var a1 = hit1 && hit1.row ? numOfPrice(hit1.row.price) : 0;
       var a2 = hit2 && hit2.row ? numOfPrice(hit2.row.price) : 0;
-      var prefix = '（）', amt = 0, ch = null, fz = false, rowAny = null;
-      if (a1 > 0) { prefix = '（CB）'; amt = a1; fz = hit1.fuzzy; rowAny = hit1.row; ch = 'CB'; }
-      else if (a2 > 0) { prefix = '（潜潮）'; amt = a2; fz = hit2.fuzzy; rowAny = hit2.row; ch = 'QC'; }
+      var amt = 0, ch = null, fz = false, rowAny = null;
+      if (a1 > 0) { amt = a1; fz = hit1.fuzzy; rowAny = hit1.row; ch = 'CB'; }
+      else if (a2 > 0) { amt = a2; fz = hit2.fuzzy; rowAny = hit2.row; ch = 'QC'; }
       else if (hit1 && hit1.row && !hit1.fuzzy) { rowAny = hit1.row; }
       else if (hit2 && hit2.row && !hit2.fuzzy) { rowAny = hit2.row; }
 
       if (!sawProduct && out.length && out[out.length - 1] !== '') out.push('');  // 产品区前空一行
       sawProduct = true;
-      out.push(prefix + nameRaw + sep + qty + (amt > 0 ? ' ' + (Math.round(amt * 100) / 100) : ''));
+      out.push('（）' + nameRaw + sep + qty + (amt > 0 ? ' ' + (Math.round(amt * 100) / 100) : ''));
       if (amt > 0) {
         matched++;
         if (fz) fuzzy++;
@@ -419,14 +419,10 @@ Scubapro D-mask 黑色 1 950
       out.push(line);                                       // 其他行（客户名、经手人等）原样保留
     });
 
-    // 支付块：@Connie需支付 + 潜潮合计 + CB ERP出库清单（带出库价格）
+    // 支付块：只保留 @Connie需支付，潜潮/CB 数据由用户自行补充（合计参考状态栏）
     if (qcItems.length || cbItems.length) {
       if (out.length && out[out.length - 1] !== '') out.push('');
       out.push('@Connie需支付');
-      if (qcItems.length) out.push('潜潮：' + fmtTotal(qcSum) + '元');
-      if (cbItems.length) out.push('CB ERP出库：' + cbItems.map(function (i) {
-        return i.name + i.sep + i.qty + ' ' + i.price;
-      }).join('、'));
     }
 
     outEl.value = out.join('\n');
