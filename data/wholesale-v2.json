@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-11T13:04:50.433Z",
-  "updated": "2026-10-11T13:04:53.434Z",
+  "version": "2026-10-11T13:04:58.676Z",
+  "updated": "2026-10-11T13:05:01.678Z",
   "categories": [
     {
       "id": "mask",
@@ -149,6 +149,10 @@
       ],
       "products": [
         [
+          "Gull Barracuda",
+          "2250"
+        ],
+        [
           "Seac Propulsion",
           "610"
         ],
@@ -175,10 +179,6 @@
         [
           "Scubapro GO Sport",
           "648"
-        ],
-        [
-          "Gull Barracuda",
-          "0"
         ]
       ]
     },
