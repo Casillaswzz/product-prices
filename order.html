@@ -99,6 +99,8 @@
   .map-hint { font-size: 0.78rem; color: #94a3b8; margin-top: 10px; line-height: 1.6; }
   .map-wrap { overflow-x: auto; }
   .empty-hint { color: #94a3b8; text-align: center; padding: 24px 0; font-size: 0.85rem; }
+  details.map.qc summary { color: #0d9488; }
+  details.map.qc { border-color: #99f6e4; }
 
   @media (max-width: 900px) {
     .panes { flex-direction: column; }
@@ -111,8 +113,8 @@
 <body>
 <a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页选择界面">🏠 主页</a>
 <header>
-  <h1>🧾 订单转换 <span class="badge">v1.12</span></h1>
-  <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本</div>
+  <h1>🧾 订单转换 <span class="badge">v1.13</span></h1>
+  <div class="sub">左边粘贴原始订单 → 右边自动生成潜潮模板文本（CB 出库优先，未命中查潜潮同行价）</div>
 </header>
 
 <main>
@@ -121,16 +123,16 @@
       <div class="pane-head">📥 原始订单 <span class="tip">粘贴后右侧自动生成</span></div>
       <textarea id="src" placeholder="把微信里收到的原始订单整段粘贴到这里，例如：
 
-65、客户名称：EVA
-
+22、客户名称：Karen
+销售日期：20261010
 销售性质：零售
-
 经手人：iker
-
-TUSA M1007SQM 粉色 1 1450
-TUSA M1010 薄荷绿 1 780
-
-收款金额：1450+780 = 2,230"></textarea>
+品牌 型号 颜色 尺码 数量 金额
+四元素 Seeker 黑色透明 1 1520
+Scubapro D-mask 黑色 1 950
+收货地址：自提
+收款金额：（1520+950）*1.03=2544.1
+收款账户：徽商银行转账"></textarea>
       <div class="pane-tools">
         <button class="btn btn-gray" id="btnSample">📄 载入示例</button>
         <button class="btn btn-gray" id="btnClear">🧹 清空</button>
@@ -148,7 +150,7 @@ TUSA M1010 薄荷绿 1 780
   </div>
 
   <details class="map" open>
-    <summary>🗂️ 常用出库价格表 <span class="cnt" id="mapCount"></span></summary>
+    <summary>🗂️ CB 出库价格表（优先匹配） <span class="cnt" id="mapCount"></span></summary>
     <div class="map-tools">
       🔍 <input type="text" id="mapSearch" placeholder="搜索产品名称">
       <button class="btn btn-blue" id="btnAdd">＋ 添加一行</button>
@@ -169,10 +171,37 @@ TUSA M1010 薄荷绿 1 780
       </table>
     </div>
     <p class="map-hint">
-      💡 匹配规则：订单产品名与「产品」列完全一致优先，否则按包含匹配（取最长，英文不分大小写）；都没有时按名称相似度（≥65%）找最相近的产品带价，状态栏会提示「相近 N 行」请人工核对。
-      匹配上的产品行会在数量后自动带上金额（口径同合计，如「潜潮：680」取 680、「1800×0.7=1260」取 1260）。
-      未匹配的行按原名输出、不计入合计 —— 在这里补一行产品和出库价格即可，右侧立即更新。
-      可点「⬇️ 从产品出库价格导入」把产品出库价格表的数据一键同步进来。
+      💡 产品行先查本表：命中且有价格 → 输出「（CB）名称 数量 价格」；未命中再查下方「潜潮同行价格表」→ 输出「（潜潮）名称 数量 价格」。
+      匹配规则：完全一致优先，其次包含匹配（取最长，英文不分大小写），再按名称相似度（≥65%）相近匹配（状态栏提示「相近 N 行」请核对）。
+      价格解析口径同合计，如「潜潮：680」取 680、「1800×0.7=1260」取 1260、「720 / CB」取 720。未匹配的行按原名输出、不计入合计。
+      收款/收货/表头（品牌 型号…）行自动丢弃，末尾统一生成支付块：@Connie需支付 + 潜潮合计 + CB ERP出库清单。
+    </p>
+  </details>
+
+  <details class="map qc" open>
+    <summary>🗂️ 潜潮同行价格表（CB 未命中时使用） <span class="cnt" id="mapCount2"></span></summary>
+    <div class="map-tools">
+      🔍 <input type="text" id="mapSearch2" placeholder="搜索产品名称">
+      <button class="btn btn-blue" id="btnAdd2">＋ 添加一行</button>
+      <button class="btn btn-blue" id="btnImport2">⬇️ 从同行报价导入</button>
+      <button class="btn btn-gray" id="btnExport2">⬇️ CSV 导出</button>
+      <label class="btn btn-gray btn-file">⬆️ CSV 导入<input type="file" id="csvFile2" accept=".csv,text/csv"></label>
+    </div>
+    <div class="map-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:48%">产品</th>
+            <th style="width:22%">潜潮价格</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="mapBody2"></tbody>
+      </table>
+    </div>
+    <p class="map-hint">
+      💡 潜潮价格来自「常用同行报价」页数据，可点「⬇️ 从同行报价导入」一键同步（合并式：同名更新价格、新名追加）。
+      同一产品两张表都有价格时按 CB 出库优先输出。此表匹配上的行计入「潜潮：合计元」，CB 匹配上的行计入「CB ERP出库：」清单。
     </p>
   </details>
 
@@ -182,9 +211,10 @@ TUSA M1010 薄荷绿 1 780
 (function () {
   'use strict';
 
-  var LS_KEY = 'order-map-data-v1';
+  /* ---------- 数据：两套价格表 ---------- */
+  var LS_KEY  = 'order-map-data-v1';        // CB 出库价格表
+  var LS_KEY2 = 'order-map-qc-data-v1';     // 潜潮同行价格表
   var ZW = /[​-‏⁠﻿]/g;   // 微信粘贴常带零宽字符，全部去掉
-  var TOTAL_RE = /(收款|应收|应付|合计|总计|总价|金额)/;
   // 产品行：名称(可能以数字结尾) 数量 价格 —— 名称用懒惰匹配，保证最后两个数字是数量和价格；
   // 数量后加负向前瞻，防止把 1450 拆成数量145+价格0 之类
   var PROD_RE = /^(.+?)(\s*)(\d+(?:\.\d+)?(?![\d.,]))(\s*)([\d][\d,]*(?:\.\d+)?)\s*$/;
@@ -194,24 +224,35 @@ TUSA M1010 薄荷绿 1 780
     { kw: 'TUSA M1010 薄荷绿', name: '', price: 515 },
     { kw: '鹦鹉螺 咬嘴 紫色', name: '', price: 30 },
     { kw: '鹦鹉螺 咬嘴 薄荷色', name: '', price: 30 },
-    { kw: 'Scubapro Delta 5mm 潜水靴 黑色 S码', name: '', price: 354.6 }
+    { kw: 'Scubapro Delta 5mm 潜水靴 黑色 S码', name: '', price: 354.6 },
+    { kw: '四元素 Seeker', name: '', price: '1800×0.7=1260' }
+  ];
+  var SEED2 = [
+    { kw: 'Scubapro D-Mask', name: '', price: 714 },
+    { kw: 'Gull Vader', name: '', price: 720 },
+    { kw: '四元素 Seeker', name: '', price: 1260 }
   ];
 
-  var SAMPLE = '65、客户名称：EVA\n\n销售性质：零售\n\n经手人：iker\n\nTUSA M1007SQM 粉色 1 1450\nTUSA M1010 薄荷绿 1 780\n鹦鹉螺 咬嘴 紫色1 50\n鹦鹉螺 咬嘴 薄荷色1 50\nScubapro Delta 5mm 潜水靴 黑色 S码 1 450\n\n收款金额：1450+780+50+50+450 = 2,780';
+  var SAMPLE = '22、客户名称：Karen\n销售日期：20261010\n销售性质：零售\n经手人：iker\n品牌 型号 颜色 尺码 数量 金额\n四元素 Seeker 黑色透明 1 1520\nScubapro D-mask 黑色 1 950\n收货地址：自提\n收款金额：（1520+950）*1.03=2544.1\n收款账户：徽商银行转账';
 
   var $ = function (id) { return document.getElementById(id); };
   var srcEl = $('src'), outEl = $('out'), statusEl = $('status');
 
-  /* ---------- 数据 ---------- */
-  var rows = [];
-  var raw = localStorage.getItem(LS_KEY);
-  if (raw) {
-    try { rows = JSON.parse(raw); } catch (e) { rows = []; }
+  function loadRows(key, seed) {
+    var out = [];
+    var raw = localStorage.getItem(key);
+    if (raw) {
+      try { out = JSON.parse(raw); } catch (e) { out = []; }
+    }
+    if (!Array.isArray(out) || out.length === 0) {
+      out = seed.map(function (r) { return { kw: r.kw, name: r.name, price: r.price }; });
+    }
+    return out;
   }
-  if (!Array.isArray(rows) || rows.length === 0) {
-    rows = SEED.map(function (r) { return { kw: r.kw, name: r.name, price: r.price }; });
-  }
+  var rows = loadRows(LS_KEY, SEED);
+  var rows2 = loadRows(LS_KEY2, SEED2);
   function saveRows() { localStorage.setItem(LS_KEY, JSON.stringify(rows)); }
+  function saveRows2() { localStorage.setItem(LS_KEY2, JSON.stringify(rows2)); }
 
   /* ---------- 匹配 ---------- */
   function norm(s) {
@@ -230,22 +271,22 @@ TUSA M1010 薄荷绿 1 780
     for (k in ga) if (gb[k]) inter++;
     return 2 * inter / (countKeys(ga) + countKeys(gb));
   }
-  function findMap(nameRaw) {
+  function findMapIn(arr, nameRaw) {
     var n = norm(nameRaw);
     var i, best = null, bestLen = 0;
-    for (i = 0; i < rows.length; i++) {
-      var k = norm(rows[i].kw);
+    for (i = 0; i < arr.length; i++) {
+      var k = norm(arr[i].kw);
       if (!k) continue;
-      if (k === n) return { row: rows[i], fuzzy: false };  // 完全一致优先
-      if (n.indexOf(k) !== -1 && k.length > bestLen) { best = rows[i]; bestLen = k.length; }
+      if (k === n) return { row: arr[i], fuzzy: false };  // 完全一致优先
+      if (n.indexOf(k) !== -1 && k.length > bestLen) { best = arr[i]; bestLen = k.length; }
     }
-    if (best) return { row: best, fuzzy: false };          // 包含匹配（取最长）
+    if (best) return { row: best, fuzzy: false };         // 包含匹配（取最长）
     var cn = n.replace(/ /g, ''), bestSim = 0, bestRow = null;
-    for (i = 0; i < rows.length; i++) {
-      var k2 = norm(rows[i].kw);
+    for (i = 0; i < arr.length; i++) {
+      var k2 = norm(arr[i].kw);
       if (!k2) continue;
       var s = sim(cn, k2.replace(/ /g, ''));
-      if (s > bestSim) { bestSim = s; bestRow = rows[i]; }
+      if (s > bestSim) { bestSim = s; bestRow = arr[i]; }
     }
     if (bestSim >= SIM_THRESHOLD) return { row: bestRow, fuzzy: true };  // 相近匹配（人工核对）
     return null;
@@ -266,27 +307,45 @@ TUSA M1010 薄荷绿 1 780
   }
 
   /* ---------- 生成 ---------- */
+  var DROP_RE = /^(收款|应收|应付|合计|总计|总价|金额|收货|收件|发货|地址|账户|物流|快递|运费|电话|品牌)/;
+
   function generate() {
     var lines = srcEl.value.split('\n');
     var out = [];
     var matched = 0, parsed = 0, unmapped = 0, fuzzy = 0;
-    var sum = 0;
+    var qcSum = 0, cbSum = 0;
+    var qcItems = [], cbItems = [];
+    var sawProduct = false;
 
-    function paymentLine() {
-      return '@Connie';                                     // 结尾只标 @Connie，不带任何文字
-    }
-
-    // 产品行输出：（）+ 名称 + 数量 —— 匹配到价格时在数量后自动追加匹配金额（口径同潜潮合计）
+    // 产品行输出：先查 CB 出库表（命中且有价格 → （CB）），再查潜潮同行表（→ （潜潮）），
+    // 都没有价格 → 原名输出「（）名称 数量」不计入合计
     function emitProduct(nameRaw, qty, sep) {
-      var hit = findMap(nameRaw);
-      var row = hit ? hit.row : null;
-      var amt = row ? numOfPrice(row.price) : 0;
-      var hasPrice = row && amt > 0;
-      out.push('（）' + nameRaw + sep + qty + (hasPrice ? ' ' + (Math.round(amt * 100) / 100) : ''));
-      if (row && (hasPrice || !hit.fuzzy)) {                // 相近匹配但价格为空 → 仍算未匹配
+      var hit1 = findMapIn(rows, nameRaw);
+      var hit2 = findMapIn(rows2, nameRaw);
+      var a1 = hit1 && hit1.row ? numOfPrice(hit1.row.price) : 0;
+      var a2 = hit2 && hit2.row ? numOfPrice(hit2.row.price) : 0;
+      var prefix = '（）', amt = 0, ch = null, fz = false, rowAny = null;
+      if (a1 > 0) { prefix = '（CB）'; amt = a1; fz = hit1.fuzzy; rowAny = hit1.row; ch = 'CB'; }
+      else if (a2 > 0) { prefix = '（潜潮）'; amt = a2; fz = hit2.fuzzy; rowAny = hit2.row; ch = 'QC'; }
+      else if (hit1 && hit1.row && !hit1.fuzzy) { rowAny = hit1.row; }
+      else if (hit2 && hit2.row && !hit2.fuzzy) { rowAny = hit2.row; }
+
+      if (!sawProduct && out.length && out[out.length - 1] !== '') out.push('');  // 产品区前空一行
+      sawProduct = true;
+      out.push(prefix + nameRaw + sep + qty + (amt > 0 ? ' ' + (Math.round(amt * 100) / 100) : ''));
+      if (amt > 0) {
         matched++;
-        if (hit.fuzzy) fuzzy++;
-        sum += amt * (parseFloat(qty) || 1);
+        if (fz) fuzzy++;
+        var q = parseFloat(qty) || 1;
+        if (ch === 'CB') {
+          cbItems.push({ name: nameRaw, qty: qty, sep: sep, price: Math.round(amt * 100) / 100 });
+          cbSum += amt * q;
+        } else {
+          qcItems.push({ name: nameRaw, qty: qty, sep: sep, price: Math.round(amt * 100) / 100 });
+          qcSum += amt * q;
+        }
+      } else if (rowAny) {
+        matched++;                             // 命中但价格为空/0 → 计已匹配、不带价格
       } else {
         unmapped++;
       }
@@ -337,12 +396,7 @@ TUSA M1010 薄荷绿 1 780
       var line = rawLine.replace(ZW, '');
       var t = line.trim();
       if (!t) { out.push(line); return; }                   // 空行原样保留
-
-      if (TOTAL_RE.test(t)) {                               // 收款行 → 换成 @联系人
-        var p = paymentLine();
-        out.push(p || line);
-        return;
-      }
+      if (DROP_RE.test(t)) return;                          // 收款/收货/地址/账户/表头行丢弃，末尾统一生成支付块
 
       var m = PROD_RE.exec(t);                              // 标准产品行：名称 数量 价格
       if (m) {
@@ -365,29 +419,40 @@ TUSA M1010 薄荷绿 1 780
       out.push(line);                                       // 其他行（客户名、经手人等）原样保留
     });
 
+    // 支付块：@Connie需支付 + 潜潮合计 + CB ERP出库清单（带出库价格）
+    if (qcItems.length || cbItems.length) {
+      if (out.length && out[out.length - 1] !== '') out.push('');
+      out.push('@Connie需支付');
+      if (qcItems.length) out.push('潜潮：' + fmtTotal(qcSum) + '元');
+      if (cbItems.length) out.push('CB ERP出库：' + cbItems.map(function (i) {
+        return i.name + i.sep + i.qty + ' ' + i.price;
+      }).join('、'));
+    }
+
     outEl.value = out.join('\n');
     var status = '✅ 已匹配 ' + matched + '/' + parsed + ' 款';
     if (fuzzy > 0) status += '（相近 ' + fuzzy + ' 行，请核对）';
-    status += ' · 潜潮合计 ¥' + fmtTotal(sum);
+    if (qcItems.length) status += ' · 潜潮 ¥' + fmtTotal(qcSum);
+    if (cbItems.length) status += ' · CB ¥' + fmtTotal(cbSum);
     if (unmapped > 0) status += ' · 未匹配 ' + unmapped + ' 行';
     statusEl.textContent = status;
     statusEl.className = (unmapped > 0 || fuzzy > 0) ? 'warn' : '';
   }
 
-  /* ---------- 对照表渲染 ---------- */
-  function renderMap() {
-    var q = norm($('mapSearch').value);
-    var list = rows;
-    if (q) list = rows.filter(function (r) {
+  /* ---------- 对照表渲染（两套表共用） ---------- */
+  function renderMapFor(cfg) {
+    var q = norm($(cfg.search).value);
+    var list = cfg.getRows();
+    if (q) list = list.filter(function (r) {
       return norm(r.kw).indexOf(q) !== -1 || norm(r.name).indexOf(q) !== -1;
     });
-    var tb = $('mapBody');
+    var tb = $(cfg.body);
     tb.innerHTML = '';
     if (!list.length) {
       tb.innerHTML = '<tr><td colspan="3" class="empty-hint">' + (q ? '没有匹配「' + q + '」的行' : '价格表为空，点「＋ 添加一行」开始录入') + '</td></tr>';
     }
     list.forEach(function (r) {
-      var idx = rows.indexOf(r);
+      var idx = cfg.getRows().indexOf(r);
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td><input class="i-kw" placeholder="原始订单里的产品名，如：TUSA M1007SQM 粉色"></td>' +
@@ -398,107 +463,133 @@ TUSA M1010 薄荷绿 1 780
       function bind(el, key) {
         el.addEventListener('input', function () {
           r[key] = el.value;
-          saveRows();
+          cfg.save();
           generate();
         });
       }
       bind(kwEl, 'kw'); bind(priceEl, 'price');
       tr.querySelector('.del-btn').addEventListener('click', function () {
-        rows.splice(idx, 1);
-        saveRows(); renderMap(); generate();
+        cfg.getRows().splice(idx, 1);
+        cfg.save(); renderMapFor(cfg); generate();
       });
       tb.appendChild(tr);
     });
-    $('mapCount').textContent = rows.length + ' 行';
+    $(cfg.count).textContent = cfg.getRows().length + ' 行';
   }
+
+  var MAP1 = {
+    getRows: function () { return rows; },
+    setRows: function (v) { rows = v; },
+    save: saveRows,
+    search: 'mapSearch', body: 'mapBody', count: 'mapCount',
+    addBtn: 'btnAdd', exportBtn: 'btnExport', csvBtn: 'csvFile', importBtn: 'btnImport',
+    label: '出库价格', fileName: '常用出库价格表', importLabel: '⬇️ 从产品出库价格导入'
+  };
+  var MAP2 = {
+    getRows: function () { return rows2; },
+    setRows: function (v) { rows2 = v; },
+    save: saveRows2,
+    search: 'mapSearch2', body: 'mapBody2', count: 'mapCount2',
+    addBtn: 'btnAdd2', exportBtn: 'btnExport2', csvBtn: 'csvFile2', importBtn: 'btnImport2',
+    label: '潜潮价格', fileName: '潜潮同行价格表', importLabel: '⬇️ 从同行报价导入'
+  };
 
   /* ---------- CSV ---------- */
   function csvField(f) {
     f = String(f == null ? '' : f);
     return /[",\n]/.test(f) ? '"' + f.replace(/"/g, '""') + '"' : f;
   }
-  $('btnExport').addEventListener('click', function () {
-    var csv = '产品,出库价格\n' + rows.map(function (r) {
-      return csvField(r.kw) + ',' + csvField(r.price);
-    }).join('\n');
-    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '常用出库价格表-' + new Date().toISOString().slice(0, 10) + '.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-  $('csvFile').addEventListener('change', function () {
-    var file = this.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      var lines = String(reader.result).replace(/^﻿/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
-      if (lines[0] && (lines[0].indexOf('关键词') !== -1 || lines[0].indexOf('产品') !== -1)) lines.shift();
-      var imported = [];
-      lines.forEach(function (l) {
-        var p = l.split(',');
-        // 兼容旧的三列备份（关键词,潜潮名称,潜潮价格）
-        imported.push({ kw: (p[0] || '').trim(), price: (p.length >= 3 ? p[2] : p[1] || '').trim() });
-      });
-      if (!imported.length) { alert('CSV 里没有数据行'); return; }
-      if (!confirm('导入 ' + imported.length + ' 行，将替换当前价格表（当前 ' + rows.length + ' 行），确定？')) return;
-      rows = imported;
-      saveRows(); renderMap(); generate();
-    };
-    reader.readAsText(file, 'utf-8');
-    this.value = '';
-  });
-  $('btnAdd').addEventListener('click', function () {
-    rows.push({ kw: '', price: '' });
-    saveRows(); renderMap(); generate();
-    var tb = $('mapBody');
-    tb.lastElementChild.querySelector('.i-kw').focus();
-  });
+  function bindCsv(cfg) {
+    $(cfg.exportBtn).addEventListener('click', function () {
+      var csv = '产品,' + cfg.label + '\n' + cfg.getRows().map(function (r) {
+        return csvField(r.kw) + ',' + csvField(r.price);
+      }).join('\n');
+      var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = cfg.fileName + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    $(cfg.csvBtn).addEventListener('change', function () {
+      var file = this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        var lines = String(reader.result).replace(/^﻿/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+        if (lines[0] && (lines[0].indexOf('关键词') !== -1 || lines[0].indexOf('产品') !== -1)) lines.shift();
+        var imported = [];
+        lines.forEach(function (l) {
+          var p = l.split(',');
+          // 兼容旧的三列备份（关键词,潜潮名称,潜潮价格）
+          imported.push({ kw: (p[0] || '').trim(), price: (p.length >= 3 ? p[2] : p[1] || '').trim() });
+        });
+        if (!imported.length) { alert('CSV 里没有数据行'); return; }
+        if (!confirm('导入 ' + imported.length + ' 行，将替换当前价格表（当前 ' + cfg.getRows().length + ' 行），确定？')) return;
+        cfg.setRows(imported);
+        cfg.save(); renderMapFor(cfg); generate();
+      };
+      reader.readAsText(file, 'utf-8');
+      this.value = '';
+    });
+    $(cfg.addBtn).addEventListener('click', function () {
+      cfg.getRows().push({ kw: '', price: '' });
+      cfg.save(); renderMapFor(cfg); generate();
+      var tb = $(cfg.body);
+      tb.lastElementChild.querySelector('.i-kw').focus();
+    });
+  }
 
-  /* 从产品出库价格页面的云端数据一键导入 */
-  var WHOLESALE_URL = 'https://raw.githubusercontent.com/Casillaswzz/product-prices/main/data/wholesale-v2.json';
-  $('btnImport').addEventListener('click', function () {
-    var btn = this;
-    btn.textContent = '⏳ 导入中…';
-    btn.disabled = true;
-    fetch(WHOLESALE_URL, { cache: 'no-store' })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (data) {
-        var items = [];
-        (data.categories || []).forEach(function (cat) {
-          (cat.products || []).forEach(function (p) {
-            var name = String(p[0] || '').trim();
-            if (name) items.push({ kw: name, price: String(p[1] == null ? '' : p[1]).trim() });
+  /* 从云端数据一键导入（合并式：同名更新价格、新名追加） */
+  function bindCloudImport(cfg, url, label) {
+    $(cfg.importBtn).addEventListener('click', function () {
+      var btn = this;
+      btn.textContent = '⏳ 导入中…';
+      btn.disabled = true;
+      fetch(url, { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (data) {
+          var items = [];
+          (data.categories || []).forEach(function (cat) {
+            (cat.products || []).forEach(function (p) {
+              var name = String(p[0] || '').trim();
+              if (name) items.push({ kw: name, price: String(p[1] == null ? '' : p[1]).trim() });
+            });
           });
-        });
-        if (!items.length) { alert('出库价格表里没有产品数据'); return; }
-        var newRows = rows.slice();                       // 先算差异，确认后再真正合并
-        var added = 0, updated = 0;
-        items.forEach(function (it) {
-          var existing = null;
-          for (var i = 0; i < newRows.length; i++) {
-            if (norm(newRows[i].kw) === norm(it.kw)) { existing = newRows[i]; break; }
-          }
-          if (existing) {
-            if (String(existing.price).trim() !== it.price) { existing.price = it.price; updated++; }
-          } else {
-            newRows.push({ kw: it.kw, price: it.price });
-            added++;
-          }
-        });
-        if (!added && !updated) { alert('没有新变化：' + items.length + ' 款已全部存在且价格相同'); return; }
-        if (!confirm('从产品出库价格表导入 ' + items.length + ' 款：\n新增 ' + added + ' 款、更新价格 ' + updated + ' 款。\n确定合并到当前价格表？')) return;
-        rows = newRows;
-        saveRows(); renderMap(); generate();
-        alert('导入完成 ✅ 新增 ' + added + ' 款、更新 ' + updated + ' 款');
-      })
-      .catch(function (e) {
-        alert('导入失败：' + e.message + '（请检查网络后重试）');
-      })
-      .then(function () { btn.textContent = '⬇️ 从产品出库价格导入'; btn.disabled = false; });
-  });
-  $('mapSearch').addEventListener('input', renderMap);
+          if (!items.length) { alert(label + '里没有产品数据'); return; }
+          var newRows = cfg.getRows().slice();             // 先算差异，确认后再真正合并
+          var added = 0, updated = 0;
+          items.forEach(function (it) {
+            var existing = null;
+            for (var i = 0; i < newRows.length; i++) {
+              if (norm(newRows[i].kw) === norm(it.kw)) { existing = newRows[i]; break; }
+            }
+            if (existing) {
+              if (String(existing.price).trim() !== it.price) { existing.price = it.price; updated++; }
+            } else {
+              newRows.push({ kw: it.kw, price: it.price });
+              added++;
+            }
+          });
+          if (!added && !updated) { alert('没有新变化：' + items.length + ' 款已全部存在且价格相同'); return; }
+          if (!confirm('从' + label + '导入 ' + items.length + ' 款：\n新增 ' + added + ' 款、更新价格 ' + updated + ' 款。\n确定合并到当前价格表？')) return;
+          cfg.setRows(newRows);
+          cfg.save(); renderMapFor(cfg); generate();
+          alert('导入完成 ✅ 新增 ' + added + ' 款、更新 ' + updated + ' 款');
+        })
+        .catch(function (e) {
+          alert('导入失败：' + e.message + '（请检查网络后重试）');
+        })
+        .then(function () { btn.textContent = cfg.importLabel; btn.disabled = false; });
+    });
+  }
+
+  bindCsv(MAP1);
+  bindCsv(MAP2);
+  bindCloudImport(MAP1, 'https://raw.githubusercontent.com/Casillaswzz/product-prices/main/data/wholesale-v2.json', '产品出库价格表');
+  bindCloudImport(MAP2, 'https://raw.githubusercontent.com/Casillaswzz/product-prices/main/data/competitor-v2.json', '同行报价表');
+  $('mapSearch').addEventListener('input', function () { renderMapFor(MAP1); });
+  $('mapSearch2').addEventListener('input', function () { renderMapFor(MAP2); });
 
   /* ---------- 其他交互 ---------- */
   $('btnSample').addEventListener('click', function () {
@@ -534,7 +625,8 @@ TUSA M1010 薄荷绿 1 780
     debounceTimer = setTimeout(generate, 250);
   });
   /* ---------- 初始化 ---------- */
-  renderMap();
+  renderMapFor(MAP1);
+  renderMapFor(MAP2);
   generate();
 })();
 </script>
