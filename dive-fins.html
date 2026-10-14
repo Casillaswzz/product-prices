@@ -147,7 +147,7 @@ footer a{color:var(--accent);text-decoration:none}
 <body>
 
 <header>
-  <div class="ver-badge" id="verBadge">v1.0</div>
+  <div class="ver-badge" id="verBadge">v1.1</div>
   <div class="top-right">
     <a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页">🏠 主页</a>
     <button id="themeBtn" title="切换深色模式">🌙 深色</button>
@@ -156,7 +156,7 @@ footer a{color:var(--accent);text-decoration:none}
   <p class="sub">各大知名品牌潜水脚蹼 · 品牌分类 / 产品优点 / 重要参数</p>
   <div class="header-stats">
     <span><b id="statBrands">13</b> 个品牌</span>
-    <span><b id="statModels">25</b> 款型号</span>
+    <span><b id="statModels">27</b> 款型号</span>
     <span>更新于 <b id="statDate">2026-10-14</b></span>
   </div>
   <div class="search-wrap">
@@ -199,7 +199,7 @@ footer a{color:var(--accent);text-decoration:none}
 
 <footer>
   参数整理自各品牌官网、产品手册及 2025–2026 经销商公开资料，可能随版本更新变化，仅供参考。<br>
-  参考价为人民币市场大致行情区间，实际以经销商报价为准。页面版本 <b id="footVer">v1.0</b> · 2026-10-14
+  参考价为人民币市场大致行情区间，实际以经销商报价为准。页面版本 <b id="footVer">v1.1</b> · 2026-10-14
 </footer>
 
 <script>
@@ -235,6 +235,11 @@ var BRANDS = [
     key:'mares', name:'Mares', cn:'意大利', flag:'🇮🇹',
     tagline:'意大利全品类大厂，四通道 Channel Thrust 经典传承',
     products:[
+      {
+        name:'Avanti Quattro 4X', tag:'休闲旗舰', price:'¥1,400–1,800',
+        pros:['Quattro 系列新一代：四线金刚再升级，四通道 Channel Thrust 传承','三材一体桨叶：动力放大 + 灵活回弹 + 耐用','脚袋上软下硬：贴合舒适 + 能量传导高效（解剖学脚跟垫减压）','弹力带护套防钩挂，附快干网袋（取代一次性塑料袋）'],
+        specs:{'类型':'开放式可调','桨叶材质':'三材一体热塑橡胶','长度':'中等长度','浮力':'中性','鞋带':'弹力带（带护套）','重量':'约 1.8 kg/对','适用':'休闲水肺 / 进阶'}
+      },
       {
         name:'Avanti Quattro Power', tag:'休闲进阶', price:'¥1,100–1,500',
         pros:['Channel Thrust 四通道专利，动力与效率的经典平衡','Tecralene 热塑 + 软胶插条，控制桨叶变形回弹','套脚式脚袋柔软贴合，可裸脚穿','柔踢感 9/10，长距离踢动不累腿'],
@@ -291,6 +296,11 @@ var BRANDS = [
         name:'RK3 HD', tag:'经典技术', price:'¥1,400–1,900',
         pros:['高密度 TPR，比标准版更硬、动力更直接','负浮力，配干衣 / 双瓶正好','军用规格：抗低温、抗冲击、耐粗暴使用','弹簧带快拆插销设计，更换简单'],
         specs:{'类型':'开放式可调','桨叶材质':'高密度热塑橡胶','长度':'约 49–57 cm','浮力':'负浮','鞋带':'不锈钢弹簧带','重量':'约 2–2.9 kg/对','适用':'技术 / 干衣'}
+      },
+      {
+        name:'RK4', tag:'经典技术', price:'¥1,500–2,000',
+        pros:['RK3 新一代：桨叶更长更宽 + 弹性桨尖，倒踢更省力','重量介于 RK3 与 RK3 HD 之间，动力与舒适平衡','淡水接近中性浮力，水下 trim 友好','一体成型橡胶可回收，不锈钢弹簧带双侧免工具微调（约 2 cm）'],
+        specs:{'类型':'开放式可调','桨叶材质':'一体成型橡胶 / TPU','长度':'桨叶约 49 cm（M 码）','浮力':'中性（淡水）','鞋带':'不锈钢弹簧带（2 档）','重量':'约 2.2–2.7 kg/对','适用':'技术 / 洞穴 / 沉船'}
       }
     ]
   },
