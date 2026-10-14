@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>潜水脚蹼大全 - 品牌分类 · 优点 · 重要参数</title>
+<style>
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+  --accent:#0284c7; --accent-2:#0ea5e9; --deep:#0c4a6e; --teal:#0d9488;
+  --line:#e2e8f0; --soft:#f1f5f9; --shadow:0 1px 3px rgba(15,23,42,.08),0 8px 24px -12px rgba(15,23,42,.15);
+  --chip-bg:#ffffff;
+}
+body.dark{
+  --bg:#0b1220; --card:#111c2e; --ink:#e2e8f0; --muted:#94a3b8;
+  --line:#24324a; --soft:#0f1a2e; --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.5);
+  --chip-bg:#16223a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:130px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);transition:background .25s,color .25s}
+
+/* ===== 头部 ===== */
+header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#0c4a6e 100%);color:#fff;padding:44px 20px 40px;text-align:center;position:relative;overflow:hidden}
+header::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 220px at 20% 110%,rgba(14,165,233,.28),transparent 70%),radial-gradient(500px 200px at 85% 100%,rgba(20,184,166,.18),transparent 70%)}
+header h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:2px;position:relative}
+header h1 .en{display:block;font-size:clamp(12px,1.6vw,15px);letter-spacing:6px;color:#7dd3fc;font-weight:600;margin-top:6px;text-transform:uppercase}
+header p.sub{margin-top:12px;color:#cbd5e1;font-size:14px;position:relative}
+.header-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;position:relative}
+.header-stats span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(4px);padding:5px 14px;border-radius:999px;font-size:13px}
+.header-stats b{color:#7dd3fc;font-weight:700}
+.search-wrap{position:relative;max-width:560px;margin:22px auto 0;position:relative}
+.search-wrap input{width:100%;padding:13px 46px 13px 18px;border-radius:999px;border:none;outline:none;font-size:15px;background:#fff;color:#0f172a;box-shadow:0 8px 30px -8px rgba(0,0,0,.5)}
+.search-wrap .s-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:16px;color:#94a3b8;pointer-events:none}
+.search-clear{position:absolute;right:44px;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;font-size:15px;cursor:pointer;display:none}
+.top-right{position:fixed;top:14px;right:16px;display:flex;gap:8px;z-index:1000}
+.top-right button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;backdrop-filter:blur(4px);transition:background .2s}
+.top-right button:hover{background:rgba(255,255,255,.26)}
+.top-right a.home-btn{background:#fff;color:#0c4a6e;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;transition:background .2s}
+.top-right a.home-btn:hover{background:#e0f2fe}
+.ver-badge{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#e2e8f0;border-radius:999px;padding:5px 12px;font-size:12px;z-index:5}
+
+/* ===== 品牌导航 ===== */
+nav.brand-nav{position:sticky;top:0;z-index:100;background:var(--chip-bg);border-bottom:1px solid var(--line);box-shadow:0 2px 10px -6px rgba(15,23,42,.18);padding:10px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+nav.brand-nav::-webkit-scrollbar{display:none}
+nav.brand-nav button{flex-shrink:0;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:7px 16px;font-size:13px;cursor:pointer;transition:all .18s;white-space:nowrap}
+nav.brand-nav button:hover{border-color:var(--accent-2);color:var(--accent)}
+nav.brand-nav button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+nav.brand-nav button .cnt{opacity:.65;font-size:11px;margin-left:3px}
+
+/* ===== 主体 ===== */
+main{max-width:1200px;margin:0 auto;padding:26px 20px 140px}
+.result-bar{font-size:13px;color:var(--muted);margin-bottom:18px;display:none}
+.result-bar b{color:var(--accent)}
+.brand-section{margin-bottom:44px}
+.brand-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--line);position:relative}
+.brand-head::after{content:"";position:absolute;left:0;bottom:-2px;width:88px;height:2px;background:linear-gradient(90deg,var(--accent),var(--teal))}
+.brand-flag{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--deep));display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:var(--shadow)}
+.brand-info h2{font-size:22px;font-weight:800}
+.brand-info h2 .en{color:var(--accent);font-size:15px;font-weight:700;letter-spacing:1px;margin-left:8px}
+.brand-info p{margin-top:4px;font-size:13px;color:var(--muted)}
+.brand-count{margin-left:auto;background:var(--soft);border:1px solid var(--line);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:999px;white-space:nowrap}
+
+/* ===== 产品卡片 ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(345px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 18px 14px;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(15,23,42,.08),0 16px 36px -14px rgba(15,23,42,.22)}
+.card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.card-top .name{font-size:18px;font-weight:800;line-height:1.25}
+.card-top .brand{font-size:12px;color:var(--muted);margin-top:3px}
+.card-top .price{margin-left:auto;text-align:right;flex-shrink:0}
+.card-top .price b{display:block;color:#c2410c;font-size:15px;font-weight:800;white-space:nowrap}
+body.dark .card-top .price b{color:#fb923c}
+.card-top .price small{font-size:11px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;color:#fff;margin-top:8px;letter-spacing:1px}
+.tag.t-entry{background:#16a34a}.tag.t-rec{background:#0284c7}.tag.t-flagship{background:#7c3aed}.tag.t-tech{background:#dc2626}.tag.t-free{background:#0d9488}.tag.t-travel{background:#db2777}
+.pros{background:var(--soft);border-radius:12px;padding:12px 14px;margin:12px 0;flex-grow:1}
+.pros .p-title{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:2px;margin-bottom:7px}
+.pros ul{list-style:none}
+.pros li{font-size:13px;line-height:1.65;padding-left:18px;position:relative;color:var(--ink)}
+.pros li::before{content:"✓";position:absolute;left:0;color:#16a34a;font-weight:800}
+body.dark .pros li::before{color:#4ade80}
+.specs{width:100%;border-collapse:collapse;font-size:12.5px}
+.specs td{padding:5px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+.specs td:first-child{color:var(--muted);white-space:nowrap;padding-right:12px;width:64px}
+.specs tr:last-child td{border-bottom:none}
+.specs .v-ai{color:#0d9488;font-weight:600}
+.specs .v-no{color:var(--muted)}
+.card-foot{margin-top:12px;display:flex;align-items:center;gap:8px}
+.cmp-btn{flex:1;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:10px;padding:8px 0;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s}
+.cmp-btn:hover{background:rgba(2,132,199,.08)}
+.cmp-btn.on{background:var(--accent);color:#fff}
+.src-note{font-size:11px;color:var(--muted)}
+
+/* ===== 空状态 ===== */
+.empty{display:none;text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.empty .big{font-size:42px;margin-bottom:10px}
+
+/* ===== 底部对比栏 ===== */
+.compare-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 40px -10px rgba(15,23,42,.4);padding:10px 14px;display:none;align-items:center;gap:10px;z-index:200;max-width:calc(100vw - 28px);flex-wrap:wrap}
+.compare-bar.show{display:flex}
+.compare-bar .cb-tip{font-size:12px;color:var(--muted)}
+.cb-chip{background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.cb-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1}
+.cb-actions{margin-left:auto;display:flex;gap:8px}
+.cb-actions button{border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.cb-go{background:var(--accent);color:#fff}
+.cb-go:disabled{opacity:.4;cursor:not-allowed}
+.cb-clear{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+
+/* ===== 对比弹窗 ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(2,6,23,.65);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:36px 16px;overflow-y:auto}
+.modal-mask.show{display:flex}
+.modal{background:var(--card);border-radius:18px;max-width:1000px;width:100%;padding:22px;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+.modal-head{display:flex;align-items:center;margin-bottom:16px}
+.modal-head h3{font-size:18px;font-weight:800}
+.modal-close{margin-left:auto;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--muted)}
+.cmp-table-wrap{overflow-x:auto}
+.cmp-table{border-collapse:collapse;font-size:13px;min-width:560px}
+.cmp-table th,.cmp-table td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+.cmp-table th{background:var(--soft);white-space:nowrap}
+.cmp-table td.row-label{background:var(--soft);font-weight:700;color:var(--muted);white-space:nowrap;position:sticky;left:0}
+.cmp-table td .m-name{font-weight:800;font-size:14px}
+.cmp-table td .m-brand{font-size:11px;color:var(--muted)}
+.cmp-table .pros-cell li{list-style:none;font-size:12.5px;line-height:1.6;padding-left:16px;position:relative;margin-bottom:3px}
+.cmp-table .pros-cell li::before{content:"✓";position:absolute;left:0;color:#16a34a;font-weight:800}
+
+/* ===== 回到顶部 ===== */
+#backTop{position:fixed;right:20px;bottom:84px;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 8px 22px -6px rgba(2,132,199,.6);display:none;z-index:150}
+#backTop.show{display:block}
+
+footer{text-align:center;padding:26px 20px 40px;color:var(--muted);font-size:12px;line-height:1.9}
+footer a{color:var(--accent);text-decoration:none}
+
+@media (max-width:640px){
+  .brand-count{display:none}
+  .grid{grid-template-columns:1fr}
+  .ver-badge{top:10px;left:10px}
+  .modal-mask{padding:20px 10px}
+  .modal{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ver-badge" id="verBadge">v1.0</div>
+  <div class="top-right">
+    <a class="home-btn" href="https://casillaswzz.github.io/product-prices/" title="返回主页">🏠 主页</a>
+    <button id="themeBtn" title="切换深色模式">🌙 深色</button>
+  </div>
+  <h1>潜水脚蹼大全<span class="en">Dive Fins Guide</span></h1>
+  <p class="sub">各大知名品牌潜水脚蹼 · 品牌分类 / 产品优点 / 重要参数</p>
+  <div class="header-stats">
+    <span><b id="statBrands">13</b> 个品牌</span>
+    <span><b id="statModels">25</b> 款型号</span>
+    <span>更新于 <b id="statDate">2026-10-14</b></span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="搜索品牌 / 型号 / 关键词，如：Quattro、负浮力、自由潜…">
+    <span class="s-icon">🔍</span>
+    <button class="search-clear" id="searchClear">✕</button>
+  </div>
+</header>
+
+<nav class="brand-nav" id="brandNav"></nav>
+
+<main id="main">
+  <div class="result-bar" id="resultBar">找到 <b id="resultCount">0</b> 款符合条件的型号</div>
+  <div id="sections"></div>
+  <div class="empty" id="emptyBox"><div class="big">🐟</div>没有找到匹配的型号，换个关键词试试</div>
+</main>
+
+<!-- 底部对比栏 -->
+<div class="compare-bar" id="compareBar">
+  <span class="cb-tip">对比</span>
+  <div id="compareChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  <div class="cb-actions">
+    <button class="cb-go" id="compareGo">开始对比</button>
+    <button class="cb-clear" id="compareClear">清空</button>
+  </div>
+</div>
+
+<!-- 对比弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🆚 参数对比</h3>
+      <button class="modal-close" id="modalClose">关闭 ✕</button>
+    </div>
+    <div class="cmp-table-wrap" id="cmpTableWrap"></div>
+  </div>
+</div>
+
+<button id="backTop" title="回到顶部">↑</button>
+
+<footer>
+  参数整理自各品牌官网、产品手册及 2025–2026 经销商公开资料，可能随版本更新变化，仅供参考。<br>
+  参考价为人民币市场大致行情区间，实际以经销商报价为准。页面版本 <b id="footVer">v1.0</b> · 2026-10-14
+</footer>
+
+<script>
+/* ================= 数据 ================= */
+var BRANDS = [
+  {
+    key:'scubapro', name:'Scubapro', cn:'瑞士', flag:'🇨🇭',
+    tagline:'瑞士潜水装备标杆，Seawing 家族与 1965 经典 Jet Fin',
+    products:[
+      {
+        name:'Seawing Supernova', tag:'休闲旗舰', price:'¥1,600–2,200',
+        pros:['2022 年 Red Dot 设计大奖：翼形桨叶 + Hydra-Loop 导流槽','Pivot Control 铰链技术，踢动中保持 40°–50° 最佳攻角','模块化系统：Boot-Fit / 全脚套脚式脚袋可互换（附工具与锁板）','Monprene 一体成型，几乎不会折断或分层'],
+        specs:{'类型':'开放式可调（模块化）','桨叶材质':'Monprene®','长度':'约 65 cm（M 码）','浮力':'正浮','鞋带':'海事级弹力带','重量':'约 2.2 kg/对（M 码）','适用':'休闲水肺 / 蛙踢'}
+      },
+      {
+        name:'Seawing Nova', tag:'休闲进阶', price:'¥1,400–1,900',
+        pros:['G4 专利铰链：翼形桨叶随踢动弯折，桨式动力 + 分体式省力','支持蛙踢、倒踢，机动性好','Monprene 弹性体皮实耐用','海事级弹力带，快穿快脱'],
+        specs:{'类型':'开放式可调','桨叶材质':'Monprene®','长度':'约 60 cm','浮力':'正浮','鞋带':'弹力带','重量':'约 2.2 kg/对（M 码）','适用':'休闲水肺'}
+      },
+      {
+        name:'Go Sport', tag:'旅行轻量', price:'¥1,000–1,400',
+        pros:['短桨叶可放进 IATA 登机箱，旅行专用','25° 预倾角桨叶 + 中央动力面板 + Power Bars 防过度弯折','100% Monprene，耐操轻量','Ergo3 加高脚袋，穿脱舒适（可选防滑侧鳍）'],
+        specs:{'类型':'开放式可调（Boot-Fit）','桨叶材质':'Monprene®','长度':'约 55 cm（短）','浮力':'正浮','鞋带':'弹力带（可换）','重量':'约 1.5 kg/对','适用':'旅行 / 休闲水肺'}
+      },
+      {
+        name:'Jet Fin', tag:'经典技术', price:'¥900–1,300',
+        pros:['1965 年诞生，军用 / 技术潜水 60 年验证的经典','镂空桨叶：上踢减阻、下踢增推，倒踢精准','负浮力，配干衣 / 厚重装备正好','天然橡胶耐操可修复，可选不锈钢弹簧带'],
+        specs:{'类型':'开放式可调','桨叶材质':'天然橡胶','长度':'短桨叶（约 56 cm）','浮力':'负浮','鞋带':'扣带 / 可选弹簧带','重量':'约 3 kg/对','适用':'技术 / 干衣 / 洞穴'}
+      }
+    ]
+  },
+  {
+    key:'mares', name:'Mares', cn:'意大利', flag:'🇮🇹',
+    tagline:'意大利全品类大厂，四通道 Channel Thrust 经典传承',
+    products:[
+      {
+        name:'Avanti Quattro Power', tag:'休闲进阶', price:'¥1,100–1,500',
+        pros:['Channel Thrust 四通道专利，动力与效率的经典平衡','Tecralene 热塑 + 软胶插条，控制桨叶变形回弹','套脚式脚袋柔软贴合，可裸脚穿','柔踢感 9/10，长距离踢动不累腿'],
+        specs:{'类型':'套脚式','桨叶材质':'Tecralene® 热塑橡胶','长度':'约 74 cm','浮力':'中性偏负','鞋带':'—','重量':'约 1.9–2.4 kg/对','适用':'休闲水肺 / 浮潜'}
+      },
+      {
+        name:'Avanti Quattro +', tag:'休闲进阶', price:'¥950–1,300',
+        pros:['开放式版本，配弹力鞋带快穿快脱','四通道 Channel Thrust 技术','800 米踢水实测速度名列前茅','侧肋包胶，耐用性佳'],
+        specs:{'类型':'开放式可调','桨叶材质':'Tecralene®','长度':'约 70 cm','浮力':'略负浮','鞋带':'弹力带','重量':'约 2 kg/对','适用':'休闲水肺 / 教学'}
+      },
+      {
+        name:'Razor Pro', tag:'自由潜', price:'¥950–1,400',
+        pros:['模块化桨叶，可升级碳纤维 / 玻纤版本','22° 倾角 + 抛物线厚度渐变（6 mm→1.6 mm），储能与释放出色','燕尾桨尖，踢动方向性好','脚袋按 3 mm 潜水袜设计，贴合稳定'],
+        specs:{'类型':'套脚式（模块化）','桨叶材质':'技术聚合物（可换碳纤）','长度':'约 89 cm','浮力':'中性','鞋带':'—','重量':'约 2.2–2.6 kg/对','适用':'自由潜 / 渔猎'}
+      }
+    ]
+  },
+  {
+    key:'cressi', name:'Cressi', cn:'意大利', flag:'🇮🇹',
+    tagline:'七十余年意大利经典，从自由潜 Gara 到入门 Frog 全覆盖',
+    products:[
+      {
+        name:'Gara Modular Sprint', tag:'自由潜', price:'¥1,200–1,600',
+        pros:['Gara 家族可换桨叶模块系统，拆装后仅普通脚蹼大小','29° 倾角 + 弹性储能技术，推进效率高','中短尺寸适合冬季 / 礁区渔猎','意大利制造，做工扎实'],
+        specs:{'类型':'套脚式（模块化）','桨叶材质':'弹性技术聚合物','长度':'约 67–70 cm','浮力':'中性','鞋带':'—','重量':'约 1.5–1.6 kg/对','适用':'自由潜 / 渔猎'}
+      },
+      {
+        name:'Frog Plus', tag:'入门休闲', price:'¥800–1,100',
+        pros:['三材料一体注塑：脚袋软、桨叶硬、侧条抗扭','脚袋下沉专利设计，有效桨面增加约 20%','EBS 旋转快拆扣，可选 316 不锈钢弹簧带','皮实耐操，教学 / 租借首选'],
+        specs:{'类型':'开放式可调','桨叶材质':'聚丙烯 + 弹性体三材注塑','长度':'约 57–68 cm','浮力':'中性','鞋带':'扣带（可选弹簧带）','重量':'约 1.4–2 kg/对','适用':'入门 / 教学 / 休闲'}
+      },
+      {
+        name:'Reaction Pro', tag:'休闲进阶', price:'¥500–700',
+        pros:['三材一体成型，桨叶长而渐薄，动力平稳','宽大柔软脚袋，赤脚穿也舒适','价格亲民，性价比突出','适合水肺 / 浮潜 / 自由潜入门'],
+        specs:{'类型':'套脚式','桨叶材质':'三种材料一体注塑','长度':'约 68 cm','浮力':'中性','鞋带':'—','重量':'约 1.3–1.8 kg/对','适用':'休闲水肺 / 浮潜'}
+      },
+      {
+        name:'Pro Light', tag:'入门休闲', price:'¥650–900',
+        pros:['轻量灵活，新手踢动轻松','暖水旅行、度假潜水足够用','开放式设计穿脱方便','Cressi 性价比入门款'],
+        specs:{'类型':'开放式可调','桨叶材质':'聚丙烯 + 弹性体','长度':'中等长度','浮力':'正浮','鞋带':'扣带','重量':'约 1.4 kg/对','适用':'暖水休闲 / 入门'}
+      }
+    ]
+  },
+  {
+    key:'apeks', name:'Apeks', cn:'英国', flag:'🇬🇧',
+    tagline:'英国技术装备名厂，RK3 军用血统技术蹼',
+    products:[
+      {
+        name:'RK3', tag:'经典技术', price:'¥1,200–1,600',
+        pros:['与美军合作设计，短宽镂空桨叶','比 HD 版更轻，踢感更柔和','不锈钢弹簧带标准配置','大脚袋兼容厚底潜水靴'],
+        specs:{'类型':'开放式可调','桨叶材质':'热塑橡胶（TPR）','长度':'约 49–57 cm','浮力':'中性（略）','鞋带':'不锈钢弹簧带','重量':'约 2 kg/对','适用':'技术 / 洞穴 / 沉船'}
+      },
+      {
+        name:'RK3 HD', tag:'经典技术', price:'¥1,400–1,900',
+        pros:['高密度 TPR，比标准版更硬、动力更直接','负浮力，配干衣 / 双瓶正好','军用规格：抗低温、抗冲击、耐粗暴使用','弹簧带快拆插销设计，更换简单'],
+        specs:{'类型':'开放式可调','桨叶材质':'高密度热塑橡胶','长度':'约 49–57 cm','浮力':'负浮','鞋带':'不锈钢弹簧带','重量':'约 2–2.9 kg/对','适用':'技术 / 干衣'}
+      }
+    ]
+  },
+  {
+    key:'atomic', name:'Atomic Aquatics', cn:'美国', flag:'🇺🇸',
+    tagline:'美国高端品牌，分体桨叶 SplitFin 鼻祖',
+    products:[
+      {
+        name:'SplitFin（开放式）', tag:'休闲旗舰', price:'¥1,300–1,800',
+        pros:['Propeller-Fin™ 分体桨叶开创者','两片翼面像螺旋桨般切开水流，省力且推进高效','半刚性弹性条 + 动力导轨（Power Rails）','Power Plate 刚性底板，力量传导直接'],
+        specs:{'类型':'开放式可调','桨叶材质':'多重复合塑料 + 弹性体','长度':'中等长度','浮力':'中性','鞋带':'扣带','重量':'约 2.5–3 kg/对','适用':'休闲水肺（蛙踢为主）'}
+      },
+      {
+        name:'Full Foot SplitFin', tag:'旅行轻量', price:'¥950–1,300',
+        pros:['套脚式轻量，约为开放式的一半重量','分体桨叶省力，浮潜 / 游泳也合适','半开口脚袋舒适透气','旅行便携，行李友好'],
+        specs:{'类型':'套脚式','桨叶材质':'多重复合塑料','长度':'约 67 cm','浮力':'正浮','鞋带':'—','重量':'约 1.4 kg/对','适用':'旅行 / 暖水休闲 / 浮潜'}
+      }
+    ]
+  },
+  {
+    key:'hollis', name:'Hollis', cn:'美国', flag:'🇺🇸',
+    tagline:'美国技术潜水品牌，F1 系列干衣潜水员标配',
+    products:[
+      {
+        name:'F1', tag:'经典技术', price:'¥1,300–1,700',
+        pros:['经典硬橡胶技术蹼，力量直接','负浮力（约 2 lb/对），干衣配重友好','镂空短桨叶，倒踢、蛙踢精准','弹簧带多孔位调节，贴合度可微调'],
+        specs:{'类型':'开放式可调','桨叶材质':'橡胶','长度':'短桨叶','浮力':'负浮','鞋带':'不锈钢弹簧带','重量':'约 3.5 kg/对','适用':'技术 / 干衣 / 洞穴'}
+      },
+      {
+        name:'F1 LT', tag:'经典技术', price:'¥1,500–1,900',
+        pros:['F1 轻量版：SEBS 复合材质减重约 1 lb','负浮力比 F1 小（约 1 lb/对），trim 更轻松','短桨叶机动性好，狭窄空间友好','大脚袋兼容干衣靴'],
+        specs:{'类型':'开放式可调','桨叶材质':'SEBS 轻量复合','长度':'短桨叶','浮力':'略负浮','鞋带':'不锈钢弹簧带','重量':'约 3.2 kg/对','适用':'技术 / 干衣'}
+      }
+    ]
+  },
+  {
+    key:'diverite', name:'Dive Rite', cn:'美国', flag:'🇺🇸',
+    tagline:'美国洞穴潜水老牌，XT 技术蹼口碑之选',
+    products:[
+      {
+        name:'XT Fin', tag:'经典技术', price:'¥1,200–1,600',
+        pros:['洞穴潜水员多年口碑之选','硬质长桨叶，推力充足（对踢法有要求）','Monoprene 材质耐用','不锈钢弹簧带 + 金属扣'],
+        specs:{'类型':'开放式可调','桨叶材质':'Monoprene®','长度':'长桨叶','浮力':'略负浮（约 0.2 kg/对）','鞋带':'不锈钢弹簧带','重量':'约 2.3 kg/对','适用':'洞穴 / 技术'}
+      }
+    ]
+  },
+  {
+    key:'fourthelement', name:'Fourth Element', cn:'英国', flag:'🇬🇧',
+    tagline:'英国新锐装备品牌，中性浮力设计理念',
+    products:[
+      {
+        name:'Tech Fin', tag:'经典技术', price:'¥1,200–1,600',
+        pros:['接近中性浮力（淡水略负），水下 trim 轻松','短桨叶设计，蛙踢 / 倒踢 / 直升机转向精准','轻量：XL 码仅约 2.6 kg/对','弹簧带 + 脚袋挂孔，携带方便'],
+        specs:{'类型':'开放式可调','桨叶材质':'热塑橡胶','长度':'短桨叶','浮力':'接近中性（略负）','鞋带':'弹簧带','重量':'约 2.1–2.9 kg/对','适用':'技术 / 沉船'}
+      }
+    ]
+  },
+  {
+    key:'tusa', name:'Tusa', cn:'日本', flag:'🇯🇵',
+    tagline:'日本潜水装备老牌，ForcElast 材料科技',
+    products:[
+      {
+        name:'Solla SF-22', tag:'休闲进阶', price:'¥900–1,300',
+        pros:['ForcElast 弹性体科技：中等力量输入，高效输出','20° 预倾角桨叶补偿踝部角度，回收约 10% 推进力','三通道桨叶 + 月牙桨尖','EZ Strap 水下快调扣，颜色选择丰富'],
+        specs:{'类型':'开放式可调','桨叶材质':'ForcElast TPE','长度':'约 56–63 cm','浮力':'中性','鞋带':'扣带（EZ 快调）','重量':'约 1.6–2 kg/对','适用':'休闲水肺'}
+      }
+    ]
+  },
+  {
+    key:'gull', name:'Gull', cn:'日本', flag:'🇯🇵',
+    tagline:'日本天然橡胶手工脚蹼，弹力回馈独一无二',
+    products:[
+      {
+        name:'MEW / HARD MEW', tag:'休闲进阶', price:'¥1,000–1,400',
+        pros:['日本天然橡胶（鬼怒川）手工制作，弹性回馈独特','三硬度一体成型：软脚袋 / 标准桨叶 / 硬鞋底','套脚式，可裸脚或配 MEW 袜套','HARD MEW 硬版出力更强'],
+        specs:{'类型':'套脚式','桨叶材质':'天然橡胶','长度':'约 52–62 cm','浮力':'略正浮','鞋带':'—','重量':'约 1.4–2 kg/对','适用':'休闲水肺 / 浮潜 / 皮肤潜水'}
+      },
+      {
+        name:'Barracuda', tag:'自由潜', price:'¥2,200–2,600',
+        pros:['世界最长橡胶桨叶之一（480 mm），弹性回弹强劲','Professional 硬版 / Standard 软版可选','加强筋设计消除侧滑与扭转','附专用携带袋，做工精良'],
+        specs:{'类型':'开放式可调','桨叶材质':'Super-X 天然橡胶','长度':'约 74.5–79.5 cm','浮力':'略负浮','鞋带':'扣带','重量':'约 2.5–2.8 kg/对','适用':'自由潜 / 强流环境'}
+      }
+    ]
+  },
+  {
+    key:'seac', name:'Seac', cn:'意大利', flag:'🇮🇹',
+    tagline:'意大利性价比之选，自由潜入门热门',
+    products:[
+      {
+        name:'Motus', tag:'自由潜', price:'¥700–1,000',
+        pros:['22° 倾角 + 燕尾桨尖，踢动效率好','技术聚合物轻量（桨叶仅约 405 g）','中长尺寸，日常渔猎合适','自由潜入门性价比之选'],
+        specs:{'类型':'套脚式','桨叶材质':'技术聚合物','长度':'约 86.5–94 cm','浮力':'中性','鞋带':'—','重量':'约 1.9–2.2 kg/对','适用':'自由潜 / 渔猎'}
+      }
+    ]
+  },
+  {
+    key:'deep6', name:'Deep 6', cn:'美国', flag:'🇺🇸',
+    tagline:'美国新锐直销品牌，技术潜水圈口碑蹼',
+    products:[
+      {
+        name:'Eddy', tag:'经典技术', price:'¥900–1,300',
+        pros:['接近中性浮力（淡水），水下 trim 省力','刚性聚合物镂空桨叶，动力与控制兼得','弹簧带三档位置调节','人体工学脚袋贴合脚型（另有负浮 Heavy Eddy 版）'],
+        specs:{'类型':'开放式可调','桨叶材质':'刚性聚合物','长度':'中等长度','浮力':'接近中性','鞋带':'弹簧带（3 档）','重量':'约 1.3–2.6 kg/对','适用':'技术 / 洞穴'}
+      }
+    ]
+  },
+  {
+    key:'oms', name:'OMS', cn:'美国', flag:'🇺🇸',
+    tagline:'美国技术装备品牌，轻量版 Jet Fin 风格',
+    products:[
+      {
+        name:'Slipstream', tag:'经典技术', price:'¥1,100–1,500',
+        pros:['Jet Fin 风格但更轻：Monoprene 树脂','双导流槽桨叶，巡航踢动省力','不锈钢弹簧带 + 金属扣','略负浮力适合干衣配置'],
+        specs:{'类型':'开放式可调','桨叶材质':'Monoprene®','长度':'约 49–57 cm','浮力':'略负浮','鞋带':'不锈钢弹簧带','重量':'约 2.1–2.7 kg/对','适用':'技术 / 干衣'}
+      }
+    ]
+  }
+];
+
+var TAG_MAP = {
+  '入门休闲':'t-entry','休闲进阶':'t-rec','休闲旗舰':'t-flagship',
+  '经典技术':'t-tech','自由潜':'t-free','旅行轻量':'t-travel'
+};
+var SPEC_ORDER = ['类型','桨叶材质','长度','浮力','鞋带','重量','适用'];
+
+/* ================= 渲染 ================= */
+var state = { search:'', brandKey:'all', compare:[] };
+var els = {};
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function productById(id){ for(var b of BRANDS) for(var p of b.products) if(p.id===id) return {brand:b, product:p}; return null; }
+function brandByKey(k){ for(var b of BRANDS) if(b.key===k) return b; return null; }
+
+function renderNav(){
+  var html = '<button data-brand="all" class="active">🏠 全部 <span class="cnt">' + totalModels() + '</span></button>';
+  BRANDS.forEach(function(b){
+    var n = b.products.length;
+    html += '<button data-brand="' + b.key + '">' + b.name + ' <span class="cnt">' + n + '</span></button>';
+  });
+  els.brandNav.innerHTML = html;
+}
+function totalModels(){ var n=0; BRANDS.forEach(function(b){ n+=b.products.length; }); return n; }
+
+function matches(p, brand){
+  var q = state.search.toLowerCase();
+  if(state.brandKey !== 'all' && brand.key !== state.brandKey) return false;
+  if(!q) return true;
+  var hay = (brand.name + ' ' + p.name + ' ' + p.tag + ' ' + p.price + ' ' + p.pros.join(' '));
+  Object.keys(p.specs).forEach(function(k){ hay += ' ' + k + ' ' + p.specs[k]; });
+  return hay.toLowerCase().indexOf(q) !== -1;
+}
+
+function renderSections(){
+  var html = '', count = 0;
+  BRANDS.forEach(function(brand){
+    var cards = '';
+    brand.products.forEach(function(p, i){
+      if(!matches(p, brand)) return;
+      count++;
+      var id = brand.key + '-' + i;
+      p.id = id; p.brandName = brand.name;
+      cards += cardHtml(brand, p, id);
+    });
+    if(!cards) return;
+    html += '<section class="brand-section" id="sec-' + brand.key + '">'
+         +  '<div class="brand-head">'
+         +    '<div class="brand-flag">' + brand.flag + '</div>'
+         +    '<div class="brand-info"><h2>' + esc(brand.name) + '<span class="en">' + esc(brand.cn) + '</span></h2><p>' + esc(brand.tagline) + '</p></div>'
+         +    '<div class="brand-count">' + brand.products.length + ' 款在售</div>'
+         +  '</div>'
+         +  '<div class="grid">' + cards + '</div>'
+         +'</section>';
+  });
+  els.sections.innerHTML = html;
+  els.resultCount.textContent = count;
+  els.resultBar.style.display = (state.search || state.brandKey!=='all') ? 'block' : 'none';
+  els.emptyBox.style.display = count === 0 ? 'block' : 'none';
+}
+
+function cardHtml(brand, p, id){
+  var on = state.compare.indexOf(id) !== -1;
+  var specs = '';
+  SPEC_ORDER.forEach(function(k){
+    var v = p.specs[k];
+    if(v === undefined) return;
+    var cls = (v === '—') ? 'v-no' : '';
+    specs += '<tr><td>' + k + '</td><td class="' + cls + '">' + esc(v) + '</td></tr>';
+  });
+  var pros = '';
+  p.pros.forEach(function(t){ pros += '<li>' + esc(t) + '</li>'; });
+  return '<div class="card" data-id="' + id + '">'
+       + '<div class="card-top"><div><div class="name">' + esc(p.name) + '</div>'
+       + '<div class="brand">' + esc(brand.name) + '</div>'
+       + '<span class="tag ' + (TAG_MAP[p.tag]||'t-rec') + '">' + p.tag + '</span></div>'
+       + '<div class="price"><b>' + esc(p.price) + '</b><small>参考价</small></div></div>'
+       + '<div class="pros"><div class="p-title">产 品 优 点</div><ul>' + pros + '</ul></div>'
+       + '<table class="specs">' + specs + '</table>'
+       + '<div class="card-foot"><button class="cmp-btn' + (on?' on':'') + '" data-id="' + id + '">' + (on?'✓ 已加入对比':'＋ 加入对比') + '</button>'
+       + '<span class="src-note">参数仅供参考</span></div>'
+       + '</div>';
+}
+
+/* ================= 对比 ================= */
+function updateCompareBar(){
+  var bar = els.compareBar, chips = els.compareChips;
+  if(state.compare.length === 0){ bar.classList.remove('show'); return; }
+  bar.classList.add('show');
+  var html = '';
+  state.compare.forEach(function(id){
+    var r = productById(id); if(!r) return;
+    html += '<span class="cb-chip">' + esc(r.product.name) + '<button data-id="' + id + '">✕</button></span>';
+  });
+  chips.innerHTML = html;
+  els.compareGo.disabled = state.compare.length < 2;
+}
+function toggleCompare(id){
+  var idx = state.compare.indexOf(id);
+  if(idx !== -1) state.compare.splice(idx,1);
+  else{
+    if(state.compare.length >= 4){ alert('最多同时对比 4 款'); return; }
+    state.compare.push(id);
+  }
+  renderSections(); updateCompareBar();
+}
+function openCompare(){
+  if(state.compare.length < 2) return;
+  var rows = [];
+  var labels = ['品牌','定位','参考价'].concat(SPEC_ORDER).concat(['优点']);
+  var models = state.compare.map(function(id){ return productById(id); }).filter(Boolean);
+  var thead = '<tr><th style="min-width:88px">参数</th>' + models.map(function(m){
+    return '<th><div class="m-name">' + esc(m.product.name) + '</div><div class="m-brand">' + esc(m.brand.name) + '</div></th>';
+  }).join('') + '</tr>';
+  var tbody = '';
+  labels.forEach(function(label){
+    tbody += '<tr><td class="row-label">' + label + '</td>';
+    models.forEach(function(m){
+      var v;
+      if(label==='品牌') v = m.brand.name;
+      else if(label==='定位') v = m.product.tag;
+      else if(label==='参考价') v = m.product.price;
+      else if(label==='优点'){
+        v = '<ul class="pros-cell">' + m.product.pros.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+      } else v = m.product.specs[label] || '—';
+      tbody += '<td>' + (label==='优点' ? v : esc(v)) + '</td>';
+    });
+    tbody += '</tr>';
+  });
+  els.cmpTableWrap.innerHTML = '<table class="cmp-table"><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>';
+  els.modalMask.classList.add('show');
+}
+
+/* ================= 事件 ================= */
+function bindEvents(){
+  els.searchInput.addEventListener('input', function(){
+    state.search = this.value.trim();
+    els.searchClear.style.display = state.search ? 'block' : 'none';
+    renderSections();
+  });
+  els.searchClear.addEventListener('click', function(){
+    els.searchInput.value = ''; state.search = '';
+    els.searchClear.style.display = 'none';
+    renderSections(); els.searchInput.focus();
+  });
+  els.brandNav.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-brand]'); if(!btn) return;
+    state.brandKey = btn.getAttribute('data-brand');
+    this.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b===btn); });
+    renderSections();
+    if(state.brandKey !== 'all'){
+      var sec = document.getElementById('sec-' + state.brandKey);
+      if(sec) sec.scrollIntoView({behavior:'smooth'});
+    }
+  });
+  els.sections.addEventListener('click', function(e){
+    var btn = e.target.closest('.cmp-btn'); if(btn) toggleCompare(btn.getAttribute('data-id'));
+  });
+  els.compareChips.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-id]'); if(btn) toggleCompare(btn.getAttribute('data-id'));
+  });
+  els.compareGo.addEventListener('click', openCompare);
+  els.compareClear.addEventListener('click', function(){ state.compare = []; renderSections(); updateCompareBar(); });
+  els.modalClose.addEventListener('click', function(){ els.modalMask.classList.remove('show'); });
+  els.modalMask.addEventListener('click', function(e){ if(e.target === els.modalMask) els.modalMask.classList.remove('show'); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') els.modalMask.classList.remove('show'); });
+
+  els.themeBtn.addEventListener('click', function(){
+    var dark = document.body.classList.toggle('dark');
+    try{ localStorage.setItem('dive-fins-theme', dark ? 'dark' : 'light'); }catch(err){}
+    this.textContent = dark ? '☀️ 浅色' : '🌙 深色';
+  });
+
+  var backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', function(){
+    backTop.classList.toggle('show', window.scrollY > 600);
+  }, {passive:true});
+  backTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+}
+
+/* ================= 启动 ================= */
+document.addEventListener('DOMContentLoaded', function(){
+  els = {
+    brandNav: document.getElementById('brandNav'),
+    sections: document.getElementById('sections'),
+    resultBar: document.getElementById('resultBar'),
+    resultCount: document.getElementById('resultCount'),
+    emptyBox: document.getElementById('emptyBox'),
+    searchInput: document.getElementById('searchInput'),
+    searchClear: document.getElementById('searchClear'),
+    compareBar: document.getElementById('compareBar'),
+    compareChips: document.getElementById('compareChips'),
+    compareGo: document.getElementById('compareGo'),
+    compareClear: document.getElementById('compareClear'),
+    modalMask: document.getElementById('modalMask'),
+    modalClose: document.getElementById('modalClose'),
+    cmpTableWrap: document.getElementById('cmpTableWrap'),
+    themeBtn: document.getElementById('themeBtn')
+  };
+  var statsB = document.getElementById('statBrands'), statsM = document.getElementById('statModels');
+  if(statsB) statsB.textContent = BRANDS.length;
+  if(statsM) statsM.textContent = totalModels();
+
+  try{
+    var saved = localStorage.getItem('dive-fins-theme');
+    if(saved === 'dark' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)){
+      document.body.classList.add('dark');
+      els.themeBtn.textContent = '☀️ 浅色';
+    }
+  }catch(err){}
+
+  renderNav();
+  renderSections();
+  bindEvents();
+});
+</script>
+</body>
+</html>
