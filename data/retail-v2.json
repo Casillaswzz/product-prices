@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-17T17:59:52.626Z",
-  "updated": "2026-10-17T17:59:55.628Z",
+  "version": "2026-10-17T18:01:35.304Z",
+  "updated": "2026-10-17T18:11:34.836Z",
   "categories": [
     {
       "id": "mask",
@@ -733,12 +733,20 @@
           "5200~5400"
         ],
         [
+          "Suunto Nautic",
+          "5100"
+        ],
+        [
           "Suunto Nautic S",
           "4100"
         ],
         [
           "Suunto Tank Pod",
           "2500"
+        ],
+        [
+          "Shearwater Peregrine",
+          "2900～3000"
         ],
         [
           "Suunto Ocean+传感器",
@@ -755,10 +763,6 @@
         [
           "Shearwater Perdix 3",
           "7200"
-        ],
-        [
-          "Shearwater Peregrine",
-          "2900～3000"
         ],
         [
           "Shearwater Peregrine TX",
