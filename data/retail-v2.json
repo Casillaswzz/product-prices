@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-24T16:48:00.540Z",
-  "updated": "2026-10-24T16:48:03.542Z",
+  "version": "2026-10-24T16:48:10.583Z",
+  "updated": "2026-10-24T16:48:13.584Z",
   "categories": [
     {
       "id": "mask",
@@ -753,7 +753,7 @@
           "3200"
         ],
         [
-          "Shearwater Tern Tx",
+          "Shearwater Tern TX",
           "4100"
         ],
         [
@@ -771,6 +771,10 @@
         [
           "Shearwater Peregrine TX",
           "4000"
+        ],
+        [
+          "Shearwater Tern",
+          "0"
         ]
       ]
     },
