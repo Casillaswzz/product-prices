@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-24T16:44:04.966Z",
-  "updated": "2026-10-24T16:44:04.966Z",
+  "version": "2026-10-24T16:44:47.779Z",
+  "updated": "2026-10-24T16:44:50.781Z",
   "categories": [
     {
       "id": "mask",
@@ -745,10 +745,6 @@
           "2500"
         ],
         [
-          "Shearwater Peregrine",
-          "2900～3000"
-        ],
-        [
           "Suunto Ocean+传感器",
           "7600"
         ],
@@ -767,6 +763,10 @@
         [
           "Shearwater Perdix 3",
           "7200"
+        ],
+        [
+          "Shearwater Peregrine",
+          "2900～3000"
         ],
         [
           "Shearwater Peregrine TX",
